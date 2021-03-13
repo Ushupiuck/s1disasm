@@ -13,7 +13,7 @@ Swi_Index:	dc.w Swi_Main-Swi_Index
 		dc.w Swi_Action-Swi_Index
 		dc.w Swi_Delete-Swi_Index
 
-swi_origY:	equ $30		; original y-axis position
+swi_origY = $30		; original y-axis position
 ; ===========================================================================
 
 Swi_Main:	; Routine 0
@@ -37,7 +37,7 @@ Swi_Action:	; Routine 2
 
 Swi_ChkDel:
 		bsr.w	DisplaySprite
-		out_of_range	Swi_Delete
+		out_of_range.w	Swi_Delete
 		rts	
 ; ===========================================================================
 

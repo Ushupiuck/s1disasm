@@ -6,7 +6,7 @@
 ;	d3 = x-position of object
 
 ; output:
-;	a1 = address within 128x128 mappings where object is standing
+;	a1 = address within 256x256 mappings where object is standing
 ;	     (refers to a 16x16 tile number)
 ; ---------------------------------------------------------------------------
 
@@ -33,7 +33,6 @@ FindNearestTile:
 		lsr.w	#3,d0			; MJ: divide by 8
 		andi.w	#$E,d0			; MJ: keep X within 10 pixels
 		add.w	d0,d1			; MJ: add to ror'd chunk ID
-
-		movea.l	d1,a1			; MJ: set address (Chunk to read)
-		rts				; MJ: return
+		movea.l	d1,a1
+		rts	
 ; End of function FindNearestTile

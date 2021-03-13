@@ -150,7 +150,7 @@ loc_6EB0:
 		bcs.s	locret_6EE8
 		bsr.w	FindFreeObj
 		bne.s	loc_6ED0
-		move.b	#id_BossGreenHill,0(a1) ; load GHZ boss	object
+		_move.b	#id_BossGreenHill,0(a1) ; load GHZ boss	object
 		move.w	#$2A60,obX(a1)
 		move.w	#$280,obY(a1)
 
@@ -208,7 +208,7 @@ loc_6F28:
 		bcc.s	locret_6F62
 		bsr.w	FindFreeObj
 		bne.s	loc_6F4A
-		move.b	#id_BossLabyrinth,0(a1) ; load LZ boss object
+		_move.b	#id_BossLabyrinth,0(a1) ; load LZ boss object
 
 loc_6F4A:
 		music	bgm_Boss,0,1,0	; play boss music
@@ -317,11 +317,10 @@ loc_702E:
 loc_703C:
 		cmpi.w	#$500,(v_screenposy).w
 		bcs.s	locret_704E
-		if Revision=0
-		else
+		if Revision<>0
 			cmpi.w	#$B80,(v_screenposx).w
 			bcs.s	locret_704E
-		endc
+		endif
 		move.w	#$500,(v_limittop2).w
 		addq.b	#2,(v_dle_routine).w
 
@@ -330,22 +329,21 @@ locret_704E:
 ; ===========================================================================
 
 loc_7050:
-		if Revision=0
-		else
+		if Revision<>0
 			cmpi.w	#$B80,(v_screenposx).w
 			bcc.s	locj_76B8
 			cmpi.w	#$340,(v_limittop2).w
 			beq.s	locret_7072
 			subq.w	#2,(v_limittop2).w
 			rts
-	locj_76B8:
+locj_76B8:
 			cmpi.w	#$500,(v_limittop2).w
 			beq.s	locj_76CE
 			cmpi.w	#$500,(v_screenposy).w
 			bcs.s	locret_7072
 			move.w	#$500,(v_limittop2).w
-	locj_76CE:
-		endc
+locj_76CE:
+		endif
 
 		cmpi.w	#$E70,(v_screenposx).w
 		bcs.s	locret_7072
@@ -388,7 +386,7 @@ DLE_MZ3boss:
 		bcs.s	locret_70E8
 		bsr.w	FindFreeObj
 		bne.s	loc_70D0
-		move.b	#id_BossMarble,0(a1) ; load MZ boss object
+		_move.b	#id_BossMarble,0(a1) ; load MZ boss object
 		move.w	#$19F0,obX(a1)
 		move.w	#$22C,obY(a1)
 

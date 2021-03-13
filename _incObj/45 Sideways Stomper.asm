@@ -35,15 +35,15 @@ SStom_Main:	; Routine 0
 		lea	(SStom_Var).l,a2
 		movea.l	a0,a1
 		moveq	#3,d1
-		bra.s	@load
+		bra.s	.load
 
-	@loop:
+.loop:
 		bsr.w	FindNextFreeObj
-		bne.s	@fail
+		bne.s	.fail
 
-	@load:
+.load:
 		move.b	(a2)+,obRoutine(a1)
-		move.b	#id_SideStomp,0(a1)
+		_move.b	#id_SideStomp,0(a1)
 		move.w	obY(a0),obY(a1)
 		move.b	(a2)+,d0
 		ext.w	d0
@@ -59,17 +59,17 @@ SStom_Main:	; Routine 0
 		move.w	d2,$34(a1)
 		move.b	#4,obPriority(a1)
 		cmpi.b	#1,(a2)		; is subobject spikes?
-		bne.s	@notspikes	; if not, branch
+		bne.s	.notspikes	; if not, branch
 		move.b	#$91,obColType(a1) ; use harmful collision type
 
-	@notspikes:
+.notspikes:
 		move.b	(a2)+,obFrame(a1)
 		move.l	a0,$3C(a1)
-		dbf	d1,@loop	; repeat 3 times
+		dbf	d1,.loop	; repeat 3 times
 
 		move.b	#3,obPriority(a1)
 
-	@fail:
+.fail:
 		move.b	#$10,obActWid(a0)
 
 SStom_Solid:	; Routine 2
@@ -104,7 +104,7 @@ SStom_Display:	; Routine 6
 		bsr.w	DisplaySprite
 
 SStom_ChkDel:
-		out_of_range	DeleteObject,$3A(a0)
+		out_of_range.w	DeleteObject,$3A(a0)
 		rts	
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||

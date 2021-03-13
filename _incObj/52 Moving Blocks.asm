@@ -12,8 +12,8 @@ MBlock_Index:	dc.w MBlock_Main-MBlock_Index
 		dc.w MBlock_Platform-MBlock_Index
 		dc.w MBlock_StandOn-MBlock_Index
 
-mblock_origX:	equ $30
-mblock_origY:	equ $32
+mblock_origX = $30
+mblock_origY = $32
 
 MBlock_Var:	dc.b $10, 0		; object width,	frame number
 		dc.b $20, 1
@@ -72,7 +72,7 @@ MBlock_StandOn:	; Routine 4
 		jsr	(MvSonicOnPtfm2).l
 
 MBlock_ChkDel:
-		out_of_range	DeleteObject,mblock_origX(a0)
+		out_of_range.w	DeleteObject,mblock_origX(a0)
 		bra.w	DisplaySprite
 ; ===========================================================================
 
@@ -173,7 +173,7 @@ MBlock_Type07:
 
 MBlock_07_ChkDel:
 		addq.l	#4,sp
-		out_of_range	DeleteObject,mblock_origX(a0)
+		out_of_range.w	DeleteObject,mblock_origX(a0)
 		rts	
 ; ===========================================================================
 

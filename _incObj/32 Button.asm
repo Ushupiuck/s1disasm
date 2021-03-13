@@ -21,7 +21,7 @@ But_Main:	; Routine 0
 
 		move.w	#$513,obGfx(a0)	; SYZ, LZ and SBZ specific code
 
-	But_IsMZ:
+But_IsMZ:
 		move.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.b	#4,obPriority(a0)
@@ -77,7 +77,7 @@ loc_BDDE:
 
 But_Display:
 		bsr.w	DisplaySprite
-		out_of_range	But_Delete
+		out_of_range.w	But_Delete
 		rts	
 ; ===========================================================================
 

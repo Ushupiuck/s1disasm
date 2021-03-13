@@ -11,8 +11,8 @@ LargeGrass:
 LGrass_Index:	dc.w LGrass_Main-LGrass_Index
 		dc.w LGrass_Action-LGrass_Index
 
-lgrass_origX:	equ $2A
-lgrass_origY:	equ $2C
+lgrass_origX = $2A
+lgrass_origY = $2C
 
 LGrass_Data:	dc.w LGrass_Data1-LGrass_Data 	; collision angle data
 		dc.b 0,	$40			; frame	number,	platform width
@@ -175,7 +175,7 @@ loc_B01C:
 		move.b	#1,$35(a0)
 		bsr.w	FindNextFreeObj
 		bne.s	loc_B07A
-		move.b	#id_GrassFire,0(a1) ; load sitting flame object
+		_move.b	#id_GrassFire,0(a1) ; load sitting flame object
 		move.w	obX(a0),obX(a1)
 		move.w	lgrass_origY(a0),lgrass_origY(a1)
 		addq.w	#8,lgrass_origY(a1)
@@ -231,7 +231,7 @@ LGrass_ChkDel:
 		bpl.s	LGrass_DelFlames
 
 loc_B0C6:
-		out_of_range	DeleteObject,lgrass_origX(a0)
+		out_of_range.w	DeleteObject,lgrass_origX(a0)
 		rts	
 ; ===========================================================================
 
@@ -263,9 +263,9 @@ locret_B116:
 ; ---------------------------------------------------------------------------
 ; Collision data for large moving platforms (MZ)
 ; ---------------------------------------------------------------------------
-LGrass_Data1:	incbin	"misc\mz_pfm1.bin"
+LGrass_Data1:	binclude	"misc/mz_pfm1.bin"
 		even
-LGrass_Data2:	incbin	"misc\mz_pfm2.bin"
+LGrass_Data2:	binclude	"misc/mz_pfm2.bin"
 		even
-LGrass_Data3:	incbin	"misc\mz_pfm3.bin"
+LGrass_Data3:	binclude	"misc/mz_pfm3.bin"
 		even
