@@ -575,7 +575,9 @@ VBlank:
 		movem.l	d0-a6,-(sp)
 		tst.b	(v_vbla_routine).w
 		beq.s	VBla_00
-		move.w	(vdp_control_port).l,d0
+-		move.w	(vdp_control_port).l,d0
+		andi.w	#8,d0
+		beq.s	-
 		move.l	#$40000010,(vdp_control_port).l
 		move.l	(v_scrposy_dup).w,(vdp_data_port).l ; send screen y-axis pos. to VSRAM
 		btst	#6,(v_megadrive).w ; is Megadrive PAL?
@@ -599,7 +601,7 @@ VBla_Music:
 VBla_Exit:
 		addq.l	#1,(v_vbla_count).w
 		movem.l	(sp)+,d0-a6
-		rte	
+		rte
 ; ===========================================================================
 VBla_Index:	dc.w VBla_00-VBla_Index, VBla_02-VBla_Index
 		dc.w VBla_04-VBla_Index, VBla_06-VBla_Index
@@ -656,7 +658,7 @@ VBla_14:
 		subq.w	#1,(v_demolength).w
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_04:
@@ -668,12 +670,12 @@ VBla_04:
 		subq.w	#1,(v_demolength).w
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_06:
 		bsr.w	sub_106E
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_10:
@@ -733,7 +735,7 @@ Demo_Time:
 		subq.w	#1,(v_demolength).w ; subtract 1 from time left
 
 .end:
-		rts	
+		rts
 ; End of function Demo_Time
 
 ; ===========================================================================
@@ -759,7 +761,7 @@ VBla_0A:
 		subq.w	#1,(v_demolength).w	; subtract 1 from time left in demo
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_0C:
@@ -794,14 +796,14 @@ VBla_0C:
 		jsr	(AnimateLevelGfx).l
 		jsr	(HUD_Update).l
 		bsr.w	sub_1642
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_0E:
 		bsr.w	sub_106E
 		addq.b	#1,($FFFFF628).w
 		move.b	#$E,(v_vbla_routine).w
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_12:
@@ -829,7 +831,7 @@ VBla_16:
 		subq.w	#1,(v_demolength).w
 
 .end:
-		rts	
+		rts
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -850,7 +852,7 @@ sub_106E:
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
-		rts	
+		rts
 ; End of function sub_106E
 
 ; ---------------------------------------------------------------------------
@@ -907,7 +909,7 @@ HBlank:
 		bne.s	loc_119E
 
 .nochg:
-		rte	
+		rte
 ; ===========================================================================
 
 loc_119E:
@@ -984,12 +986,14 @@ VDPSetupGame:
 .setreg:
 		move.w	(a2)+,(a0)
 		dbf	d7,.setreg	; set the VDP registers
-
 		move.w	(VDPSetupArray+2).l,d0
 		move.w	d0,(v_vdp_buffer1).w
 		move.w	#$8A00+223,(v_hbla_hreg).w	; H-INT every 224th scanline
 		moveq	#0,d0
-		move.l	#$C0000000,(vdp_control_port).l ; set VDP to CRAM write
+		move.l	#$40000010,(VDP_control_port).l
+		move.w	d0,(a1)
+		move.w	d0,(a1)
+		move.l	#$C0000000,(VDP_control_port).l
 		move.w	#$3F,d7
 
 .clrCRAM:
@@ -1008,7 +1012,7 @@ VDPSetupGame:
 
 		move.w	#$8F02,(a5)	; set VDP increment size
 		move.l	(sp)+,d1
-		rts	
+		rts
 ; End of function VDPSetupGame
 
 ; ===========================================================================
@@ -2346,7 +2350,7 @@ Tit_ClrScroll2:
 ; ---------------------------------------------------------------------------
 
 LevelSelect:
-		move.b	#4,(v_vbla_routine).w
+		move.b	#2,(v_vbla_routine).w
 		bsr.w	WaitForVBla
 		bsr.w	LevSelControls
 		bsr.w	RunPLC
@@ -2382,7 +2386,7 @@ LevSel_PlaySnd:
 LevSel_Ending:
 		move.b	#id_Ending,(v_gamemode).w ; set screen mode to $18 (Ending)
 		move.w	#(id_EndZ<<8),(v_zone).w ; set level to 0600 (Ending)
-		rts	
+		rts
 ; ===========================================================================
 
 LevSel_Credits:
