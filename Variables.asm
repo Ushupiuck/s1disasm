@@ -11,7 +11,7 @@ v_errortype	= ramaddr ( $FFFFFC44 )	; error type
 v_128x128:	= ramaddr ( $FF0000 )	; 128x128 tile mappings ($A400 bytes)
 v_lvllayoutfg	= ramaddr ( $FFFFA400 )	; level layout ROM address (4 bytes)
 v_lvllayoutbg	= ramaddr ( $FFFFA404 )	; background layout ROM address (4 bytes)
-
+v_bgscroll_buffer	= ramaddr( $FFFFA800 )	; background scroll buffer ($200 bytes)
 v_ngfx_buffer	= ramaddr ( $FFFFAA00 )	; Nemesis graphics decompression buffer ($200 bytes)
 v_spritequeue	= ramaddr ( $FFFFAC00 )	; sprite display queue, in order of priority ($400 bytes)
 v_16x16	= ramaddr ( $FFFFB000 )	; 16x16 tile mappings
@@ -166,16 +166,26 @@ v_limitbtm2	= ramaddr ( $FFFFF72E )	; bottom level boundary (2 bytes)
 
 v_limitleft3	= ramaddr ( $FFFFF732 )	; left level boundary, at the end of an act (2 bytes)
 
-v_scrshiftx	= ramaddr ( $FFFFF73A )	; screen shift as Sonic moves horizontally
+v_scrshiftx	= ramaddr ( $FFFFF73A )	; x-screen shift (new - last) * $100
+v_scrshifty	= ramaddr ( $FFFFF73C )	; y-screen shift (new - last) * $100
 
 v_lookshift	= ramaddr ( $FFFFF73E )	; screen shift when Sonic looks up/down (2 bytes)
 v_dle_routine	= ramaddr ( $FFFFF742 )	; dynamic level event - routine counter
 f_nobgscroll	= ramaddr ( $FFFFF744 )	; flag set to cancel background scrolling
 
-v_fg_scroll_flags	= ramaddr ( $FFFFF754 )	; background scrolling variable 1
-v_bg1_scroll_flags	= ramaddr ( $FFFFF756 )	; background scrolling variable 2
-v_bg2_scroll_flags	= ramaddr ( $FFFFF758 )	; background scrolling variable 3
-v_bg3_scroll_flags	= ramaddr ( $FFFFF75A )	; background scrolling variable 4
+v_fg_xblock	= ramaddr ( $FFFFF74A )	; foreground x-block parity (for redraw)
+v_fg_yblock	= ramaddr ( $FFFFF74B )	; foreground y-block parity (for redraw)
+v_bg1_xblock	= ramaddr ( $FFFFF74C )	; background x-block parity (for redraw)
+v_bg1_yblock	= ramaddr ( $FFFFF74D )	; background y-block parity (for redraw)
+v_bg2_xblock	= ramaddr ( $FFFFF74E )	; secondary background x-block parity (for redraw)
+v_bg2_yblock	= ramaddr ( $FFFFF74F )	; secondary background y-block parity (unused)
+v_bg3_xblock	= ramaddr ( $FFFFF750 )	; teritary background x-block parity (for redraw)
+v_bg3_yblock	= ramaddr ( $FFFFF751 )	; teritary background y-block parity (unused)
+
+v_fg_scroll_flags	= ramaddr ( $FFFFF754 )	; screen redraw flags for foreground
+v_bg1_scroll_flags	= ramaddr ( $FFFFF756 )	; screen redraw flags for background 1
+v_bg2_scroll_flags	= ramaddr ( $FFFFF758 )	; screen redraw flags for background 2
+v_bg3_scroll_flags	= ramaddr ( $FFFFF75A )	; screen redraw flags for background 3
 f_bgscrollvert	= ramaddr ( $FFFFF75C )	; flag for vertical background scrolling
 v_sonspeedmax	= ramaddr ( $FFFFF760 )	; Sonic's maximum speed (2 bytes)
 v_sonspeedacc	= ramaddr ( $FFFFF762 )	; Sonic's acceleration (2 bytes)
