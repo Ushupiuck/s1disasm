@@ -232,7 +232,7 @@ out_of_range:	macro exit,pos
 
 music:		macro track,terminate,branch,byte
 		  if (OptimiseSound<>0)
-			move.b	#track,(v_snddriver_ram+v_playsnd1).l
+			move.b	#track,(v_snddriver_ram+v_soundqueue0).l
 		    if ("terminate"<>"0")
 			rts
 		    endif
@@ -260,7 +260,7 @@ music:		macro track,terminate,branch,byte
 
 sfx:		macro track,terminate,branch,byte
 		  if (OptimiseSound<>0)
-			move.b	#track,(v_snddriver_ram+v_playsnd2).l
+			move.b	#track,(v_snddriver_ram+v_soundqueue1).l
 		    if ("terminate"<>"0")
 			rts
 		    endif

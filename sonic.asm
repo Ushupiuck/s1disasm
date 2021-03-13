@@ -28,7 +28,7 @@ Revision	  = 1
 
 ZoneCount	  = 6	; discrete zones are: GHZ, MZ, SYZ, LZ, SLZ, and SBZ
 
-OptimiseSound	  = 0	; change to 1 to optimise sound queuing
+OptimiseSound	  = 1	; change to 1 to optimise sound queuing
 
 DebugPathSwappers: = 1
 
@@ -144,8 +144,8 @@ EndOfHeader:
 ; Crash/Freeze the 68000. Unlike Sonic 2, Sonic 1 uses the 68000 for playing music, so it stops too
 
 ErrorTrap:
-		nop	
-		nop	
+		nop
+		nop
 		bra.s	ErrorTrap
 ; ===========================================================================
 
@@ -327,7 +327,7 @@ CheckSumCheck:
 		bne.w	CheckSumError	; if they don't match, branch
 
 CheckSumOk:
-		lea	($FFFFFE00).w,a6
+		lea	(v_systemstack).w,a6
 		moveq	#0,d7
 		move.w	#$7F,d6
 .clearRAM:
