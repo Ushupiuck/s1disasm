@@ -4,6 +4,11 @@
 
 RememberState:
 		out_of_range.w	.offscreen
+;		move.w	obX(a0),d0
+;		andi.w	#$FF80,d0
+;		sub.w	(v_screenposx).w,d0
+;		cmpi.w	#$280,d0
+;		bhi.w	.offscreen
 		bra.w	DisplaySprite
 
 .offscreen:

@@ -29,7 +29,6 @@ Msl_Main:	; Routine 0
 		andi.b	#3,obStatus(a0)
 		tst.b	obSubtype(a0)	; was object created by	a Newtron?
 		beq.s	Msl_Animate	; if not, branch
-
 		move.b	#8,obRoutine(a0) ; run "Msl_FromNewt" routine
 		move.b	#$87,obColType(a0)
 		move.b	#1,obAnim(a0)
@@ -66,12 +65,11 @@ Msl_FromBuzz:	; Routine 4
 		bsr.w	SpeedToPos
 		lea	(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
-		bsr.w	DisplaySprite
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has object moved below the level boundary?
 		bcs.s	Msl_Delete	; if yes, branch
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 .explode:
@@ -81,8 +79,7 @@ Msl_FromBuzz:	; Routine 4
 ; ===========================================================================
 
 Msl_Delete:	; Routine 6
-		bsr.w	DeleteObject
-		rts	
+		bra.w	DeleteObject
 ; ===========================================================================
 
 Msl_FromNewt:	; Routine 8
@@ -93,5 +90,4 @@ Msl_FromNewt:	; Routine 8
 Msl_Animate2:
 		lea	(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
-		bsr.w	DisplaySprite
-		rts	
+		bra.w	DisplaySprite
