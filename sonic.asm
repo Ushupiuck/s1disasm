@@ -9,7 +9,7 @@
 
 	cpu 68000
 
-zeroOffsetOptimization = 0
+zeroOffsetOptimization = 1
 ;	| If 1, makes a handful of zero-offset instructions smaller
 
 	include "MacroSetup.asm"
@@ -556,9 +556,10 @@ ShowErrorValue:
 
 ErrorWaitForC:
 		bsr.w	ReadJoypads
-		cmpi.b	#btnC,(v_jpadpress1).w ; is button C pressed?
+;		cmpi.b	#btnC,(v_jpadpress1).w ; is button C pressed? temporarily commented out
+		cmpi.b	#btnC,(v_jpadhold1).w ; is button C held?
 		bne.w	ErrorWaitForC	; if not, branch
-		rts	
+		rts
 ; End of function ErrorWaitForC
 
 ; ===========================================================================
@@ -581,13 +582,10 @@ VBlank:
 		move.l	#$40000010,(vdp_control_port).l
 		move.l	(v_scrposy_dup).w,(vdp_data_port).l ; send screen y-axis pos. to VSRAM
 		btst	#6,(v_megadrive).w ; is Megadrive PAL?
-		beq.s	.notPAL		; if not, branch
-
+		beq.s	+		; if not, branch
 		move.w	#$700,d0
-.waitPAL:
-		dbf	d0,.waitPAL ; wait here in a loop doing nothing for a while...
-
-.notPAL:
+-		dbf	d0,- ; wait here in a loop doing nothing for a while...
++
 		move.b	(v_vbla_routine).w,d0
 		move.b	#0,(v_vbla_routine).w
 		move.w	#1,(f_hbla_pal).w
@@ -970,7 +968,7 @@ ReadJoypads:
 		move.b	d0,(a0)+
 		and.b	d0,d1
 		move.b	d1,(a0)+
-		rts	
+		rts
 ; End of function ReadJoypads
 
 
@@ -1009,7 +1007,6 @@ VDPSetupGame:
 		move.w	(a5),d1
 		btst	#1,d1		; is DMA (fillVRAM) still running?
 		bne.s	.waitforDMA	; if yes, branch
-
 		move.w	#$8F02,(a5)	; set VDP increment size
 		move.l	(sp)+,d1
 		rts
@@ -1070,7 +1067,7 @@ ClearScreen:
 
 		lea	(v_spritetablebuffer).w,a1
 		moveq	#0,d0
-		move.w	#($280/4),d1	; This should be ($280/4)-1, leading to a slight bug (first bit of v_pal_water is cleared)
+		move.w	#($280/4)-1,d1
 
 .clearsprites:
 		move.l	d0,(a1)+
@@ -1078,7 +1075,7 @@ ClearScreen:
 
 		lea	(v_hscrolltablebuffer).w,a1
 		moveq	#0,d0
-		move.w	#($400/4),d1	; This should be ($400/4)-1, leading to a slight bug (first bit of the Sonic object's RAM is cleared)
+		move.w	#($400/4)-1,d1
 
 .clearhscroll:
 		move.l	d0,(a1)+
@@ -1260,7 +1257,6 @@ RunPLC:
 
 loc_160E:
 		andi.w	#$7FFF,d2
-		move.w	d2,(f_plc_execute).w
 		bsr.w	NemDec_BuildCodeTable
 		move.b	(a0)+,d5
 		asl.w	#8,d5
@@ -1274,9 +1270,10 @@ loc_160E:
 		move.l	d0,($FFFFF6EC).w
 		move.l	d5,($FFFFF6F0).w
 		move.l	d6,($FFFFF6F4).w
+		move.w	d2,(f_plc_execute).w
 
 Rplc_Exit:
-		rts	
+		rts
 ; End of function RunPLC
 
 
@@ -1559,7 +1556,7 @@ FadeOut_ToBlack:
 .decolour2:
 		bsr.s	FadeOut_DecColour
 		dbf	d0,.decolour2
-		rts	
+		rts
 ; End of function FadeOut_ToBlack
 
 
@@ -1690,7 +1687,7 @@ WhiteIn_DecColour:
 		cmp.w	d2,d1
 		blo.s	.dered
 		move.w	d1,(a0)+
-		rts	
+		rts
 ; ===========================================================================
 
 .dered:
@@ -1856,7 +1853,7 @@ loc_206A:
 		cmpi.w	#$30,d0
 		blo.s	loc_2088
 		moveq	#0,d0
-		rts	
+		rts
 ; ===========================================================================
 
 loc_2088:
@@ -1954,7 +1951,7 @@ PalLoad3_Water:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad3_Water
 
 
@@ -2213,7 +2210,7 @@ Tit_LoadText:
 		move.w	#$178,(v_demolength).w ; run title screen for $178 frames
 		lea	(v_objspace+$80).w,a1
 		moveq	#0,d0
-		move.w	#7,d1
+		move.w	#$F,d1
 
 Tit_ClrObj2:
 		move.l	d0,(a1)+
@@ -2435,54 +2432,30 @@ PlayLevel:
 			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		endif
 		sfx	bgm_Fade,0,1,1 ; fade out music
-		rts	
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Level	select - level pointers
 ; ---------------------------------------------------------------------------
-LevSel_Ptrs:	if Revision=0
-		; old level order
-		dc.b id_GHZ, 0
+LevSel_Ptrs:	dc.b id_GHZ, 0
 		dc.b id_GHZ, 1
 		dc.b id_GHZ, 2
-		dc.b id_LZ, 0
-		dc.b id_LZ, 1
-		dc.b id_LZ, 2
 		dc.b id_MZ, 0
 		dc.b id_MZ, 1
 		dc.b id_MZ, 2
-		dc.b id_SLZ, 0
-		dc.b id_SLZ, 1
-		dc.b id_SLZ, 2
 		dc.b id_SYZ, 0
 		dc.b id_SYZ, 1
 		dc.b id_SYZ, 2
+		dc.b id_LZ, 0
+		dc.b id_LZ, 1
+		dc.b id_LZ, 2
+		dc.b id_SLZ, 0
+		dc.b id_SLZ, 1
+		dc.b id_SLZ, 2
 		dc.b id_SBZ, 0
 		dc.b id_SBZ, 1
 		dc.b id_LZ, 3		; Scrap Brain Zone 3
 		dc.b id_SBZ, 2		; Final Zone
-		else
-		; correct level order
-		dc.b id_GHZ, 0
-		dc.b id_GHZ, 1
-		dc.b id_GHZ, 2
-		dc.b id_MZ, 0
-		dc.b id_MZ, 1
-		dc.b id_MZ, 2
-		dc.b id_SYZ, 0
-		dc.b id_SYZ, 1
-		dc.b id_SYZ, 2
-		dc.b id_LZ, 0
-		dc.b id_LZ, 1
-		dc.b id_LZ, 2
-		dc.b id_SLZ, 0
-		dc.b id_SLZ, 1
-		dc.b id_SLZ, 2
-		dc.b id_SBZ, 0
-		dc.b id_SBZ, 1
-		dc.b id_LZ, 3
-		dc.b id_SBZ, 2
-		endif
 		dc.b id_SS, 0		; Special Stage
 		dc.w $8000		; Sound Test
 		even
@@ -2733,11 +2706,8 @@ LevSel_CharOk:
 ; ---------------------------------------------------------------------------
 ; Level	select menu text
 ; ---------------------------------------------------------------------------
-LevelMenuText:	if Revision=0
-		binclude	"misc/Level Select Text.bin"
-		else
+LevelMenuText:
 		binclude	"misc/Level Select Text (JP1).bin"
-		endif
 		even
 ; ---------------------------------------------------------------------------
 ; Music	playlist
@@ -2909,7 +2879,6 @@ Level_SkipTtlCard:
 		bset	#2,(v_fg_scroll_flags).w
 		bsr.w	LevelDataLoad ; load block mappings and palettes
 		bsr.w	LoadTilesFromStart
-		jsr	(FloorLog_Unk).l
 		bsr.w	ColIndexLoad
 		bsr.w	LZWaterFeatures
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
@@ -3905,9 +3874,7 @@ End_LoadData:
 		move.l	#Col_GHZ_1,(v_colladdr1).w ; MJ: Set first collision for ending
 		move.l	#Col_GHZ_2,(v_colladdr2).w ; MJ: Set second collision for ending
 		enable_ints
-		lea	(Kos_EndFlowers).l,a0 ;	load extra flower patterns
-		lea	($FFFF9400).w,a1 ; RAM address to buffer the patterns
-		bsr.w	KosDec
+;		lea	(Kos_EndFlowers).l,a0 ;	loaded from ROM now
 		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad1	; load Sonic's palette
 		music	bgm_Ending,0,1,0	; play ending sequence music
@@ -3972,7 +3939,7 @@ End_MainLoop:
 		move.b	#id_Credits,(v_gamemode).w ; goto credits
 		sfx	bgm_Credits,0,1,1 ; play credits music
 		move.w	#0,(v_creditsnum).w ; set credits index number to 0
-		rts	
+		rts
 ; ===========================================================================
 
 End_ChkEmerald:
@@ -4032,7 +3999,7 @@ End_MoveSonic:
 		addq.b	#2,(v_sonicend).w
 		move.b	#1,(f_lockctrl).w ; lock player's controls
 		move.w	#(btnR<<8),(v_jpadhold2).w ; move Sonic to the right
-		rts	
+		rts
 ; ===========================================================================
 
 End_MoveSon2:
@@ -4050,7 +4017,7 @@ End_MoveSon2:
 		move.b	#3,(v_player+obFrame).w
 		move.w	#(id_Wait<<8)+id_Wait,(v_player+obAnim).w ; use "standing" animation
 		move.b	#3,(v_player+obTimeFrame).w
-		rts	
+		rts
 ; ===========================================================================
 
 End_MoveSon3:
@@ -4062,7 +4029,7 @@ End_MoveSon3:
 		clr.w	(v_player+obRoutine).w
 
 End_MoveSonExit:
-		rts	
+		rts
 ; End of function End_MoveSonic
 
 ; ===========================================================================
@@ -4534,7 +4501,7 @@ locj_6D88:
 		endif
 
 locret_69F2:
-		rts	
+		rts
 ; End of function DrawBGScrollBlock1
 
 
@@ -4597,7 +4564,7 @@ loc_6A3E:
 		bsr.w	DrawBlocks_TB_2
 
 locret_6A80:
-		rts	
+		rts
 ; End of function DrawBGScrollBlock2
 
 ; ===========================================================================
@@ -4638,7 +4605,7 @@ loc_6AAC:
 		bsr.w	DrawBlocks_TB_2
 
 locret_6AD6:
-		rts	
+		rts
 
 		else
 
@@ -4999,7 +4966,7 @@ DrawFlipXY:
 ; incrementing its palette lines by 1. This may have been
 ; a debug function to discolour mirrored tiles, to test
 ; if they're loading properly.
-		rts	
+		rts
 		move.l	d0,(a5)
 		move.w	#$2000,d5
 		move.w	(a1)+,d4
@@ -5072,7 +5039,7 @@ GetBlockData_2:
 		adda.w	d3,a1
 
 locret_6C1E:
-		rts	
+		rts
 ; End of function GetBlockData
 
 
@@ -5104,7 +5071,7 @@ Calc_VRAM_Pos_2:
 		moveq	#3,d0	; Highest bits of plane VRAM address
 		swap	d0
 		move.w	d4,d0
-		rts	
+		rts
 ; End of function Calc_VRAM_Pos
 
 
@@ -5128,7 +5095,7 @@ Calc_VRAM_Pos_Unknown:
 		moveq	#2,d0
 		swap	d0
 		move.w	d4,d0
-		rts	
+		rts
 ; End of function Calc_VRAM_Pos_Unknown
 
 ; ---------------------------------------------------------------------------
@@ -6213,6 +6180,8 @@ loc_D358:
 ; ===========================================================================
 
 loc_D362:
+		cmpi.b	#$A,(v_player+obRoutine).w	; Has Sonic drowned?
+		beq.s	loc_D348			; If so, run objects a little longer
 		moveq	#$1F,d7
 		bsr.s	loc_D348
 		moveq	#$5F,d7
@@ -6691,6 +6660,9 @@ loc_DA02:
 loc_DA10:
 		bsr.w	loc_DA3C
 		beq.s	loc_DA02
+		tst.b	obMap(a0)	; was this object a remember state?
+		bpl.s	loc_DA16	; if not, branch
+		subq.b	#1,(a2)	; move right counter back
 
 loc_DA16:
 		move.l	a0,(v_opl_data).w
@@ -6714,17 +6686,17 @@ loc_DA36:
 		move.l	a0,(v_opl_data+4).w
 
 locret_DA3A:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_DA3C:
 		tst.b	4(a0)
 		bpl.s	OPL_MakeItem
-		bset	#7,2(a2,d2.w)
+		btst	#7,obGfx(a2,d2.w)
 		beq.s	OPL_MakeItem
 		addq.w	#6,a0
 		moveq	#0,d0
-		rts	
+		rts
 ; ===========================================================================
 
 OPL_MakeItem:
@@ -6741,6 +6713,7 @@ OPL_MakeItem:
 		move.b	d1,obStatus(a1)
 		move.b	(a0)+,d0
 		bpl.s	loc_DA80
+		bset	#7,obGfx(a2,d2.w)	; set as removed
 		andi.b	#$7F,d0
 		move.b	d2,obRespawnNo(a1)
 
@@ -6898,6 +6871,7 @@ Sonic_Index:	dc.w Sonic_Main-Sonic_Index
 		dc.w Sonic_Hurt-Sonic_Index
 		dc.w Sonic_Death-Sonic_Index
 		dc.w Sonic_ResetLevel-Sonic_Index
+		dc.w Sonic_Drowned-Sonic_Index
 ; ===========================================================================
 
 Sonic_Main:	; Routine 0
@@ -6960,7 +6934,7 @@ loc_12CA6:
 loc_12CB6:
 		bsr.w	Sonic_Loops
 		bsr.w	Sonic_LoadGfx
-		rts	
+		rts
 ; ===========================================================================
 Sonic_Modes:	dc.w Sonic_MdNormal-Sonic_Modes
 		dc.w Sonic_MdJump-Sonic_Modes
@@ -6998,7 +6972,7 @@ Sonic_MdNormal:
 		jsr	(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
 		bsr.w	Sonic_SlopeRepel
-		rts	
+		rts
 ; ===========================================================================
 
 Sonic_MdJump:
@@ -7013,7 +6987,7 @@ Sonic_MdJump:
 loc_12E5C:
 		bsr.w	Sonic_JumpAngle
 		bsr.w	Sonic_Floor
-		rts	
+		rts
 ; ===========================================================================
 
 Sonic_MdRoll:
@@ -7024,7 +6998,7 @@ Sonic_MdRoll:
 		jsr	(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
 		bsr.w	Sonic_SlopeRepel
-		rts	
+		rts
 ; ===========================================================================
 
 Sonic_MdJump2:
@@ -7039,7 +7013,7 @@ Sonic_MdJump2:
 loc_12EA6:
 		bsr.w	Sonic_JumpAngle
 		bsr.w	Sonic_Floor
-		rts	
+		rts
 
 		include	"_incObj/Sonic Move.asm"
 		include	"_incObj/Sonic RollSpeed.asm"
@@ -7062,7 +7036,7 @@ loc_12EA6:
 		move.b	#id_Warp3,obAnim(a0) ; use "warping" animation
 
 locret_13302:
-		rts	
+		rts
 
 		include	"_incObj/Sonic LevelBound.asm"
 		include	"_incObj/Sonic Roll.asm"
@@ -7076,6 +7050,7 @@ locret_13302:
 		include	"_incObj/Sonic ResetOnFloor.asm"
 		include	"_incObj/Sonic (part 2).asm"
 		include	"_incObj/Sonic Loops.asm"
+		include "_incObj/Sonic Drowns.asm"
 		include	"_incObj/Sonic Animate.asm"
 		include	"_anim/Sonic.asm"
 		include	"_incObj/Sonic LoadGfx.asm"
@@ -7115,7 +7090,7 @@ ResumeMusic:
 .over12:
 		move.w	#30,(v_air).w	; reset air to 30 seconds
 		clr.b	(v_objspace+$340+$32).w
-		rts	
+		rts
 ; End of function ResumeMusic
 
 ; ===========================================================================
@@ -7139,104 +7114,6 @@ Map_Splash:	include	"_maps/Water Splash.asm"
 		include	"_incObj/sub FindNearestTile.asm"
 		include	"_incObj/sub FindFloor.asm"
 		include	"_incObj/sub FindWall.asm"
-
-; ---------------------------------------------------------------------------
-; Unused floor/wall subroutine - logs something	to do with collision
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-FloorLog_Unk:
-		rts	
-
-		lea	(CollArray1).l,a1
-		lea	(CollArray1).l,a2
-		move.w	#$FF,d3
-
-loc_14C5E:
-		moveq	#$10,d5
-		move.w	#$F,d2
-
-loc_14C64:
-		moveq	#0,d4
-		move.w	#$F,d1
-
-loc_14C6A:
-		move.w	(a1)+,d0
-		lsr.l	d5,d0
-		addx.w	d4,d4
-		dbf	d1,loc_14C6A
-
-		move.w	d4,(a2)+
-		suba.w	#$20,a1
-		subq.w	#1,d5
-		dbf	d2,loc_14C64
-
-		adda.w	#$20,a1
-		dbf	d3,loc_14C5E
-
-		lea	(CollArray1).l,a1
-		lea	(CollArray2).l,a2
-		bsr.s	FloorLog_Unk2
-		lea	(CollArray1).l,a1
-		lea	(CollArray1).l,a2
-
-; End of function FloorLog_Unk
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-FloorLog_Unk2:
-		move.w	#$FFF,d3
-
-loc_14CA6:
-		moveq	#0,d2
-		move.w	#$F,d1
-		move.w	(a1)+,d0
-		beq.s	loc_14CD4
-		bmi.s	loc_14CBE
-
-loc_14CB2:
-		lsr.w	#1,d0
-		bhs.s	loc_14CB8
-		addq.b	#1,d2
-
-loc_14CB8:
-		dbf	d1,loc_14CB2
-
-		bra.s	loc_14CD6
-; ===========================================================================
-
-loc_14CBE:
-		cmpi.w	#-1,d0
-		beq.s	loc_14CD0
-
-loc_14CC4:
-		lsl.w	#1,d0
-		bhs.s	loc_14CCA
-		subq.b	#1,d2
-
-loc_14CCA:
-		dbf	d1,loc_14CC4
-
-		bra.s	loc_14CD6
-; ===========================================================================
-
-loc_14CD0:
-		move.w	#$10,d0
-
-loc_14CD4:
-		move.w	d0,d2
-
-loc_14CD6:
-		move.b	d2,(a2)+
-		dbf	d3,loc_14CA6
-
-		rts	
-
-; End of function FloorLog_Unk2
-
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -7638,10 +7515,7 @@ loc_1504A:
 ObjHitWallLeft:
 		add.w	obX(a0),d3
 		move.w	obY(a0),d2
-		; Engine bug: colliding with left walls is erratic with this function.
-		; The cause is this: a missing instruction to flip collision on the found
-		; 16x16 block; this one:
-		;eori.w	#$F,d3
+		eori.w	#$F,d3
 		lea	(v_anglebuffer).w,a4
 		move.b	#0,(a4)
 		movea.w	#-$10,a3
@@ -8496,16 +8370,16 @@ Art_LivesNums:	binclude	"artunc/Lives Counter Numbers.bin" ; 8x8 pixel numbers o
 		include	"_inc/LevelHeaders.asm"
 		include	"_inc/Pattern Load Cues.asm"
 
-		align	$200
+;		align	$200
 		if Revision=0
 Nem_SegaLogo:	binclude	"artnem/Sega Logo.bin"	; large Sega logo
 		even
 Eni_SegaLogo:	binclude	"tilemaps/Sega Logo.bin" ; large Sega logo (mappings)
 		even
 		else
-		rept $300
-			dc.b	$FF
-		endm
+;		rept $300
+;			dc.b	$FF
+;		endm
 Nem_SegaLogo:	binclude	"artnem/Sega Logo (JP1).bin" ; large Sega logo
 			even
 Eni_SegaLogo:	binclude	"tilemaps/Sega Logo (JP1).bin" ; large Sega logo (mappings)
@@ -8911,7 +8785,7 @@ Nem_EndEggman:	if Revision=0
 		binclude	"artnem/Unused - Eggman Ending.bin"
 		endif
 		even
-Kos_EndFlowers:	binclude	"artkos/Flowers at Ending.bin" ; ending sequence animated flowers
+EndFlowers:	binclude	"artkos/Flowers at Ending.unc" ; ending sequence animated flowers
 		even
 Nem_EndFlower:	binclude	"artnem/Ending - Flowers.bin"
 		even
@@ -8919,16 +8793,6 @@ Nem_CreditText:	binclude	"artnem/Ending - Credits.bin"
 		even
 Nem_EndStH:	binclude	"artnem/Ending - StH Logo.bin"
 		even
-
-		if Revision=0
-		rept $104
-		dc.b $FF			; why?
-		endm
-		else
-		rept $40
-		dc.b $FF
-		endm
-		endif
 ; ---------------------------------------------------------------------------
 ; Collision data
 ; ---------------------------------------------------------------------------
@@ -9082,8 +8946,6 @@ Level_EndGood:	binclude	"levels/ending_good.bin"
 Art_BigRing:	binclude	"artunc/Giant Ring.bin"
 		even
 
-		align	$100
-
 ; ---------------------------------------------------------------------------
 ; Sprite locations index
 ; ---------------------------------------------------------------------------
@@ -9140,25 +9002,13 @@ ObjPos_GHZ1:	binclude	"objpos/ghz1.bin"
 		even
 ObjPos_GHZ2:	binclude	"objpos/ghz2.bin"
 		even
-ObjPos_GHZ3:	if Revision=0
-		binclude	"objpos/ghz3.bin"
-		else
-		binclude	"objpos/ghz3 (JP1).bin"
-		endif
+ObjPos_GHZ3:	binclude	"objpos/ghz3 (JP1).bin"
 		even
-ObjPos_LZ1:	if Revision=0
-		binclude	"objpos/lz1.bin"
-		else
-		binclude	"objpos/lz1 (JP1).bin"
-		endif
+ObjPos_LZ1:	binclude	"objpos/lz1 (JP1).bin"
 		even
 ObjPos_LZ2:	binclude	"objpos/lz2.bin"
 		even
-ObjPos_LZ3:	if Revision=0
-		binclude	"objpos/lz3.bin"
-		else
-		binclude	"objpos/lz3 (JP1).bin"
-		endif
+ObjPos_LZ3:	binclude	"objpos/lz3 (JP1).bin"
 		even
 ObjPos_SBZ3:	binclude	"objpos/sbz3.bin"
 		even
@@ -9174,11 +9024,7 @@ ObjPos_LZ3pf1:	binclude	"objpos/lz3pf1.bin"
 		even
 ObjPos_LZ3pf2:	binclude	"objpos/lz3pf2.bin"
 		even
-ObjPos_MZ1:	if Revision=0
-		binclude	"objpos/mz1.bin"
-		else
-		binclude	"objpos/mz1 (JP1).bin"
-		endif
+ObjPos_MZ1:	binclude	"objpos/mz1 (JP1).bin"
 		even
 ObjPos_MZ2:	binclude	"objpos/mz2.bin"
 		even
@@ -9194,17 +9040,9 @@ ObjPos_SYZ1:	binclude	"objpos/syz1.bin"
 		even
 ObjPos_SYZ2:	binclude	"objpos/syz2.bin"
 		even
-ObjPos_SYZ3:	if Revision=0
-		binclude	"objpos/syz3.bin"
-		else
-		binclude	"objpos/syz3 (JP1).bin"
-		endif
+ObjPos_SYZ3:	binclude	"objpos/syz3 (JP1).bin"
 		even
-ObjPos_SBZ1:	if Revision=0
-		binclude	"objpos/sbz1.bin"
-		else
-		binclude	"objpos/sbz1 (JP1).bin"
-		endif
+ObjPos_SBZ1:	binclude	"objpos/sbz1 (JP1).bin"
 		even
 ObjPos_SBZ2:	binclude	"objpos/sbz2.bin"
 		even
@@ -9226,20 +9064,9 @@ ObjPos_End:	binclude	"objpos/ending.bin"
 		even
 ObjPos_Null:	dc.b $FF, $FF, 0, 0, 0,	0
 
-		if Revision=0
-		rept $62A
-		dc.b $FF
-		endm
-		else
-		rept $63C
-		dc.b $FF
-		endm
-		endif
-
 SoundDriver:	include "s1.sounddriver.asm"
 
 ; end of 'ROM'
-		even
 EndOfRom:
 
 		END

@@ -7,33 +7,7 @@
 
 MoveSonicInDemo:
 		tst.w	(f_demo).w	; is demo mode on?
-		bne.s	MDemo_On	; if yes, branch
-		rts	
-; ===========================================================================
-
-; This is an unused subroutine for recording a demo
-
-DemoRecorder:
-		lea	($80000).l,a1
-		move.w	(v_btnpushtime1).w,d0
-		adda.w	d0,a1
-		move.b	(v_jpadhold1).w,d0
-		cmp.b	(a1),d0
-		bne.s	.next
-		addq.b	#1,1(a1)
-		cmpi.b	#$FF,1(a1)
-		beq.s	.next
-		rts	
-
-.next:
-		move.b	d0,2(a1)
-		move.b	#0,3(a1)
-		addq.w	#2,(v_btnpushtime1).w
-		andi.w	#$3FF,(v_btnpushtime1).w
-		rts	
-; ===========================================================================
-
-MDemo_On:
+		beq.w	.end		; if not, branch
 		tst.b	(v_jpadhold1).w	; is start button pressed?
 		bpl.s	.dontquit	; if not, branch
 		tst.w	(f_demo).w	; is this an ending sequence demo?
@@ -65,11 +39,7 @@ MDemo_On:
 		move.b	(a1),d0
 		lea	(v_jpadhold1).w,a0
 		move.b	d0,d1
-		if Revision=0
-		move.b	(a0),d2
-		else
-			moveq	#0,d2
-		endif
+		move.b	v_jpadhold2-v_jpadhold1(a0),d2
 		eor.b	d2,d0
 		move.b	d1,(a0)+
 		and.b	d1,d0
@@ -80,7 +50,7 @@ MDemo_On:
 		addq.w	#2,(v_btnpushtime1).w
 
 .end:
-		rts	
+		rts
 ; End of function MoveSonicInDemo
 
 ; ===========================================================================

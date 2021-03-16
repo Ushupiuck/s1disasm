@@ -32,7 +32,7 @@ Mon_Main:	; Routine 0
 		beq.s	.notbroken	; if not, branch
 		move.b	#8,obRoutine(a0) ; run "Mon_Display" routine
 		move.b	#$B,obFrame(a0)	; use broken monitor frame
-		rts	
+		rts
 ; ===========================================================================
 
 .notbroken:
@@ -122,7 +122,11 @@ loc_A246:
 loc_A25C:
 		btst	#5,obStatus(a0)
 		beq.s	Mon_Animate
-		move.w	#1,obAnim(a1)	; clear obAnim and set obNextAni to 1
+		cmpi.b	#id_Roll,obAnim(a1)	; is Sonic in his jumping/rolling animation?
+		beq.s	loc_A26A	; if so, branch
+		cmpi.b	#id_Drown,obAnim(a1)	; is Sonic in his drowning animation?
+		beq.s	loc_A26A	; if so, branch
+		move.w	#1,obAnim(a1)	; clear obAnim and set obNextAni to 1, putting Sonic in his walking animation
 
 loc_A26A:
 		bclr	#5,obStatus(a0)
@@ -135,7 +139,7 @@ Mon_Animate:	; Routine 6
 Mon_Display:	; Routine 8
 		bsr.w	DisplaySprite
 		out_of_range.w	DeleteObject
-		rts	
+		rts
 ; ===========================================================================
 
 Mon_BreakOpen:	; Routine 4

@@ -266,7 +266,7 @@ AniArt_SBZ:
 ; ===========================================================================
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Animated pattern routine - ending sequence
@@ -280,10 +280,10 @@ AniArt_Ending_BigFlower:
 
 		subq.b	#1,(v_lani1_time).w ; decrement timer
 		bpl.s	AniArt_Ending_SmallFlower ; branch if not 0
-		
+
 		move.b	#7,(v_lani1_time).w
 		lea	(Art_GhzFlower1).l,a1 ;	load big flower	patterns
-		lea	($FFFF9400).w,a2 ; load 2nd big flower from RAM
+		lea	(EndFlowers).l,a2 ; load 2nd big flower from RAM
 		move.b	(v_lani1_frame).w,d0
 		addq.b	#1,(v_lani1_frame).w ; increment frame counter
 		andi.w	#1,d0		; only 2 frames
@@ -307,7 +307,7 @@ AniArt_Ending_SmallFlower:
 
 		subq.b	#1,(v_lani2_time).w ; decrement timer
 		bpl.s	AniArt_Ending_Flower3 ; branch if not 0
-		
+
 		move.b	#7,(v_lani2_time).w
 		move.b	(v_lani2_frame).w,d0
 		addq.b	#1,(v_lani2_frame).w ; increment frame counter
@@ -332,7 +332,7 @@ AniArt_Ending_Flower3:
 
 		subq.b	#1,(v_lani4_time).w ; decrement timer
 		bpl.s	AniArt_Ending_Flower4 ; branch if not 0
-		
+
 		move.b	#$E,(v_lani4_time).w
 		move.b	(v_lani4_frame).w,d0
 		addq.b	#1,(v_lani4_frame).w ; increment frame counter
@@ -341,7 +341,7 @@ AniArt_Ending_Flower3:
 		lsl.w	#8,d0		; multiply by $100
 		add.w	d0,d0		; multiply by 2
 		locVRAM	$7000
-		lea	($FFFF9800).w,a1 ; load	special	flower patterns	(from RAM)
+		lea	(EndFlowers+$400).l,a1 ; load	special	flower patterns	(from RAM)
 		lea	(a1,d0.w),a1	; jump to appropriate tile
 		move.w	#.size-1,d1
 		bra.w	LoadTiles
@@ -355,7 +355,7 @@ AniArt_Ending_Flower4:
 
 		subq.b	#1,(v_lani5_time).w ; decrement timer
 		bpl.s	.end		; branch if not 0
-		
+
 		move.b	#$B,(v_lani5_time).w
 		move.b	(v_lani5_frame).w,d0
 		addq.b	#1,(v_lani5_frame).w ; increment frame counter
@@ -364,18 +364,18 @@ AniArt_Ending_Flower4:
 		lsl.w	#8,d0		; multiply by $100
 		add.w	d0,d0		; multiply by 2
 		locVRAM	$6800
-		lea	($FFFF9E00).w,a1 ; load	special	flower patterns	(from RAM)
+		lea	(EndFlowers+$A00).l,a1 ; load	special	flower patterns	(from RAM)
 		lea	(a1,d0.w),a1	; jump to appropriate tile
 		move.w	#.size-1,d1
 		bra.w	LoadTiles
 ; ===========================================================================
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 AniArt_none:
-		rts	
+		rts
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	transfer graphics to VRAM
@@ -399,7 +399,7 @@ LoadTiles:
 		move.l	(a1)+,(a6)
 		move.l	(a1)+,(a6)
 		dbf	d1,LoadTiles
-		rts	
+		rts
 ; End of function LoadTiles
 
 ; ===========================================================================
@@ -420,7 +420,7 @@ loc_1C3EE:
 		move.l	(a1),(a6)
 		lea	$10(a1),a1
 		dbf	d1,loc_1C3EE
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1C3FA:
@@ -430,14 +430,14 @@ loc_1C3FA:
 		move.l	d0,(a6)
 		lea	$10(a1),a1
 		dbf	d1,loc_1C3FA
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1C410:
 		move.l	2(a1),(a6)
 		lea	$10(a1),a1
 		dbf	d1,loc_1C410
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1C41E:
@@ -447,14 +447,14 @@ loc_1C41E:
 		move.l	d0,(a6)
 		lea	$10(a1),a1
 		dbf	d1,loc_1C41E
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1C434:
 		move.l	4(a1),(a6)
 		lea	$10(a1),a1
 		dbf	d1,loc_1C434
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1C442:
@@ -464,7 +464,7 @@ loc_1C442:
 		move.l	d0,(a6)
 		lea	$10(a1),a1
 		dbf	d1,loc_1C442
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1C458:

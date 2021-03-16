@@ -8,13 +8,13 @@ v_regbuffer	= ramaddr ( $FFFFFC00 )	; stores registers d0-a7 during an error eve
 v_spbuffer	= ramaddr ( $FFFFFC40 )	; stores most recent sp address (4 bytes)
 v_errortype	= ramaddr ( $FFFFFC44 )	; error type
 
-v_128x128:	= ramaddr ( $FF0000 )	; 128x128 tile mappings ($A400 bytes)
-v_lvllayoutfg	= ramaddr ( $FFFFA400 )	; level layout ROM address (4 bytes)
-v_lvllayoutbg	= ramaddr ( $FFFFA404 )	; background layout ROM address (4 bytes)
-v_bgscroll_buffer	= ramaddr( $FFFFA800 )	; background scroll buffer ($200 bytes)
-v_ngfx_buffer	= ramaddr ( $FFFFAA00 )	; Nemesis graphics decompression buffer ($200 bytes)
-v_spritequeue	= ramaddr ( $FFFFAC00 )	; sprite display queue, in order of priority ($400 bytes)
-v_16x16	= ramaddr ( $FFFFB000 )	; 16x16 tile mappings
+v_128x128:	= ramaddr ( $FF0000 )	; 128x128 tile mappings ($8000 bytes)
+v_16x16		= ramaddr ( $FFFF8000 )	; 16x16 tile mappings ($1800 bytes)
+v_lvllayoutfg	= ramaddr ( $FFFF9800 )	; level layout ROM address (4 bytes)
+v_lvllayoutbg	= ramaddr ( $FFFF9804 )	; background layout ROM address (4 bytes)
+v_bgscroll_buffer	= ramaddr( $FFFF9808 )	; background scroll buffer ($200 bytes)
+v_ngfx_buffer	= ramaddr ( $FFFF9A08 )	; Nemesis graphics decompression buffer ($200 bytes)
+v_spritequeue	= ramaddr ( $FFFF9C08 )	; sprite display queue, in order of priority ($400 bytes)
 
 v_sgfx_buffer	= ramaddr ( $FFFFC800 )	; buffered Sonic graphics ($17 cells) ($2E0 bytes)
 v_tracksonic	= ramaddr ( $FFFFCB00 )	; position tracking data for Sonic ($100 bytes)
@@ -212,8 +212,8 @@ v_bossstatus	= ramaddr ( $FFFFF7A7 )	; status of boss and prison capsule (01 = b
 v_trackpos	= ramaddr ( $FFFFF7A8 )	; position tracking reference number (2 bytes)
 v_trackbyte	= ramaddr ( $FFFFF7A9 )	; low byte for position tracking
 f_lockscreen	= ramaddr ( $FFFFF7AA )	; flag set to lock screen during bosses
-v_256loop1	= ramaddr ( $FFFFF7AC )	; 256x256 level tile which contains a loop (GHZ/SLZ)
-v_256loop2	= ramaddr ( $FFFFF7AD )	; 256x256 level tile which contains a loop (GHZ/SLZ)
+;v_256loop1	= ramaddr ( $FFFFF7AC )	; 256x256 level tile which contains a loop (GHZ/SLZ)
+;v_256loop2	= ramaddr ( $FFFFF7AD )	; 256x256 level tile which contains a loop (GHZ/SLZ)
 v_256roll1	= ramaddr ( $FFFFF7AE )	; 256x256 level tile which contains a roll tunnel (GHZ)
 v_256roll2	= ramaddr ( $FFFFF7AF )	; 256x256 level tile which contains a roll tunnel (GHZ)
 v_lani0_frame	= ramaddr ( $FFFFF7B0 )	; level graphics animation 0 - current frame

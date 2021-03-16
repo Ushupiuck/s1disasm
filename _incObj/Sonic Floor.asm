@@ -15,11 +15,11 @@ Sonic_Floor:
 		move.w	obVelX(a0),d1
 		move.w	obVelY(a0),d2
 		jsr	(CalcAngle).l
-		move.b	d0,($FFFFFFEC).w
+;		move.b	d0,($FFFFFFEC).w
 		subi.b	#$20,d0
-		move.b	d0,($FFFFFFED).w
+;		move.b	d0,($FFFFFFED).w
 		andi.b	#$C0,d0
-		move.b	d0,($FFFFFFEE).w
+;		move.b	d0,($FFFFFFEE).w
 		cmpi.b	#$40,d0
 		beq.w	loc_13680
 		cmpi.b	#$80,d0
@@ -41,7 +41,7 @@ loc_135F0:
 
 loc_13602:
 		bsr.w	Sonic_HitFloor
-		move.b	d1,($FFFFFFEF).w
+;		move.b	d1,($FFFFFFEF).w
 		tst.w	d1
 		bpl.s	locret_1367E
 		move.b	obVelY(a0),d2
@@ -72,7 +72,7 @@ loc_1361E:
 loc_1364E:
 		move.w	#0,obVelY(a0)
 		move.w	obVelX(a0),obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1365C:
@@ -88,7 +88,7 @@ loc_13670:
 		neg.w	obInertia(a0)
 
 locret_1367E:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_13680:
@@ -98,7 +98,7 @@ loc_13680:
 		sub.w	d1,obX(a0)
 		move.w	#0,obVelX(a0)
 		move.w	obVelY(a0),obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1369A:
@@ -111,7 +111,7 @@ loc_1369A:
 		move.w	#0,obVelY(a0)
 
 locret_136B2:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_136B4:
@@ -128,7 +128,7 @@ loc_136B4:
 		move.w	obVelX(a0),obInertia(a0)
 
 locret_136E0:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_136E2:
@@ -155,7 +155,7 @@ loc_13706:
 		andi.b	#$40,d0
 		bne.s	loc_13726
 		move.w	#0,obVelY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_13726:
@@ -167,7 +167,7 @@ loc_13726:
 		neg.w	obInertia(a0)
 
 locret_1373C:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1373E:
@@ -177,7 +177,7 @@ loc_1373E:
 		add.w	d1,obX(a0)
 		move.w	#0,obVelX(a0)
 		move.w	obVelY(a0),obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_13758:
@@ -190,7 +190,7 @@ loc_13758:
 		move.w	#0,obVelY(a0)
 
 locret_13770:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_13772:
@@ -207,5 +207,5 @@ loc_13772:
 		move.w	obVelX(a0),obInertia(a0)
 
 locret_1379E:
-		rts	
+		rts
 ; End of function Sonic_Floor

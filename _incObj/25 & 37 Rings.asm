@@ -208,7 +208,6 @@ RLoss_Count:	; Routine 0
 		move.b	#3,obPriority(a1)
 		move.b	#$47,obColType(a1)
 		move.b	#8,obActWid(a1)
-		move.b	#-1,(v_ani3_time).w
 		tst.w	d4
 		bmi.s	.loc_9D62
 		move.w	d4,d0
@@ -234,8 +233,11 @@ RLoss_Count:	; Routine 0
 
 .resetcounter:
 		move.w	#0,(v_rings).w	; reset number of rings to zero
-		move.b	#$80,(f_ringcount).w ; update ring counter
+		move.b	#$80,(f_ringcount).w	; update ring counter
 		move.b	#0,(v_lifecount).w
+		moveq	#-1,d0			; Move #-1 to d0
+		move.b	d0,obDelayAni(a0)	; Move d0 to new timer
+		move.b	d0,(v_ani3_time).w	; Move d0 to old timer (for animated purposes)
 		sfx	sfx_RingLoss,0,0,0	; play ring loss sound
 
 RLoss_Bounce:	; Routine 2
@@ -257,13 +259,19 @@ RLoss_Bounce:	; Routine 2
 		neg.w	obVelY(a0)
 
 .chkdel:
-		tst.b	(v_ani3_time).w
-		beq.s	RLoss_Delete
+		subq.b	#1,obDelayAni(a0)	; Subtract 1
+		beq.w	DeleteObject		; If 0, delete
+		cmpi.w	#$FF00,(v_limittop2).w		; is vertical wrapping enabled?
+		beq.w	DisplaySprite			; if so, branch
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has object moved below level boundary?
 		bcs.s	RLoss_Delete	; if yes, branch
-		bra.w	DisplaySprite
+		btst	#0, obDelayAni(a0) ; Test the first bit of the timer, so rings flash every other frame.
+		beq.w	DisplaySprite      ; If the bit is 0, the ring will appear.
+		cmpi.b	#80,obDelayAni(a0) ; Rings will flash during last 80 steps of their life.
+		bhi.w	DisplaySprite      ; If the timer is higher than 80, obviously the rings will STAY visible.
+		rts
 ; ===========================================================================
 
 RLoss_Collect:	; Routine 4

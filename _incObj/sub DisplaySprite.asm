@@ -19,7 +19,6 @@ DisplaySprite:
 
 DSpr_Full:
 		rts	
-
 ; End of function DisplaySprite
 
 

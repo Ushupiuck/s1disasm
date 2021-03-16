@@ -55,6 +55,7 @@ Obj09_Modes:	dc.w Obj09_OnWall-Obj09_Modes
 ; ===========================================================================
 
 Obj09_OnWall:
+		bclr	#7,obStatus(a0)	; clear "Sonic has jumped" flag
 		bsr.w	Obj09_Jump
 		bsr.w	Obj09_Move
 		bsr.w	Obj09_Fall
@@ -62,7 +63,7 @@ Obj09_OnWall:
 ; ===========================================================================
 
 Obj09_InAir:
-		bsr.w	nullsub_2
+		bsr.w	Obj09_JumpHeight
 		bsr.w	Obj09_Move
 		bsr.w	Obj09_Fall
 
@@ -75,7 +76,7 @@ Obj09_Display:
 		add.w	(v_ssrotate).w,d0
 		move.w	d0,(v_ssangle).w
 		jsr	(Sonic_Animate).l
-		rts	
+		rts
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -133,12 +134,12 @@ loc_1BAA8:
 		sub.l	d1,obX(a0)
 		sub.l	d0,obY(a0)
 		move.w	#0,obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1BAF2:
 		movem.l	(sp)+,d0-d1
-		rts	
+		rts
 ; End of function Obj09_Move
 
 
@@ -159,17 +160,17 @@ loc_1BB06:
 
 loc_1BB14:
 		move.w	d0,obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1BB1A:
 		subi.w	#$40,d0
-		bcc.s	loc_1BB22
-		nop	
+;		bcc.s	loc_1BB22
+;		nop
 
-loc_1BB22:
+;loc_1BB22:
 		move.w	d0,obInertia(a0)
-		rts	
+		rts
 ; End of function Obj09_MoveLeft
 
 
@@ -187,19 +188,17 @@ Obj09_MoveRight:
 
 loc_1BB42:
 		move.w	d0,obInertia(a0)
-		bra.s	locret_1BB54
+		rts
 ; ===========================================================================
 
 loc_1BB48:
 		addi.w	#$40,d0
-		bcc.s	loc_1BB50
-		nop	
+;		bcc.s	loc_1BB50
+;		nop
 
-loc_1BB50:
+;loc_1BB50:
 		move.w	d0,obInertia(a0)
-
-locret_1BB54:
-		rts	
+		rts
 ; End of function Obj09_MoveRight
 
 
@@ -222,34 +221,56 @@ Obj09_Jump:
 		asr.l	#8,d0
 		move.w	d0,obVelY(a0)
 		bset	#1,obStatus(a0)
+		bset	#7,obStatus(a0)	; set "Sonic has jumped" flag
 		sfx	sfx_Jump,0,0,0	; play jumping sound
 
 Obj09_NoJump:
-		rts	
+		rts
 ; End of function Obj09_Jump
 
 
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-nullsub_2:
-		rts	
-; End of function nullsub_2
-
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; unused subroutine to limit Sonic's upward vertical speed
+; Subroutine to limit Sonic's upward vertical speed
 ; ---------------------------------------------------------------------------
-		move.w	#-$400,d1
-		cmp.w	obVelY(a0),d1
-		ble.s	locret_1BBB4
-		move.b	(v_jpadhold2).w,d0
+
+; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
+
+Obj09_JumpHeight:			; XREF: Obj09_InAir
+		move.b	(v_jpadhold2).w,d0	; is the jump button up?
 		andi.b	#btnABC,d0
-		bne.s	locret_1BBB4
-		move.w	d1,obVelY(a0)
+		bne.s	locret_1BBB4		; if not, branch to return
+		btst	#7,obStatus(a0)		; did Sonic jump or is he just falling or hit by a bumper?
+		beq.s	locret_1BBB4		; if not, branch to return
+		move.b	(v_ssangle).w,d0	; get SS angle
+		andi.b	#$FC,d0
+		neg.b	d0
+		subi.b	#$40,d0
+		jsr	(CalcSine).l
+		move.w	obVelY(a0),d2		; get Y speed
+		muls.w	d2,d0			; multiply Y speed by sin
+		asr.l	#8,d0			; find the new Y speed
+		move.w	obVelX(a0),d2		; get X speed
+		muls.w	d2,d1			; multiply X speed by cos
+		asr.l	#8,d1			; find the new X speed
+		add.w	d0,d1			; combine the two speeds
+		cmpi.w	#$400,d1		; compare the combined speed with the jump release speed
+		ble.s	locret_1BBB4		; if it's less, branch to return
+		move.b	(v_ssangle).w,d0
+		andi.b	#$FC,d0
+		neg.b	d0
+		subi.b	#$40,d0
+		jsr	(CalcSine).l
+		muls.w	#$400,d1
+		asr.l	#8,d1
+		move.w	d1,obVelX(a0)
+		muls.w	#$400,d0
+		asr.l	#8,d0
+		move.w	d0,obVelY(a0)		; set the speed to the jump release speed
+		bclr	#7,obStatus(a0)		; clear "Sonic has jumped" flag
 
 locret_1BBB4:
-		rts	
+		rts
 ; ---------------------------------------------------------------------------
 ; Subroutine to	fix the	camera on Sonic's position (special stage)
 ; ---------------------------------------------------------------------------
@@ -274,7 +295,7 @@ loc_1BBCE:
 		sub.w	d0,(v_screenposy).w
 
 locret_1BBDE:
-		rts	
+		rts
 ; End of function SS_FixCamera
 
 ; ===========================================================================
@@ -478,7 +499,7 @@ Obj09_GetCont:
 
 Obj09_NoCont:
 		moveq	#0,d4
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_Chk1Up:
@@ -494,7 +515,7 @@ Obj09_Get1Up:
 		addq.b	#1,(f_lifecount).w ; update the lives counter
 		music	bgm_ExtraLife,0,0,0	; play extra life music
 		moveq	#0,d4
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_ChkEmer:
@@ -520,7 +541,7 @@ Obj09_GetEmer:
 Obj09_NoEmer:
 		sfx	bgm_Emerald,0,0,0 ;	play emerald music
 		moveq	#0,d4
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_ChkGhost:
@@ -537,7 +558,7 @@ Obj09_ChkGhostTag:
 
 Obj09_NoGhost:
 		moveq	#-1,d4
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_MakeGhostSolid:
@@ -563,7 +584,7 @@ Obj09_NoReplace:
 Obj09_GhostNotSolid:
 		clr.b	$3A(a0)
 		moveq	#0,d4
-		rts	
+		rts
 ; End of function Obj09_ChkItems
 
 
@@ -583,7 +604,7 @@ loc_1BEA0:
 		move.b	#0,$37(a0)
 
 locret_1BEAC:
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_ChkBumper:
@@ -610,6 +631,7 @@ Obj09_ChkBumper:
 		asr.l	#8,d0
 		move.w	d0,obVelY(a0)
 		bset	#1,obStatus(a0)
+		bclr	#7,obStatus(a0)	; clear "Sonic has jumped" flag
 		bsr.w	SS_RemoveCollectedItem
 		bne.s	Obj09_BumpSnd
 		move.b	#2,(a2)

@@ -360,4 +360,4 @@ loc_C2E0:
 		add.w	d1,obY(a0)
 
 locret_C2E4:
-		rts	
+		rts
