@@ -165,10 +165,6 @@ loc_1BB14:
 
 loc_1BB1A:
 		subi.w	#$40,d0
-;		bcc.s	loc_1BB22
-;		nop
-
-;loc_1BB22:
 		move.w	d0,obInertia(a0)
 		rts
 ; End of function Obj09_MoveLeft
@@ -193,10 +189,6 @@ loc_1BB42:
 
 loc_1BB48:
 		addi.w	#$40,d0
-;		bcc.s	loc_1BB50
-;		nop
-
-;loc_1BB50:
 		move.w	d0,obInertia(a0)
 		rts
 ; End of function Obj09_MoveRight
