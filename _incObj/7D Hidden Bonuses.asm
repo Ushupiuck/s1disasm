@@ -45,18 +45,18 @@ Bonus_Main:	; Routine 0
 		moveq	#0,d0
 		move.b	obSubtype(a0),d0
 		add.w	d0,d0
-		move.w	.points(pc,d0.w),d0 ; load bonus points array
+		move.w	Bonuspoints(pc,d0.w),d0 ; load bonus points array
 		jsr	(AddPoints).l
 
 .chkdel:
-		out_of_range.s	.delete
+		out_of_range.s	delete
 		rts
 
-.delete:
+delete:
 		jmp	(DeleteObject).l
 
 ; ===========================================================================
-.points:	dc.w 0			; Bonus	points array
+Bonuspoints:	dc.w 0			; Bonus	points array
 		dc.w 1000
 		dc.w 100
 		dc.w 10
@@ -64,9 +64,6 @@ Bonus_Main:	; Routine 0
 
 Bonus_Display:	; Routine 2
 		subq.w	#1,bonus_timelen(a0) ; decrement display time
-		bmi.s	Bonus_Display_Delete		; if time is zero, branch
-		out_of_range.s	Bonus_Display_Delete
+		jmi	(DeleteObject).l		; if time is zero, branch
+		out_of_range.s	delete
 		jmp	(DisplaySprite).l
-
-Bonus_Display_Delete:
-		jmp	(DeleteObject).l

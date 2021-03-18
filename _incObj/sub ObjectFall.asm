@@ -15,6 +15,6 @@ ObjectFall:
 		ext.l	d0
 		lsl.l	#8,d0
 		add.l	d0,obY(a0)
-		rts	
+		rts
 
 ; End of function ObjectFall

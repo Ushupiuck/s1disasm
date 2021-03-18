@@ -5819,8 +5819,6 @@ Map_Monitor:	include	"_maps/Monitor.asm"
 		include	"_anim/Title Screen Sonic.asm"
 		include	"_anim/Press Start and TM.asm"
 
-		include	"_incObj/sub AnimateSprite.asm"
-
 Map_PSB:	include	"_maps/Press Start and TM.asm"
 Map_TSon:	include	"_maps/Title Screen Sonic.asm"
 
@@ -6176,7 +6174,7 @@ loc_D348:
 loc_D358:
 		lea	$40(a0),a0	; next object
 		dbf	d7,loc_D348
-		rts	
+		rts
 ; ===========================================================================
 
 loc_D362:
@@ -6199,7 +6197,7 @@ loc_D378:
 
 loc_D37C:
 		dbf	d7,loc_D368
-		rts	
+		rts
 ; End of function ExecuteObjects
 
 ; ===========================================================================
@@ -6213,6 +6211,7 @@ Obj_Index:
 		include	"_incObj/sub SpeedToPos.asm"
 		include	"_incObj/sub DisplaySprite.asm"
 		include	"_incObj/sub DeleteObject.asm"
+		include	"_incObj/sub AnimateSprite.asm"
 
 ; ===========================================================================
 BldSpr_ScrPos:	dc.l 0				; blank
@@ -6229,6 +6228,12 @@ BldSpr_ScrPos:	dc.l 0				; blank
 BuildSprites:
 		lea	(v_spritetablebuffer).w,a2 ; set address for sprite table
 		moveq	#0,d5
+		moveq	#0,d4
+;		tst.b	($FFFFF711).w
+;		beq.s	loc_D026
+;		bsr.w	BuildSprites2
+
+;loc_D026:
 		lea	(v_spritequeue).w,a4
 		moveq	#7,d7
 
@@ -6241,9 +6246,14 @@ loc_D672:
 		movea.w	(a4,d6.w),a0
 		tst.b	(a0)
 		beq.w	loc_D726
+;		tst.l	obMap(a0)
+;		beq.w	loc_D726
+;		andi.b	#$7F,obRender(a0) ; ''
 		bclr	#7,obRender(a0)
 		move.b	obRender(a0),d0
 		move.b	d0,d4
+;		btst	#6,d0
+;		bne.w	loc_D126
 		andi.w	#$C,d0
 		beq.s	loc_D6DE
 		movea.l	BldSpr_ScrPos(pc,d0.w),a1
@@ -6321,12 +6331,12 @@ loc_D72E:
 		cmpi.b	#$50,d5
 		beq.s	loc_D748
 		move.l	#0,(a2)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_D748:
 		move.b	#0,-5(a2)
-		rts	
+		rts
 ; End of function BuildSprites
 
 
@@ -6372,7 +6382,7 @@ loc_D78E:
 		dbf	d1,sub_D762
 
 locret_D794:
-		rts	
+		rts
 ; End of function sub_D762
 
 ; ===========================================================================
@@ -6415,7 +6425,7 @@ loc_D7DC:
 		dbf	d1,loc_D79E
 
 locret_D7E2:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_D7E4:
@@ -6452,7 +6462,7 @@ loc_D822:
 		dbf	d1,loc_D7E4
 
 locret_D828:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_D82A:
@@ -6495,7 +6505,7 @@ loc_D876:
 		dbf	d1,loc_D82A
 
 locret_D87C:
-		rts	
+		rts
 
 		include	"_incObj/sub ChkObjectVisible.asm"
 
@@ -6528,180 +6538,204 @@ OPL_Main:
 		adda.w	(a0,d0.w),a0
 		move.l	a0,(v_opl_data).w
 		move.l	a0,(v_opl_data+4).w
-		adda.w	2(a1,d0.w),a1
-		move.l	a1,(v_opl_data+8).w
-		move.l	a1,(v_opl_data+$C).w
+;		adda.w	2(a1,d0.w),a1
+		move.l	a0,(v_opl_data+8).w	; Changed from a1 to a0
+		move.l	a0,(v_opl_data+$C).w	; Changed from a1 to a0
 		lea	(v_objstate).w,a2
 		move.w	#$101,(a2)+
 		move.w	#$5E,d0
 
 OPL_ClrList:
-		clr.l	(a2)+
-		dbf	d0,OPL_ClrList	; clear	pre-destroyed object list
-
-		lea	(v_objstate).w,a2
+		clr.l	(a2)+		; loop clears all other respawn values
+		dbf	d0,OPL_ClrList
+		lea	(v_objstate).w,a2	; reset
 		moveq	#0,d2
 		move.w	(v_screenposx).w,d6
-		subi.w	#$80,d6
-		bhs.s	loc_D93C
-		moveq	#0,d6
+		subi.w	#$80,d6	; look one chunk to the left
+		bhs.s	loc_D93C	; if the result was negative,
+		moveq	#0,d6	; cap at zero
 
 loc_D93C:
 		andi.w	#$FF80,d6
-		movea.l	(v_opl_data).w,a0
+		movea.l	(v_opl_data).w,a0	; load address of object placement list
 
 loc_D944:
-		cmp.w	(a0),d6
-		bls.s	loc_D956
-		tst.b	4(a0)
-		bpl.s	loc_D952
+		cmp.w	(a0),d6		; is object's x position >= d6?
+		bls.s	loc_D956	; if yes, branch
+		tst.b	4(a0)	; does the object get a respawn table entry?
+		bpl.s	loc_D952	; if not, branch
 		move.b	(a2),d2
-		addq.b	#1,(a2)
+		addq.b	#1,(a2)	; respawn index of next object to the right
 
 loc_D952:
-		addq.w	#6,a0
+		addq.w	#6,a0	; next object
 		bra.s	loc_D944
 ; ===========================================================================
 
 loc_D956:
-		move.l	a0,(v_opl_data).w
-		movea.l	(v_opl_data+4).w,a0
-		subi.w	#$80,d6
-		blo.s	loc_D976
+		move.l	a0,(v_opl_data).w	; remember rightmost object that has been processed, so far (we still need to look forward)
+		move.l	a0,(v_opl_data+8).w
+		movea.l	(v_opl_data+4).w,a0	; reset a0
+		subi.w	#$80,d6		; look even farther left (any object behind this is out of range)
+		bcs.s	loc_D976	; branch, if camera position would be behind level's left boundary
 
-loc_D964:
-		cmp.w	(a0),d6
-		bls.s	loc_D976
+loc_D964:	; count how many objects are behind the screen that are not in range and need to remember their state
+		cmp.w	(a0),d6		; is object's x position >= d6?
+		bls.s	loc_D976	; if yes, branch
+;		tst.b	2(a0)	; does the object get a respawn table entry?
 		tst.b	4(a0)
-		bpl.s	loc_D972
-		addq.b	#1,1(a2)
+		bpl.s	loc_D972	; if not, branch
+		addq.b	#1,1(a2)	; respawn index of current object to the left
 
 loc_D972:
 		addq.w	#6,a0
-		bra.s	loc_D964
+		bra.s	loc_D964	; continue with next object
 ; ===========================================================================
 
 loc_D976:
 		move.l	a0,(v_opl_data+4).w
+		move.l	a0,(v_opl_data+$C).w
 		move.w	#-1,(v_opl_screen).w
+; ---------------------------------------------------------------------------
 
 OPL_Next:
+		move.w	(v_screenposx).w,d1
+		subi.w	#$80,d1
+		andi.w	#$FF80,d1
+		move.w	d1,(v_screenposx_coarse).w
 		lea	(v_objstate).w,a2
 		moveq	#0,d2
 		move.w	(v_screenposx).w,d6
 		andi.w	#$FF80,d6
-		cmp.w	(v_opl_screen).w,d6
-		beq.w	locret_DA3A
-		bge.s	loc_D9F6
-		move.w	d6,(v_opl_screen).w
-		movea.l	(v_opl_data+4).w,a0
-		subi.w	#$80,d6
-		blo.s	loc_D9D2
+		cmp.w	(v_opl_screen).w,d6	; is the X range the same as last time?
+		beq.w	locret_DA3A	; if yes, branch (rts)
+		bge.s	loc_D9F6	; if new pos is greater than old pos, branch
+		; if the player is moving back
+		move.w	d6,(v_opl_screen).w	; remember current position for next time
+		movea.l	(v_opl_data+4).w,a0	; get current object from the left
+		subi.w	#$80,d6		; look one chunk to the left
+		blo.s	loc_D9D2	; branch, if camera position would be behind level's left boundary
 
-loc_D9A6:
-		cmp.w	-6(a0),d6
-		bge.s	loc_D9D2
-		subq.w	#6,a0
+loc_D9A6:	; load all objects left of the screen that are now in range
+		cmp.w	-6(a0),d6	; is the previous object's X pos less than d6?
+		bge.s	loc_D9D2	; if it is, branch
+		subq.w	#6,a0		; get object's address
+;		tst.b	2(a0)	; does the object get a respawn table entry?
 		tst.b	4(a0)
-		bpl.s	loc_D9BC
-		subq.b	#1,1(a2)
+		bpl.s	loc_D9BC	; if not, branch
+		subq.b	#1,1(a2)	; respawn index of this object
 		move.b	1(a2),d2
 
 loc_D9BC:
-		bsr.w	loc_DA3C
-		bne.s	loc_D9C6
+		bsr.w	loc_DA3C	; load object
+		bne.s	loc_D9C6	; branch, if SST is full
 		subq.w	#6,a0
-		bra.s	loc_D9A6
+		bra.s	loc_D9A6	; continue with previous object
 ; ===========================================================================
 
-loc_D9C6:
+loc_D9C6:	; undo a few things, if the object couldn't load
+;		tst.b	2(a0)	; does the object get a respawn table entry?
 		tst.b	4(a0)
-		bpl.s	loc_D9D0
-		addq.b	#1,1(a2)
+		bpl.s	loc_D9D0	; if not, branch
+		addq.b	#1,1(a2)	; since we didn't load the object, undo last change
 
 loc_D9D0:
-		addq.w	#6,a0
+		addq.w	#6,a0	; go back to last object
 
 loc_D9D2:
-		move.l	a0,(v_opl_data+4).w
-		movea.l	(v_opl_data).w,a0
-		addi.w	#$300,d6
+		move.l	a0,(v_opl_data+4).w	; remember current object from the left
+		movea.l	(v_opl_data).w,a0	; get next object from the right
+		addi.w	#$300,d6	; look two chunks beyond the right edge of the screen
 
-loc_D9DE:
-		cmp.w	-6(a0),d6
-		bgt.s	loc_D9F0
-		tst.b	-2(a0)
-		bpl.s	loc_D9EC
-		subq.b	#1,(a2)
+loc_D9DE:	; subtract number of objects that have been moved out of range (from the right side)
+		cmp.w	-6(a0),d6	; is the previous object's X pos less than d6?
+		bgt.s	loc_D9F0	; if it is, branch
+;		tst.b	-4(a0)	; does the previous object get a respawn table entry?
+		tst.b	-2(a0)	; does the previous object get a respawn table entry?
+		bpl.s	loc_D9EC	; if not, branch
+		subq.b	#1,(a2)		; respawn index of next object to the right
 
 loc_D9EC:
 		subq.w	#6,a0
-		bra.s	loc_D9DE
+		bra.s	loc_D9DE	; continue with previous object
 ; ===========================================================================
 
 loc_D9F0:
-		move.l	a0,(v_opl_data).w
-		rts	
+		move.l	a0,(v_opl_data).w	; remember next object from the right
+		rts
 ; ===========================================================================
 
 loc_D9F6:
 		move.w	d6,(v_opl_screen).w
-		movea.l	(v_opl_data).w,a0
-		addi.w	#$280,d6
+		movea.l	(v_opl_data).w,a0	; get next object from the right
+		addi.w	#$280,d6	; look two chunks forward
 
-loc_DA02:
-		cmp.w	(a0),d6
-		bls.s	loc_DA16
+loc_DA02:	; load all objects right of the screen that are now in range
+		cmp.w	(a0),d6		; is object's x position >= d6?
+		bls.s	loc_DA16	; if yes, branch
+;		tst.b	2(a0)	; does the object get a respawn table entry?
 		tst.b	4(a0)
-		bpl.s	loc_DA10
-		move.b	(a2),d2
-		addq.b	#1,(a2)
+		bpl.s	loc_DA10	; if not, branch
+		move.b	(a2),d2		; respawn index of this object
+		addq.b	#1,(a2)		; respawn index of next object to the right
 
 loc_DA10:
-		bsr.w	loc_DA3C
-		beq.s	loc_DA02
-		tst.b	obMap(a0)	; was this object a remember state?
-		bpl.s	loc_DA16	; if not, branch
-		subq.b	#1,(a2)	; move right counter back
-
+		bsr.w	loc_DA3C	; load object (and get address of next object)
+		beq.s	loc_DA02	; continue loading objects, if the SST isn't full
 loc_DA16:
-		move.l	a0,(v_opl_data).w
-		movea.l	(v_opl_data+4).w,a0
-		subi.w	#$300,d6
-		blo.s	loc_DA36
+		move.l	a0,(v_opl_data).w	; remember next object from the right
+		movea.l	(v_opl_data+4).w,a0	; get current object from the left
+		subi.w	#$300,d6	; look one chunk behind the left edge of the screen
+		bcs.s	loc_DA36	; branch, if camera position would be behind level's left boundary
 
-loc_DA24:
-		cmp.w	(a0),d6
-		bls.s	loc_DA36
+loc_DA24:	; subtract number of objects that have been moved out of range (from the left)
+		cmp.w	(a0),d6		; is object's x position >= d6?
+		bls.s	loc_DA36	; if yes, branch
+;		tst.b	2(a0)	; does the object get a respawn table entry?
 		tst.b	4(a0)
-		bpl.s	loc_DA32
-		addq.b	#1,1(a2)
+		bpl.s	loc_DA32	; if not, branch
+		addq.b	#1,1(a2)	; respawn index of next object to the left
 
 loc_DA32:
 		addq.w	#6,a0
-		bra.s	loc_DA24
+		bra.s	loc_DA24	; continue with previous object
 ; ===========================================================================
 
 loc_DA36:
-		move.l	a0,(v_opl_data+4).w
+		move.l	a0,(v_opl_data+4).w	; remember current object from the left
 
 locret_DA3A:
 		rts
 ; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to check if an object needs to be loaded.
+;
+; input variables:
+;  d2 = respawn index of object to be loaded
+;
+;  a0 = address in object placement list
+;  a2 = object respawn table
+;
+; writes:
+;  d0, d1
+;  a1 = object
+; ---------------------------------------------------------------------------
 
 loc_DA3C:
+;		tst.b	2(a0)	; does the object get a respawn table entry?
 		tst.b	4(a0)
-		bpl.s	OPL_MakeItem
-		btst	#7,obGfx(a2,d2.w)
-		beq.s	OPL_MakeItem
-		addq.w	#6,a0
-		moveq	#0,d0
+		bpl.s	OPL_MakeItem	; if not, branch
+;		bset	#7,4(a2,d2.w)	; mark object as loaded
+		bset	#7,2(a2,d2.w)	; mark object as loaded
+		beq.s	OPL_MakeItem		; branch if it wasn't already loaded
+		addq.w	#6,a0	; next object
+		moveq	#0,d0	; let the objects manager know that it can keep going
 		rts
 ; ===========================================================================
 
 OPL_MakeItem:
-		bsr.w	FindFreeObj
-		bne.s	locret_DA8A
+		bsr.w	FindFreeObj	; find empty slot
+		bne.s	locret_DA8A	; branch, if there is no room left in the SST
 		move.w	(a0)+,obX(a1)
 		move.w	(a0)+,d0
 		move.w	d0,d1
@@ -6713,7 +6747,7 @@ OPL_MakeItem:
 		move.b	d1,obStatus(a1)
 		move.b	(a0)+,d0
 		bpl.s	loc_DA80
-		bset	#7,obGfx(a2,d2.w)	; set as removed
+;		bset	#7,obGfx(a2,d2.w)	; set as removed
 		andi.b	#$7F,d0
 		move.b	d2,obRespawnNo(a1)
 
@@ -6723,7 +6757,7 @@ loc_DA80:
 		moveq	#0,d0
 
 locret_DA8A:
-		rts	
+		rts
 
 		include	"_incObj/sub FindFreeObj.asm"
 		include	"_incObj/41 Springs.asm"

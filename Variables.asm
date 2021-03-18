@@ -16,6 +16,10 @@ v_bgscroll_buffer	= ramaddr( $FFFF9808 )	; background scroll buffer ($200 bytes)
 v_ngfx_buffer	= ramaddr ( $FFFF9A08 )	; Nemesis graphics decompression buffer ($200 bytes)
 v_spritequeue	= ramaddr ( $FFFF9C08 )	; sprite display queue, in order of priority ($400 bytes)
 
+;v_opl_routine	= ramaddr ( $FFFFA008 )	; ObjPosLoad - routine counter
+;v_opl_screen	= ramaddr ( $FFFFA00C )	; ObjPosLoad - screen variable
+;v_opl_data	= ramaddr ( $FFFFA010 )	; ObjPosLoad - data buffer ($10 bytes)
+
 v_sgfx_buffer	= ramaddr ( $FFFFC800 )	; buffered Sonic graphics ($17 cells) ($2E0 bytes)
 v_tracksonic	= ramaddr ( $FFFFCB00 )	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer	= ramaddr ( $FFFFCC00 )	; scrolling table data (actually $380 bytes, but $400 is reserved for it)
@@ -178,9 +182,9 @@ v_fg_yblock	= ramaddr ( $FFFFF74B )	; foreground y-block parity (for redraw)
 v_bg1_xblock	= ramaddr ( $FFFFF74C )	; background x-block parity (for redraw)
 v_bg1_yblock	= ramaddr ( $FFFFF74D )	; background y-block parity (for redraw)
 v_bg2_xblock	= ramaddr ( $FFFFF74E )	; secondary background x-block parity (for redraw)
-v_bg2_yblock	= ramaddr ( $FFFFF74F )	; secondary background y-block parity (unused)
+;v_bg2_yblock	= ramaddr ( $FFFFF74F )	; secondary background y-block parity (unused)
 v_bg3_xblock	= ramaddr ( $FFFFF750 )	; teritary background x-block parity (for redraw)
-v_bg3_yblock	= ramaddr ( $FFFFF751 )	; teritary background y-block parity (unused)
+;v_bg3_yblock	= ramaddr ( $FFFFF751 )	; teritary background y-block parity (unused)
 
 v_fg_scroll_flags	= ramaddr ( $FFFFF754 )	; screen redraw flags for foreground
 v_bg1_scroll_flags	= ramaddr ( $FFFFF756 )	; screen redraw flags for background 1
@@ -212,10 +216,11 @@ v_bossstatus	= ramaddr ( $FFFFF7A7 )	; status of boss and prison capsule (01 = b
 v_trackpos	= ramaddr ( $FFFFF7A8 )	; position tracking reference number (2 bytes)
 v_trackbyte	= ramaddr ( $FFFFF7A9 )	; low byte for position tracking
 f_lockscreen	= ramaddr ( $FFFFF7AA )	; flag set to lock screen during bosses
+v_screenposx_coarse	= ramaddr ( $FFFFF7AC )	; (Camera_X_pos - 128) / 256 (2 bytes)
 ;v_256loop1	= ramaddr ( $FFFFF7AC )	; 256x256 level tile which contains a loop (GHZ/SLZ)
 ;v_256loop2	= ramaddr ( $FFFFF7AD )	; 256x256 level tile which contains a loop (GHZ/SLZ)
-v_256roll1	= ramaddr ( $FFFFF7AE )	; 256x256 level tile which contains a roll tunnel (GHZ)
-v_256roll2	= ramaddr ( $FFFFF7AF )	; 256x256 level tile which contains a roll tunnel (GHZ)
+;v_256roll1	= ramaddr ( $FFFFF7AE )	; 256x256 level tile which contains a roll tunnel (GHZ)
+;v_256roll2	= ramaddr ( $FFFFF7AF )	; 256x256 level tile which contains a roll tunnel (GHZ)
 v_lani0_frame	= ramaddr ( $FFFFF7B0 )	; level graphics animation 0 - current frame
 v_lani0_time	= ramaddr ( $FFFFF7B1 )	; level graphics animation 0 - time until next frame
 v_lani1_frame	= ramaddr ( $FFFFF7B2 )	; level graphics animation 1 - current frame
@@ -320,12 +325,12 @@ v_ani3_buf	= ramaddr ( $FFFFFEC8 )	; synchronised sprite animation 3 - info buff
 v_limittopdb	= ramaddr ( $FFFFFEF0 )	; level upper boundary, buffered for debug mode (2 bytes)
 v_limitbtmdb	= ramaddr ( $FFFFFEF2 )	; level bottom boundary, buffered for debug mode (2 bytes)
 
-v_screenposx_dup	= ramaddr ( $FFFFFF10 )	; screen position x (duplicate) (2 bytes)
-v_screenposy_dup	= ramaddr ( $FFFFFF14 )	; screen position y (duplicate) (2 bytes)
+v_screenposx_dup	= ramaddr ( $FFFFFF10 )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
+;v_screenposy_dup	= ramaddr ( $FFFFFF14 )	; screen position y (duplicate) (2 bytes)
 v_bgscreenposx_dup	= ramaddr ( $FFFFFF18 )	; background screen position x (duplicate) (2 bytes)
 v_bgscreenposy_dup	= ramaddr ( $FFFFFF1C )	; background screen position y (duplicate) (2 bytes)
 v_bg2screenposx_dup	= ramaddr ( $FFFFFF20 )	; 2 bytes
-v_bg2screenposy_dup	= ramaddr ( $FFFFFF24 )	; 2 bytes
+;v_bg2screenposy_dup	= ramaddr ( $FFFFFF24 )	; 2 bytes
 v_bg3screenposx_dup	= ramaddr ( $FFFFFF28 )	; 2 bytes
 v_bg3screenposy_dup	= ramaddr ( $FFFFFF2C )	; 2 bytes
 v_fg_scroll_flags_dup	= ramaddr ( $FFFFFF30 )
