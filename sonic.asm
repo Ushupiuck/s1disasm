@@ -7381,6 +7381,7 @@ ObjHitWallRight:
 		move.b	#0,(a4)
 		movea.w	#$10,a3
 		move.w	#0,d6
+		moveq	#$D,d5
 		bsr.w	FindWall	; MJ: check solidity
 		move.b	(v_anglebuffer).w,d3
 		btst	#0,d3
@@ -7388,7 +7389,7 @@ ObjHitWallRight:
 		move.b	#-$40,d3
 
 locret_14F06:
-		rts	
+		rts
 
 ; End of function ObjHitWallRight
 

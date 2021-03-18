@@ -108,7 +108,7 @@ loc_C02C:	; Routine 4
 		clr.w	obVelY(a0)
 
 locret_C044:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_C046:
@@ -203,7 +203,7 @@ PushB_ChkLava:
 		beq.s	PushB_LoadLava
 		cmpi.w	#$BA0,obX(a0)
 		beq.s	PushB_LoadLava
-		rts	
+		rts
 ; ===========================================================================
 
 PushB_ChkLava2:
@@ -216,7 +216,7 @@ PushB_ChkLava2:
 		beq.s	PushB_LoadLava
 
 PushB_NoLava:
-		rts	
+		rts
 ; ===========================================================================
 
 PushB_LoadLava:
@@ -230,7 +230,7 @@ PushB_LoadLava:
 		move.l	a0,$3C(a1)
 
 locret_C184:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_C186:
@@ -242,7 +242,7 @@ loc_C186:
 		btst	#3,obStatus(a1)
 		bne.s	loc_C1A4
 		clr.b	ob2ndRout(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_C1A4:
@@ -272,7 +272,7 @@ loc_C1AA:
 		clr.w	obY+2(a0)
 
 locret_C1F0:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_C1F2:
@@ -284,7 +284,7 @@ loc_C1F2:
 		move.w	obVelX(a0),$30(a0)
 		clr.w	obVelX(a0)
 		subq.b	#2,ob2ndRout(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_C218:
