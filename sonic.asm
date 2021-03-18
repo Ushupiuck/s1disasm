@@ -6562,7 +6562,7 @@ loc_D93C:
 loc_D944:
 		cmp.w	(a0),d6		; is object's x position >= d6?
 		bls.s	loc_D956	; if yes, branch
-		tst.b	4(a0)	; does the object get a respawn table entry?
+		tst.b	4(a0)		; does the object get a respawn table entry?
 		bpl.s	loc_D952	; if not, branch
 		move.b	(a2),d2
 		addq.b	#1,(a2)	; respawn index of next object to the right
@@ -6582,8 +6582,7 @@ loc_D956:
 loc_D964:	; count how many objects are behind the screen that are not in range and need to remember their state
 		cmp.w	(a0),d6		; is object's x position >= d6?
 		bls.s	loc_D976	; if yes, branch
-;		tst.b	2(a0)	; does the object get a respawn table entry?
-		tst.b	4(a0)
+		tst.b	4(a0)		; does the object get a respawn table entry?
 		bpl.s	loc_D972	; if not, branch
 		addq.b	#1,1(a2)	; respawn index of current object to the left
 
@@ -6620,8 +6619,7 @@ loc_D9A6:	; load all objects left of the screen that are now in range
 		cmp.w	-6(a0),d6	; is the previous object's X pos less than d6?
 		bge.s	loc_D9D2	; if it is, branch
 		subq.w	#6,a0		; get object's address
-;		tst.b	2(a0)	; does the object get a respawn table entry?
-		tst.b	4(a0)
+		tst.b	4(a0)		; does the object get a respawn table entry?
 		bpl.s	loc_D9BC	; if not, branch
 		subq.b	#1,1(a2)	; respawn index of this object
 		move.b	1(a2),d2
@@ -6634,8 +6632,7 @@ loc_D9BC:
 ; ===========================================================================
 
 loc_D9C6:	; undo a few things, if the object couldn't load
-;		tst.b	2(a0)	; does the object get a respawn table entry?
-		tst.b	4(a0)
+		tst.b	4(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_D9D0	; if not, branch
 		addq.b	#1,1(a2)	; since we didn't load the object, undo last change
 
@@ -6650,8 +6647,7 @@ loc_D9D2:
 loc_D9DE:	; subtract number of objects that have been moved out of range (from the right side)
 		cmp.w	-6(a0),d6	; is the previous object's X pos less than d6?
 		bgt.s	loc_D9F0	; if it is, branch
-;		tst.b	-4(a0)	; does the previous object get a respawn table entry?
-		tst.b	-2(a0)	; does the previous object get a respawn table entry?
+		tst.b	-2(a0)		; does the previous object get a respawn table entry?
 		bpl.s	loc_D9EC	; if not, branch
 		subq.b	#1,(a2)		; respawn index of next object to the right
 
@@ -6673,8 +6669,7 @@ loc_D9F6:
 loc_DA02:	; load all objects right of the screen that are now in range
 		cmp.w	(a0),d6		; is object's x position >= d6?
 		bls.s	loc_DA16	; if yes, branch
-;		tst.b	2(a0)	; does the object get a respawn table entry?
-		tst.b	4(a0)
+		tst.b	4(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_DA10	; if not, branch
 		move.b	(a2),d2		; respawn index of this object
 		addq.b	#1,(a2)		; respawn index of next object to the right
@@ -6691,8 +6686,7 @@ loc_DA16:
 loc_DA24:	; subtract number of objects that have been moved out of range (from the left)
 		cmp.w	(a0),d6		; is object's x position >= d6?
 		bls.s	loc_DA36	; if yes, branch
-;		tst.b	2(a0)	; does the object get a respawn table entry?
-		tst.b	4(a0)
+		tst.b	4(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_DA32	; if not, branch
 		addq.b	#1,1(a2)	; respawn index of next object to the left
 
@@ -6722,8 +6716,7 @@ locret_DA3A:
 ; ---------------------------------------------------------------------------
 
 loc_DA3C:
-;		tst.b	2(a0)	; does the object get a respawn table entry?
-		tst.b	4(a0)
+		tst.b	4(a0)	; does the object get a respawn table entry?
 		bpl.s	OPL_MakeItem	; if not, branch
 ;		bset	#7,4(a2,d2.w)	; mark object as loaded
 		bset	#7,2(a2,d2.w)	; mark object as loaded
