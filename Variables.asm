@@ -326,6 +326,7 @@ v_limittopdb	= ramaddr ( $FFFFFEF0 )	; level upper boundary, buffered for debug 
 v_limitbtmdb	= ramaddr ( $FFFFFEF2 )	; level bottom boundary, buffered for debug mode (2 bytes)
 
 v_screenposx_dup	= ramaddr ( $FFFFFF10 )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
+v_cameralag		= ramaddr ( $FFFFFF14 )	; camera lag after launching Spin Dash (2 bytes)
 ;v_screenposy_dup	= ramaddr ( $FFFFFF14 )	; screen position y (duplicate) (2 bytes)
 v_bgscreenposx_dup	= ramaddr ( $FFFFFF18 )	; background screen position x (duplicate) (2 bytes)
 v_bgscreenposy_dup	= ramaddr ( $FFFFFF1C )	; background screen position y (duplicate) (2 bytes)
