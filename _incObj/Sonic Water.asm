@@ -17,6 +17,8 @@ Sonic_Water:
 		move.w	(v_waterpos1).w,d0
 		cmp.w	obY(a0),d0	; is Sonic above the water?
 		bge.s	.abovewater	; if yes, branch
+		tst.w	obVelY(a0)	; check if player is moving upward (i.e. from jumping)
+		bmi.s	.exit		; if yes, skip routine
 		bset	#6,obStatus(a0)
 		bne.s	.exit
 		bsr.w	ResumeMusic

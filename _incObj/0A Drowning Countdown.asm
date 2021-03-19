@@ -211,7 +211,7 @@ Drown_Countdown:; Routine $A
 
 .reduceair:
 		subq.w	#1,(v_air).w	; subtract 1 from air remaining
-		bcc.w	.gotomakenum	; if air is above 0, branch
+		bcc.w	Makenum		; if air is above 0, branch
 
 		; Sonic drowns here
 		bsr.w	ResumeMusic
@@ -230,6 +230,7 @@ Drown_Countdown:; Routine $A
 		move.w	#0,obVelX(a0)
 		move.w	#0,obInertia(a0)
 		move.b	#$A,obRoutine(a0)	; Force the character to drown
+		move.b	#0,(f_timecount).w      ; Stop the timer immediately
 		move.b	#1,(f_nobgscroll).w
 		movea.l	(sp)+,a0
 		rts
@@ -242,17 +243,13 @@ Drown_Countdown:; Routine $A
 		rts
 ; ===========================================================================
 
-.gotomakenum:
-		bra.s	.makenum
-; ===========================================================================
-
 .nochange:
 		tst.w	$36(a0)
 		beq.w	.nocountdown
 		subq.w	#1,$3A(a0)
 		bpl.w	.nocountdown
 
-.makenum:
+Makenum:
 		jsr	(RandomNumber).l
 		andi.w	#$F,d0
 		move.w	d0,$3A(a0)

@@ -48,9 +48,9 @@ Lamp_Main:	; Routine 0
 
 Lamp_Blue:	; Routine 2
 		tst.w	(v_debuguse).w	; is debug mode	being used?
-		bne.w	.donothing	; if yes, branch
+		bne.w	Lamp_Finish	; if yes, branch
 		tst.b	(f_lockmulti).w
-		bmi.w	.donothing
+		bmi.w	Lamp_Finish
 		move.b	(v_lastlamp).w,d1
 		andi.b	#$7F,d1
 		move.b	obSubtype(a0),d2
@@ -63,7 +63,7 @@ Lamp_Blue:	; Routine 2
 		bset	#0,2(a2,d0.w)
 		move.b	#4,obRoutine(a0)
 		move.b	#3,obFrame(a0)
-		bra.w	.donothing
+		bra.w	Lamp_Finish
 ; ===========================================================================
 
 .chkhit:
@@ -71,12 +71,12 @@ Lamp_Blue:	; Routine 2
 		sub.w	obX(a0),d0
 		addq.w	#8,d0
 		cmpi.w	#$10,d0
-		bcc.w	.donothing
+		bcc.w	Lamp_Finish
 		move.w	(v_player+obY).w,d0
 		sub.w	obY(a0),d0
 		addi.w	#$40,d0
 		cmpi.w	#$68,d0
-		bcc.s	.donothing
+		bcc.s	Lamp_Finish
 
 		sfx	sfx_Lamppost,0,0,0	; play lamppost sound
 		addq.b	#2,obRoutine(a0)
@@ -102,10 +102,6 @@ Lamp_Blue:	; Routine 2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		bset	#0,2(a2,d0.w)
-
-.donothing:
-		rts	
-; ===========================================================================
 
 Lamp_Finish:	; Routine 4
 		rts	

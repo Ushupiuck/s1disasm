@@ -73,6 +73,14 @@ Sonic_UpdateSpindash:
 ;		move.b	#0,(Sonic_Dust+anim).w
 		move.w	#$BC,d0	; spindash zoom sound
 		jsr	(PlaySound_Special).l
+		move.b	angle(a0),d0
+		jsr	(CalcSine).l
+		muls.w	inertia(a0),d1
+		asr.l	#8,d1
+		move.w	d1,x_vel(a0)
+		muls.w	inertia(a0),d0
+		asr.l	#8,d0
+		move.w	d0,y_vel(a0)
 		bra.s	Obj01_Spindash_ResetScr
 ; ===========================================================================
 ; word_1AD0C:
