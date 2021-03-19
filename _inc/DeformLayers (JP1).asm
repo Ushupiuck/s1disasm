@@ -643,7 +643,7 @@ Deform_SBZ2:;loc_68A2:
 		swap	d0
 		move.w	(v_bgscreenposx).w,d0
 		neg.w	d0
-	.loop:
+	.loop:		
 		move.l	d0,(a1)+
 		dbf	d1,.loop
 		rts

@@ -31,7 +31,7 @@ Sonic_LevelBound:
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has Sonic touched the	bottom boundary?
 		blt.s	.bottom		; if yes, branch
-		rts
+		rts	
 ; ===========================================================================
 
 .bottom:
@@ -42,7 +42,7 @@ Sonic_LevelBound:
 		clr.b	(v_lastlamp).w	; clear	lamppost counter
 		move.w	#1,(f_restart).w ; restart the level
 		move.w	#(id_LZ<<8)+3,(v_zone).w ; set level to SBZ3 (LZ4)
-		rts
+		rts	
 ; ===========================================================================
 
 .sides:

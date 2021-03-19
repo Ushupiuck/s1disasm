@@ -2090,7 +2090,7 @@ Sega_WaitEnd:
 
 Sega_GotoTitle:
 		move.b	#id_Title,(v_gamemode).w ; go to title screen
-		rts
+		rts	
 ; ===========================================================================
 
 ; ---------------------------------------------------------------------------
@@ -2492,7 +2492,7 @@ loc_33B6:
 		cmpi.w	#$1C00,d0
 		blo.s	loc_33E4
 		move.b	#id_Sega,(v_gamemode).w
-		rts
+		rts	
 ; ===========================================================================
 
 loc_33E4:
@@ -6991,7 +6991,6 @@ MusicList2:
 ; ---------------------------------------------------------------------------
 
 Sonic_MdNormal:
-		bsr.w	Sonic_SpinDash
 		bsr.w	Sonic_Jump
 		bsr.w	Sonic_SlopeResist
 		bsr.w	Sonic_Move
@@ -6999,7 +6998,8 @@ Sonic_MdNormal:
 		bsr.w	Sonic_LevelBound
 		jsr	(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
-		jmp	(Sonic_SlopeRepel).l
+		bsr.w	Sonic_SlopeRepel
+		rts
 ; ===========================================================================
 
 Sonic_MdJump:
@@ -7013,7 +7013,8 @@ Sonic_MdJump:
 
 loc_12E5C:
 		bsr.w	Sonic_JumpAngle
-		jmp	(Sonic_Floor).l
+		bsr.w	Sonic_Floor
+		rts
 ; ===========================================================================
 
 Sonic_MdRoll:
@@ -7023,7 +7024,8 @@ Sonic_MdRoll:
 		bsr.w	Sonic_LevelBound
 		jsr	(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
-		jmp	(Sonic_SlopeRepel).l
+		bsr.w	Sonic_SlopeRepel
+		rts
 ; ===========================================================================
 
 Sonic_MdJump2:
@@ -7037,12 +7039,13 @@ Sonic_MdJump2:
 
 loc_12EA6:
 		bsr.w	Sonic_JumpAngle
-		jmp	(Sonic_Floor).l
+		bsr.w	Sonic_Floor
+		rts
 
 		include	"_incObj/Sonic Move.asm"
 		include	"_incObj/Sonic RollSpeed.asm"
 		include	"_incObj/Sonic JumpDirection.asm"
-		include "_incObj/Sonic Spindash.asm"
+
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Unused subroutine to squash Sonic
