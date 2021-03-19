@@ -42,14 +42,8 @@ Brick_Action:	; Routine 2
 		bsr.w	SolidObject
 
 .chkdel:
-		if Revision=0
-		bsr.w	DisplaySprite
 		out_of_range.w	DeleteObject
-		rts	
-		else
-			out_of_range.w	DeleteObject
-			bra.w	DisplaySprite
-		endif
+		bra.w	DisplaySprite
 ; ===========================================================================
 Brick_TypeIndex:dc.w Brick_Type00-Brick_TypeIndex
 		dc.w Brick_Type01-Brick_TypeIndex
@@ -85,7 +79,7 @@ loc_E8A8:
 		move.w	brick_origY(a0),d1
 		sub.w	d0,d1
 		move.w	d1,obY(a0)	; update the block's position to make it wobble
-		rts	
+		rts
 ; ===========================================================================
 
 Brick_Type03:
@@ -93,30 +87,23 @@ Brick_Type03:
 		addi.w	#$18,obVelY(a0)	; increase falling speed
 		bsr.w	ObjFloorDist
 		tst.w	d1		; has the block	hit the	floor?
-		bpl.w	locret_E8EE	; if not, branch
+		bpl.s	locret_E8EE	; if not, branch
 		add.w	d1,obY(a0)
 		clr.w	obVelY(a0)	; stop the block falling
 		move.w	obY(a0),brick_origY(a0)
 		move.b	#4,obSubtype(a0)
 		move.w	(a1),d0
 		andi.w	#$3FF,d0
-		if Revision=0
-		cmpi.w	#$2E8,d0
-		else
-			cmpi.w	#$16A,d0
-		endif
+		cmpi.w	#$16A,d0
 		bcc.s	locret_E8EE
 		move.b	#0,obSubtype(a0)
 
 locret_E8EE:
-		rts	
+		rts
 ; ===========================================================================
 
 Brick_Type04:
 		moveq	#0,d0
 		move.b	(v_oscillate+$12).w,d0
 		lsr.w	#3,d0
-		move.w	brick_origY(a0),d1
-		sub.w	d0,d1
-		move.w	d1,obY(a0)	; make the block wobble
-		rts	
+		bra.s	loc_E8A8

@@ -5,10 +5,8 @@
 LZWaterFeatures:
 		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ
 		bne.s	.notlabyrinth	; if not, branch
-		if Revision<>0
-			tst.b   (f_nobgscroll).w
-			bne.s	.setheight
-		endif
+		tst.b   (f_nobgscroll).w
+		bne.s	.setheight
 		cmpi.b	#6,(v_player+obRoutine).w ; has Sonic just died?
 		bcc.s	.setheight	; if yes, skip other effects
 
@@ -41,7 +39,7 @@ LZWaterFeatures:
 		move.b	d0,(v_hbla_line).w ; set water surface as on-screen
 
 .notlabyrinth:
-		rts	
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Initial water heights
@@ -75,7 +73,7 @@ LZDynamicWater:
 		add.w	d1,(v_waterpos2).w ; move water up/down
 
 .exit:
-		rts	
+		rts
 ; ===========================================================================
 DynWater_Index:	dc.w DynWater_LZ1-DynWater_Index
 		dc.w DynWater_LZ2-DynWater_Index
@@ -109,7 +107,7 @@ DynWater_LZ1:
 
 .setwater:
 		move.w	d1,(v_waterpos3).w
-		rts	
+		rts
 ; ===========================================================================
 
 .sonicishigh:
@@ -137,7 +135,7 @@ DynWater_LZ1:
 		move.w	d1,(v_waterpos3).w
 
 .skip:
-		rts	
+		rts
 ; ===========================================================================
 
 DynWater_LZ2:
@@ -152,7 +150,7 @@ DynWater_LZ2:
 
 .setwater:
 		move.w	d1,(v_waterpos3).w
-		rts	
+		rts
 ; ===========================================================================
 
 DynWater_LZ3:
@@ -176,7 +174,7 @@ DynWater_LZ3:
 .setwaterlz3:
 		move.w	d1,(v_waterpos3).w
 		move.w	d1,(v_waterpos2).w ; change water height instantly
-		rts	
+		rts
 ; ===========================================================================
 
 .routine2:
@@ -204,7 +202,7 @@ DynWater_LZ3:
 
 .setwater2:
 		move.w	d1,(v_waterpos3).w
-		rts	
+		rts
 ; ===========================================================================
 
 .routine3:
@@ -224,7 +222,7 @@ DynWater_LZ3:
 
 .setwater3:
 		move.w	d1,(v_waterpos3).w
-		rts	
+		rts
 ; ===========================================================================
 
 .routine4:
@@ -240,13 +238,13 @@ DynWater_LZ3:
 		move.w	#$608,(v_waterpos3).w
 		move.w	#$7C0,(v_waterpos2).w
 		move.b	#1,(f_switch+8).w
-		rts	
+		rts
 ; ===========================================================================
 
 .setwater4:
 		move.w	d1,(v_waterpos3).w
 		move.w	d1,(v_waterpos2).w
-		rts	
+		rts
 ; ===========================================================================
 
 .routine5:
@@ -255,7 +253,7 @@ DynWater_LZ3:
 		move.w	#$128,(v_waterpos3).w
 
 .dontset:
-		rts	
+		rts
 ; ===========================================================================
 
 DynWater_SBZ3:
@@ -341,7 +339,7 @@ LZWindTunnels:
 		addq.w	#1,obY(a1)	; move Sonic down on pole
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 .chknext:
@@ -355,7 +353,7 @@ LZWindTunnels:
 		clr.b	(f_wtunnelmode).w ; finish tunnel
 
 .quit:
-		rts	
+		rts
 ; End of function LZWindTunnels
 
 ; ===========================================================================
@@ -403,13 +401,13 @@ loc_3F6A:
 		clr.b	(f_jumponly).w
 
 locret_3F7A:
-		rts	
+		rts
 ; ===========================================================================
 
 LZSlide_Move:
 		cmpi.w	#3,d1
 		bcc.s	loc_3F84
-		nop	
+		nop
 
 loc_3F84:
 		bclr	#0,obStatus(a1)
@@ -428,7 +426,7 @@ loc_3F9A:
 		sfx	sfx_Waterfall,0,0,0	; play water sound
 
 locret_3FBE:
-		rts	
+		rts
 ; End of function LZWaterSlides
 
 ; ===========================================================================

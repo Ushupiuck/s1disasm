@@ -86,18 +86,15 @@ Spik_Hurt:
 		lea	(v_player).w,a0
 		cmpi.b	#4,obRoutine(a0)
 		bcc.s	loc_CF20
-	if Revision<>2
+		; This fixes the infamous "spike bug"
+		tst.w	flashtime(a0)	; Is Sonic flashing after being hurt?
+		bne.s	loc_CF20	; If so, skip getting hurt
 		move.l	obY(a0),d3
 		move.w	obVelY(a0),d0
 		ext.l	d0
 		asl.l	#8,d0
-	else
-		; This fixes the infamous "spike bug"
-		tst.w	flashtime(a0)	; Is Sonic flashing after being hurt?
-		bne.s	loc_CF20	; If so, skip getting hurt
-		jmp	(loc_E0).l	; This is a copy of the above code that was pushed aside for this
+
 loc_D5A2:
-	endif
 		sub.l	d0,d3
 		move.l	d3,obY(a0)
 		jsr	(HurtSonic).l
@@ -176,4 +173,4 @@ loc_CFC6:
 		move.w	#60,$38(a0)	; set time delay to 1 second
 
 locret_CFE6:
-		rts	
+		rts

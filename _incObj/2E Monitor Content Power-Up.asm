@@ -97,15 +97,13 @@ Pow_ChkInvinc:
 		move.b	#4,(v_objspace+$2C0+obAnim).w
 		tst.b	(f_lockscreen).w ; is boss mode on?
 		bne.s	Pow_NoMusic	; if yes, branch
-		if Revision<>0
-			cmpi.w	#$C,(v_air).w
-			bls.s	Pow_NoMusic
-		endif
+		cmpi.w	#$C,(v_air).w
+		bls.s	Pow_NoMusic
 		music	bgm_Invincible,1,0,0 ; play invincibility music
 ; ===========================================================================
 
 Pow_NoMusic:
-		rts	
+		rts
 ; ===========================================================================
 
 Pow_ChkRings:
@@ -130,7 +128,7 @@ Pow_RingSound:
 Pow_ChkS:
 		cmpi.b	#7,d0		; does monitor contain 'S'?
 		bne.s	Pow_ChkEnd
-		nop	
+		nop
 
 Pow_ChkEnd:
 		rts			; 'S' and goggles monitors do nothing
@@ -139,4 +137,4 @@ Pow_ChkEnd:
 Pow_Delete:	; Routine 4
 		subq.w	#1,obTimeFrame(a0)
 		bmi.w	DeleteObject	; delete after half a second
-		rts	
+		rts

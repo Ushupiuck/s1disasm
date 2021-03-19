@@ -155,7 +155,8 @@ obSolid:	equ ob2ndRout ; solid status flag
 flashtime:	equ $30	; time between flashes after getting hit
 invtime:	equ $32	; time left for invincibility
 shoetime:	equ $34	; time left for speed shoes
-
+spindash_flag:	equ $39
+spindash_counter:	equ $3A
 ; Object variables (Sonic 2 disassembly nomenclature)
 render_flags:	equ 1	; bitfield for x/y flip, display mode
 art_tile:	equ 2	; palette line & VRAM setting (2 bytes)
@@ -164,6 +165,7 @@ x_pos:		equ 8	; x-axis position (2-4 bytes)
 y_pos:		equ $C	; y-axis position (2-4 bytes)
 x_vel:		equ $10	; x-axis velocity (2 bytes)
 y_vel:		equ $12	; y-axis velocity (2 bytes)
+inertia:	equ $14	; potential speed (2 bytes)
 y_radius:	equ $16	; height/2
 x_radius:	equ $17	; width/2
 priority:	equ $18	; sprite stack priority -- 0 is front

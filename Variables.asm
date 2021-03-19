@@ -326,13 +326,11 @@ v_limittopdb	= ramaddr ( $FFFFFEF0 )	; level upper boundary, buffered for debug 
 v_limitbtmdb	= ramaddr ( $FFFFFEF2 )	; level bottom boundary, buffered for debug mode (2 bytes)
 
 v_screenposx_dup	= ramaddr ( $FFFFFF10 )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
-;v_screenposy_dup	= ramaddr ( $FFFFFF14 )	; screen position y (duplicate) (2 bytes)
-v_bgscreenposx_dup	= ramaddr ( $FFFFFF18 )	; background screen position x (duplicate) (2 bytes)
-v_bgscreenposy_dup	= ramaddr ( $FFFFFF1C )	; background screen position y (duplicate) (2 bytes)
-v_bg2screenposx_dup	= ramaddr ( $FFFFFF20 )	; 2 bytes
-;v_bg2screenposy_dup	= ramaddr ( $FFFFFF24 )	; 2 bytes
-v_bg3screenposx_dup	= ramaddr ( $FFFFFF28 )	; 2 bytes
-v_bg3screenposy_dup	= ramaddr ( $FFFFFF2C )	; 2 bytes
+Horiz_scroll_delay_val	= ramaddr ( $FFFFFF12 ) ; ; if its value is a, where a != 0, X scrolling will be based on the player's X position a-1 frames ago
+Camera_Y_pos_bias	= ramaddr ( $FFFFFF14 )	; screen position y (duplicate) (2 bytes)
+v_bgscreenposx_dup	= ramaddr ( $FFFFFF18 )	; background screen position x (duplicate) (8 bytes)
+v_bg2screenposx_dup	= ramaddr ( $FFFFFF20 )	; 8 bytes
+v_bg3screenposx_dup	= ramaddr ( $FFFFFF28 )	; 8 bytes
 v_fg_scroll_flags_dup	= ramaddr ( $FFFFFF30 )
 v_bg1_scroll_flags_dup	= ramaddr ( $FFFFFF32 )
 v_bg2_scroll_flags_dup	= ramaddr ( $FFFFFF34 )
