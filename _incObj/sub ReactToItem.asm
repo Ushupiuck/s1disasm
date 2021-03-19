@@ -115,7 +115,6 @@ ReactToItem:
 		bhi.w	.next
 
 .withiny:
-.chktype:
 		move.b	obColType(a1),d1 ; load collision type
 		andi.b	#$C0,d1		; is obColType $40 or higher?
 		beq.w	React_Enemy	; if not, branch
@@ -167,6 +166,8 @@ React_Monitor:
 React_Enemy:
 		tst.b	(v_invinc).w	; is Sonic invincible?
 		bne.s	.donthurtsonic	; if yes, branch
+		cmpi.b	#id_Spindash,obAnim(a0) ; is Sonic Spin Dashing?
+		beq.s	.donthurtsonic	; if yes, branch
 		cmpi.b	#id_Roll,obAnim(a0) ; is Sonic rolling/jumping?
 		bne.w	React_ChkHurt	; if not, branch
 

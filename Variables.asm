@@ -297,6 +297,7 @@ v_shield	= ramaddr ( $FFFFFE2C )	; shield status (00 = no; 01 = yes)
 v_invinc	= ramaddr ( $FFFFFE2D )	; invinciblity status (00 = no; 01 = yes)
 v_shoes	= ramaddr ( $FFFFFE2E )	; speed shoes status (00 = no; 01 = yes)
 v_lastlamp	= ramaddr ( $FFFFFE30 )	; number of the last lamppost you hit
+v_savedlastlamp	= v_lastlamp+1	; last lamppost you hit
 v_lamp_xpos	= v_lastlamp+2	; x-axis for Sonic to respawn at lamppost (2 bytes)
 v_lamp_ypos	= v_lastlamp+4	; y-axis for Sonic to respawn at lamppost (2 bytes)
 v_lamp_rings	= v_lastlamp+6	; rings stored at lamppost (2 bytes)
@@ -305,11 +306,17 @@ v_lamp_dle	= v_lastlamp+$C	; dynamic level event routine counter at lamppost
 v_lamp_limitbtm	= v_lastlamp+$E	; level bottom boundary at lamppost (2 bytes)
 v_lamp_scrx	= v_lastlamp+$10 ; x-axis screen at lamppost (2 bytes)
 v_lamp_scry	= v_lastlamp+$12 ; y-axis screen at lamppost (2 bytes)
-
+v_lamp_bgscrx	= v_lastlamp+$14 ; x-axis screen at lamppost (2 bytes)
+v_lamp_bgscry	= v_lastlamp+$16 ; y-axis screen at lamppost (2 bytes)
+v_lamp_bg2scrx	= v_lastlamp+$18 ; y-axis screen at lamppost (2 bytes)
+v_lamp_bg2scry	= v_lastlamp+$1A ; y-axis screen at lamppost (2 bytes)
+v_lamp_bg3scrx	= v_lastlamp+$1C ; y-axis screen at lamppost (2 bytes)
+v_lamp_bg3scry	= v_lastlamp+$1E ; y-axis screen at lamppost (2 bytes)
 v_lamp_wtrpos	= v_lastlamp+$20 ; water position at lamppost (2 bytes)
 v_lamp_wtrrout	= v_lastlamp+$22 ; water routine at lamppost
 v_lamp_wtrstat	= v_lastlamp+$23 ; water state at lamppost
 v_lamp_lives	= v_lastlamp+$24 ; lives counter at lamppost
+
 v_emeralds	= ramaddr ( $FFFFFE57 )	; number of chaos emeralds
 v_emldlist	= ramaddr ( $FFFFFE58 )	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
 v_oscillate	= ramaddr ( $FFFFFE5E )	; values which oscillate - for swinging platforms, et al ($42 bytes)

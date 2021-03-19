@@ -13,8 +13,7 @@ Sonic_CheckSpindash:
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0
 		beq.w	return_1AC8C
-;		move.b	#AniIDSonAni_Spindash,anim(a0)
-		move.b	#id_roll,anim(a0)
+		move.b	#id_Spindash,anim(a0)
 		move.w	#$BE,d0
 		jsr	(PlaySound_Special).l
 		addq.l	#4,sp
@@ -40,6 +39,7 @@ return_1AC8C:
 
 ; loc_1AC8E:
 Sonic_UpdateSpindash:
+		move.b	#id_Spindash,anim(a0)
 		move.b	(v_jpadhold2).w,d0
 		btst	#bitDn,d0
 		bne.w	Sonic_ChargingSpindash
@@ -49,7 +49,7 @@ Sonic_UpdateSpindash:
 		move.b	#7,x_radius(a0)
 		move.b	#id_roll,anim(a0)
 		addq.w	#5,y_pos(a0)	; add the difference between Sonic's rolling and standing heights
-		move.b	#0,spindash_flag(a0) ; clear Spin Dash flag 
+		move.b	#0,spindash_flag(a0) ; clear Spin Dash flag
 		moveq	#0,d0
 		move.b	spindash_counter(a0),d0
 		add.w	d0,d0
@@ -111,7 +111,7 @@ Sonic_ChargingSpindash:			; If still charging the dash...
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0
 		beq.w	Obj01_Spindash_ResetScr
-;		move.w	#id_roll,anim(a0)
+		move.w	#(id_Spindash<<8),anim(a0)
 		move.w	#$BE,d0
 		jsr	(PlaySound_Special).l
 		addi.w	#$200,spindash_counter(a0)

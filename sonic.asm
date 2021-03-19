@@ -2790,7 +2790,7 @@ Level_WaterPal:
 		bsr.w	PalLoad3_Water	; load underwater palette
 		tst.b	(v_lastlamp).w
 		beq.s	Level_GetBgm
-		move.b	($FFFFFE53).w,(f_wtr_state).w
+		move.b	(v_lamp_wtrstat).w,(f_wtr_state).w
 
 Level_GetBgm:
 		tst.w	(f_demo).w
@@ -6757,6 +6757,7 @@ Sonic_MdNormal:
 ; ===========================================================================
 
 Sonic_MdJump:
+		clr.b	spindash_flag(a0)
 		bsr.w	Sonic_JumpHeight
 		bsr.w	Sonic_JumpDirection
 		bsr.w	Sonic_LevelBound
@@ -6781,6 +6782,7 @@ Sonic_MdRoll:
 ; ===========================================================================
 
 Sonic_MdJump2:
+		clr.b	spindash_flag(a0)
 		bsr.w	Sonic_JumpHeight
 		bsr.w	Sonic_JumpDirection
 		bsr.w	Sonic_LevelBound
