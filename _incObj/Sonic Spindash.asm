@@ -49,7 +49,7 @@ Sonic_UpdateSpindash:
 		move.b	#7,x_radius(a0)
 		move.b	#id_roll,anim(a0)
 		addq.w	#5,y_pos(a0)	; add the difference between Sonic's rolling and standing heights
-		move.b	#0,spindash_flag(a0)
+		move.b	#0,spindash_flag(a0) ; clear Spin Dash flag 
 		moveq	#0,d0
 		move.b	spindash_counter(a0),d0
 		add.w	d0,d0

@@ -6830,7 +6830,7 @@ locret_13302:
 		include	"_incObj/Sonic Loops.asm"
 		include "_incObj/Sonic Drowns.asm"
 		include	"_incObj/Sonic Animate.asm"
-		include	"_anim/Sonic.asm"
+		include	"_anim/Sonic (without frame IDs).asm"
 		include	"_incObj/Sonic LoadGfx.asm"
 
 		include	"_incObj/0A Drowning Countdown.asm"
