@@ -243,8 +243,8 @@ PLC_Boss:	dc.w ((PLC_Bossend-PLC_Boss-2)/6)-1
 		plcm	Nem_Eggman, $8000	; Eggman main patterns
 		plcm	Nem_Weapons, $8D80	; Eggman's weapons
 		plcm	Nem_Prison, $93A0	; prison capsule
-		plcm	Nem_Bomb, $A300		; bomb enemy ((gets overwritten)
-		plcm	Nem_SlzSpike, $A300	; spikeball ((SLZ boss)
+		plcm	Nem_Bomb, $A300		; bomb enemy (gets overwritten)
+		plcm	Nem_SlzSpike, $A300	; spikeball (SLZ boss)
 		plcm	Nem_Exhaust, $A540	; exhaust flame
 PLC_Bossend:
 ; ---------------------------------------------------------------------------

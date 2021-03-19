@@ -174,9 +174,9 @@ Drown_Countdown:; Routine $A
 		tst.w	$2C(a0)
 		bne.w	.loc_13F86
 		cmpi.b	#6,(v_player+obRoutine).w
-		bcc.w	.nocountdown
+		bcc.w	NoCountdown
 		btst	#6,(v_player+obStatus).w ; is Sonic underwater?
-		beq.w	.nocountdown	; if not, branch
+		beq.w	NoCountdown	; if not, branch
 
 		subq.w	#1,drown_time(a0)	; decrement timer
 		bpl.w	.nochange	; branch if time remains
@@ -245,16 +245,16 @@ Drown_Countdown:; Routine $A
 
 .nochange:
 		tst.w	$36(a0)
-		beq.w	.nocountdown
+		beq.w	NoCountdown
 		subq.w	#1,$3A(a0)
-		bpl.w	.nocountdown
+		bpl.w	NoCountdown
 
 Makenum:
 		jsr	(RandomNumber).l
 		andi.w	#$F,d0
 		move.w	d0,$3A(a0)
 		jsr	(FindFreeObj).l
-		bne.w	.nocountdown
+		bne.w	NoCountdown
 		_move.b	#id_DrownCount,0(a1) ; load object
 		move.w	(v_player+obX).w,obX(a1) ; match X position to Sonic
 		moveq	#6,d0
@@ -306,8 +306,8 @@ Makenum:
 
 .loc_14082:
 		subq.b	#1,$34(a0)
-		bpl.s	.nocountdown
+		bpl.s	NoCountdown
 		clr.w	$36(a0)
 
-.nocountdown:
+NoCountdown:
 		rts
