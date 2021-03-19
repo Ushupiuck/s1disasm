@@ -2176,7 +2176,6 @@ Tit_LoadText:
 		move.w	#0,(v_pcyc_time).w ; disable palette cycling
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
-		jsr	(ScreenEvents).l
 		lea	(v_16x16).w,a1
 		lea	(Blk16_GHZ).l,a0 ; load	GHZ 16x16 mappings
 		move.w	#0,d0
@@ -2231,9 +2230,8 @@ Tit_ClrObj2:
 		move.b	#id_PSBTM,(v_objspace+$100).w ; load object which hides part of Sonic
 		move.b	#2,(v_objspace+$100+obFrame).w
 		jsr	(ExecuteObjects).l
-		jsr	(DeformLayers).l
+		bsr.w	DeformLayers
 		jsr	(BuildSprites).l
-		jsr	(ScreenEvents).l
 		moveq	#plcid_Main,d0
 		bsr.w	NewPLC
 		move.w	#0,(v_title_dcount).w
@@ -2247,9 +2245,8 @@ Tit_MainLoop:
 		move.b	#4,(v_vbla_routine).w
 		bsr.w	WaitForVBla
 		jsr	(ExecuteObjects).l
-		jsr	(DeformLayers).l
+		bsr.w	DeformLayers
 		jsr	(BuildSprites).l
-		jsr	(ScreenEvents).l
 		bsr.w	PCycle_Title
 		bsr.w	RunPLC
 		move.w	(v_objspace+obX).w,d0
@@ -2487,7 +2484,6 @@ loc_33B6:
 		move.b	#4,(v_vbla_routine).w
 		bsr.w	WaitForVBla
 		bsr.w	DeformLayers
-		jsr	(ScreenEvents).l
 		bsr.w	PaletteCycle
 		bsr.w	RunPLC
 		move.w	(v_objspace+obX).w,d0
@@ -2880,7 +2876,6 @@ Level_SkipTtlCard:
 		bsr.w	PalLoad1	; load Sonic's palette
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
-		jsr	(ScreenEvents).l
 		bset	#2,(v_fg_scroll_flags).w
 		bsr.w	LevelDataLoad ; load block mappings and palettes
 		bsr.w	LoadTilesFromStart
@@ -2912,7 +2907,6 @@ Level_LoadObj:
 		jsr	(ObjPosLoad).l
 		jsr	(ExecuteObjects).l
 		jsr	(BuildSprites).l
-		jsr	(ScreenEvents).l
 		moveq	#0,d0
 		tst.b	(v_lastlamp).w	; are you starting from	a lamppost?
 		bne.s	Level_SkipClr	; if yes, branch
@@ -3024,17 +3018,20 @@ Level_DoScroll:
 		bsr.w	DeformLayers
 
 Level_SkipScroll:
-		jsr	(LZWaterFeatures).l
-		jsr	(ObjPosLoad).l
 		jsr	(BuildSprites).l
-		jsr	(ScreenEvents).l
+		jsr	(ObjPosLoad).l
 		bsr.w	PaletteCycle
 		bsr.w	RunPLC
 		bsr.w	OscillateNumDo
 		bsr.w	SynchroAnimate
 		bsr.w	SignpostArtLoad
+
 		cmpi.b	#id_Demo,(v_gamemode).w
 		beq.s	Level_ChkDemo	; if mode is 8 (demo), branch
+		if Revision=0
+		tst.w	(f_restart).w	; is the level set to restart?
+		bne.w	GM_Level	; if yes, branch
+		endif
 		cmpi.b	#id_Level,(v_gamemode).w
 		beq.w	Level_MainLoop	; if mode is $C (level), branch
 		rts	
@@ -3069,9 +3066,7 @@ Level_FDLoop:
 		bsr.w	WaitForVBla
 		bsr.w	MoveSonicInDemo
 		jsr	(ExecuteObjects).l
-		jsr	(DeformLayers).l
 		jsr	(BuildSprites).l
-		jsr	(ScreenEvents).l
 		jsr	(ObjPosLoad).l
 		subq.w	#1,(v_palchgspeed).w
 		bpl.s	loc_3BC8
@@ -3873,7 +3868,6 @@ End_LoadData:
 		jsr	(Hud_Base).l
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
-		jsr	(ScreenEvents).l
 		bset	#2,(v_fg_scroll_flags).w
 		bsr.w	LevelDataLoad
 		bsr.w	LoadTilesFromStart
@@ -3898,7 +3892,6 @@ End_LoadSonic:
 		jsr	(ObjPosLoad).l
 		jsr	(ExecuteObjects).l
 		jsr	(BuildSprites).l
-		jsr	(ScreenEvents).l
 		moveq	#0,d0
 		move.w	d0,(v_rings).w
 		move.l	d0,(v_time).w
@@ -3936,7 +3929,6 @@ End_MainLoop:
 		jsr	(ExecuteObjects).l
 		bsr.w	DeformLayers
 		jsr	(BuildSprites).l
-		jsr	(ScreenEvents).l
 		jsr	(ObjPosLoad).l
 		bsr.w	PaletteCycle
 		bsr.w	OscillateNumDo
@@ -3967,7 +3959,6 @@ End_AllEmlds:
 		jsr	(ExecuteObjects).l
 		bsr.w	DeformLayers
 		jsr	(BuildSprites).l
-		jsr	(ScreenEvents).l
 		jsr	(ObjPosLoad).l
 		bsr.w	OscillateNumDo
 		bsr.w	SynchroAnimate
