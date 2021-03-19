@@ -4998,16 +4998,10 @@ DrawFlipXY:
 ; a1 = Address of block
 ; DrawBlocks:
 GetBlockData:
-		if Revision=0
-		lea	(v_16x16).w,a1	; MJ: load Block's location
-		add.w	4(a3),d4	; MJ: load Y position to d4
 		add.w	(a3),d5		; MJ: load X position to d5
-		else
-			add.w	(a3),d5		; MJ: load X position to d5
 GetBlockData_2:
-			add.w	4(a3),d4	; MJ: load Y position to d4
-			lea	(v_16x16).w,a1	; MJ: load Block's location
-		endif
+		add.w	4(a3),d4	; MJ: load Y position to d4
+		lea	(v_16x16).w,a1	; MJ: load Block's location
 		; Turn Y coordinate into index into level layout
 		move.w	d4,d3		; MJ: copy Y position to d3
 		andi.w	#$780,d3	; MJ: get within 780 (Not 380) (E00 pixels (not 700)) in multiples of 80
@@ -5051,14 +5045,9 @@ locret_6C1E:
 ; d5 = Relative X coordinate
 ; Returns VDP command in d0
 Calc_VRAM_Pos:
-		if Revision=0
-		add.w	4(a3),d4	; Add camera Y coordinate
-		add.w	(a3),d5		; Add camera X coordinate
-		else
-			add.w	(a3),d5
+		add.w	(a3),d5
 Calc_VRAM_Pos_2:
-			add.w	4(a3),d4
-		endif
+		add.w	4(a3),d4
 		; Floor the coordinates to the nearest pair of tiles (the size of a block).
 		; Also note that this wraps the value to the size of the plane:
 		; The plane is 64*8 wide, so wrap at $100, and it's 32*8 tall, so wrap at $200
@@ -5115,16 +5104,14 @@ LoadTilesFromStart:
 		lea	(v_bgscreenposx).w,a3
 		movea.l	(v_lvllayoutbg).w,a4	; MJ: Load address of layout BG
 		move.w	#$6000,d2
-		if Revision<>0
-			tst.b	(v_zone).w
-			beq.w	Draw_GHz_Bg
-			cmpi.b	#id_MZ,(v_zone).w
-			beq.w	Draw_Mz_Bg
-			cmpi.w	#(id_SBZ<<8)+0,(v_zone).w
-			beq.w	Draw_SBz_Bg
-			cmpi.b	#id_EndZ,(v_zone).w
-			beq.w	Draw_GHz_Bg
-		endif
+		tst.b	(v_zone).w
+		beq.w	Draw_GHz_Bg
+		cmpi.b	#id_MZ,(v_zone).w
+		beq.w	Draw_Mz_Bg
+		cmpi.w	#(id_SBZ<<8)+0,(v_zone).w
+		beq.w	Draw_SBz_Bg
+		cmpi.b	#id_EndZ,(v_zone).w
+		beq.w	Draw_GHz_Bg
 ; End of function LoadTilesFromStart
 
 
@@ -6923,7 +6910,7 @@ Sonic_Control:	; Routine 2
 		beq.s	loc_12C58	; if not, branch
 		move.w	#1,(v_debuguse).w ; change Sonic into a ring/item
 		clr.b	(f_lockctrl).w
-		rts	
+		rts
 ; ===========================================================================
 
 loc_12C58:
@@ -6960,8 +6947,7 @@ loc_12CA6:
 
 loc_12CB6:
 		bsr.w	Sonic_Loops
-		bsr.w	Sonic_LoadGfx
-		rts
+		jmp	(Sonic_LoadGfx).l
 ; ===========================================================================
 Sonic_Modes:	dc.w Sonic_MdNormal-Sonic_Modes
 		dc.w Sonic_MdJump-Sonic_Modes
@@ -6998,8 +6984,7 @@ Sonic_MdNormal:
 		bsr.w	Sonic_LevelBound
 		jsr	(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
-		bsr.w	Sonic_SlopeRepel
-		rts
+		jmp	(Sonic_SlopeRepel).l
 ; ===========================================================================
 
 Sonic_MdJump:
@@ -7013,8 +6998,7 @@ Sonic_MdJump:
 
 loc_12E5C:
 		bsr.w	Sonic_JumpAngle
-		bsr.w	Sonic_Floor
-		rts
+		jmp	(Sonic_Floor).l
 ; ===========================================================================
 
 Sonic_MdRoll:
@@ -7024,8 +7008,7 @@ Sonic_MdRoll:
 		bsr.w	Sonic_LevelBound
 		jsr	(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
-		bsr.w	Sonic_SlopeRepel
-		rts
+		jmp	(Sonic_SlopeRepel).l
 ; ===========================================================================
 
 Sonic_MdJump2:
@@ -7039,13 +7022,12 @@ Sonic_MdJump2:
 
 loc_12EA6:
 		bsr.w	Sonic_JumpAngle
-		bsr.w	Sonic_Floor
-		rts
+		jmp	(Sonic_Floor).l
 
 		include	"_incObj/Sonic Move.asm"
 		include	"_incObj/Sonic RollSpeed.asm"
 		include	"_incObj/Sonic JumpDirection.asm"
-
+;		include	"_incObj/Sonic Spindash.asm"
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Unused subroutine to squash Sonic
@@ -7101,16 +7083,14 @@ ResumeMusic:
 		move.w	#bgm_SBZ,d0	; play SBZ music
 
 .notsbz:
-		if Revision<>0
-			tst.b	(v_invinc).w ; is Sonic invincible?
-			beq.s	.notinvinc ; if not, branch
-			move.w	#bgm_Invincible,d0
+		tst.b	(v_invinc).w ; is Sonic invincible?
+		beq.s	.notinvinc ; if not, branch
+		move.w	#bgm_Invincible,d0
 .notinvinc:
-			tst.b	(f_lockscreen).w ; is Sonic at a boss?
-			beq.s	.playselected ; if not, branch
-			move.w	#bgm_Boss,d0
+		tst.b	(f_lockscreen).w ; is Sonic at a boss?
+		beq.s	.playselected ; if not, branch
+		move.w	#bgm_Boss,d0
 .playselected:
-		endif
 
 		jsr	(PlaySound).l
 
@@ -7662,7 +7642,7 @@ BossMove:
 		add.l	d0,d3
 		move.l	d2,$30(a0)
 		move.l	d3,$38(a0)
-		rts	
+		rts
 ; End of function BossMove
 
 ; ===========================================================================
@@ -7840,7 +7820,7 @@ loc_1B268:
 
 loc_1B288:
 		move.b	#0,-5(a2)
-		rts	
+		rts
 ; End of function SS_ShowLayout
 
 ; ---------------------------------------------------------------------------
@@ -8013,7 +7993,7 @@ loc_1B4E8:
 loc_1B4EA:
 		dbf	d7,loc_1B4DA
 
-		rts	
+		rts
 ; End of function SS_AniItems
 
 ; ===========================================================================
