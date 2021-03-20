@@ -7824,7 +7824,7 @@ SS_AniEmeraldSparks:
 		bne.s	locret_1B60C
 		clr.l	(a0)
 		clr.l	4(a0)
-		move.b	#4,($FFFFD024).w
+		move.b	#4,(v_objspace+$24).w
 		sfx	sfx_SSGoal,0,0,0	; play special stage GOAL sound
 
 locret_1B60C:

@@ -25,7 +25,7 @@ got_finalX = $32		; position for card to finish on
 Got_ChkPLC:	; Routine 0
 		tst.l	(v_plc_buffer).w ; are the pattern load cues empty?
 		beq.s	Got_Main	; if yes, branch
-		rts	
+		rts
 ; ===========================================================================
 
 Got_Main:
@@ -73,7 +73,7 @@ loc_C5FE:
 ; ===========================================================================
 
 locret_C60E:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_C610:
@@ -82,7 +82,7 @@ loc_C610:
 ; ===========================================================================
 
 loc_C61A:
-		cmpi.b	#$E,($FFFFD724).w
+		cmpi.b	#$E,(v_objspace+$724).w
 		beq.s	loc_C610
 		cmpi.b	#4,obFrame(a0)
 		bne.s	loc_C5FE
@@ -126,7 +126,7 @@ Got_SetDelay:
 		move.w	#180,obTimeFrame(a0) ; set time delay to 3 seconds
 
 locret_C692:
-		rts	
+		rts
 ; ===========================================================================
 
 Got_AddBonus:
@@ -228,7 +228,7 @@ Got_ChgPos2:
 ; ===========================================================================
 
 locret_C748:
-		rts	
+		rts
 ; ===========================================================================
 
 Got_SBZ2:
@@ -243,7 +243,7 @@ loc_C766:	; Routine $10
 		addq.w	#2,(v_limitright2).w
 		cmpi.w	#$2100,(v_limitright2).w
 		beq.w	DeleteObject
-		rts	
+		rts
 ; ===========================================================================
 		;    x-start,	x-main,	y-main,
 		;				routine, frame number
