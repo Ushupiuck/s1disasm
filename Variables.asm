@@ -296,6 +296,7 @@ v_score		= ramaddr ( $FFFFFE26 )	; score (4 bytes)
 v_shield	= ramaddr ( $FFFFFE2A )	; shield status (00 = no; 01 = yes)
 v_invinc	= ramaddr ( $FFFFFE2B )	; invinciblity status (00 = no; 01 = yes)
 v_shoes		= ramaddr ( $FFFFFE2C )	; speed shoes status (00 = no; 01 = yes)
+; Free space	= ramaddr ( $FFFFFE2D-2F)
 v_lastlamp	= ramaddr ( $FFFFFE30 )	; number of the last lamppost you hit
 v_savedlastlamp	= v_lastlamp+1	; last lamppost you hit
 v_lamp_xpos	= v_lastlamp+2	; x-axis for Sonic to respawn at lamppost (2 bytes)
