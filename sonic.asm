@@ -694,7 +694,7 @@ VBla_08:
 		movem.l	d0-d1,(v_fg_scroll_flags_dup).w
 		cmpi.b	#96,(v_hbla_line).w
 		bhs.s	Demo_Time
-		move.b	#1,(v_hint_update).w
+		move.b	#1,(v_int_update).w
 		addq.l	#4,sp
 		bra.w	VBla_Exit
 
@@ -781,7 +781,7 @@ VBla_0C:
 
 VBla_0E:
 		bsr.w	sub_106E
-		addq.b	#1,($FFFFF628).w
+		addq.b	#1,(v_int0E_Counter).w
 		move.b	#$E,(v_vbla_routine).w
 		rts
 ; ===========================================================================
@@ -885,7 +885,7 @@ HBlank:
 		move.l	(a0)+,(a1)
 		move.w	#$8A00+223,4(a1) ; reset HBlank register
 		movem.l	(sp)+,a0-a1
-		tst.b	(v_hint_update).w
+		tst.b	(v_int_update).w
 		bne.s	loc_119E
 
 .nochg:
@@ -893,7 +893,7 @@ HBlank:
 ; ===========================================================================
 
 loc_119E:
-		clr.b	(v_hint_update).w
+		clr.b	(v_int_update).w
 		movem.l	d0-a6,-(sp)
 		bsr.w	Demo_Time
 		jsr	(UpdateMusic).l
@@ -2140,7 +2140,6 @@ Tit_LoadText:
 		move.b	#0,(v_lastlamp).w ; clear lamppost counter
 		move.w	#0,(v_debuguse).w ; disable debug item placement mode
 		move.w	#0,(f_demo).w	; disable debug mode
-		move.w	#0,($FFFFFFEA).w ; unused variable
 		move.w	#(id_GHZ<<8),(v_zone).w	; set level to GHZ (00)
 		move.w	#0,(v_pcyc_time).w ; disable palette cycling
 		bsr.w	LevelSizeLoad
@@ -3589,7 +3588,7 @@ loc_4C4E:
 		cmpi.w	#$C,d0
 		bne.s	loc_4C74
 		subq.w	#1,(v_bg3screenposx).w
-		lea	($FFFFAB00).w,a3
+		lea	(v_ngfx_buffer+$100).w,a3
 		move.l	#$18000,d2
 		moveq	#6,d1
 
@@ -3601,7 +3600,7 @@ loc_4C64:
 		dbf	d1,loc_4C64
 
 loc_4C74:
-		lea	($FFFFAB00).w,a3
+		lea	(v_ngfx_buffer+$100).w,a3
 		lea	(byte_4CC4).l,a2
 
 loc_4C7E:
@@ -7336,7 +7335,7 @@ BossDefeated:
 		add.w	d0,obY(a1)
 
 locret_178A2:
-		rts	
+		rts
 ; End of function BossDefeated
 
 ; ---------------------------------------------------------------------------
@@ -7532,7 +7531,7 @@ loc_1B268:
 		cmpi.b	#$50,d5
 		beq.s	loc_1B288
 		move.l	#0,(a2)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1B288:
@@ -7652,7 +7651,7 @@ loc_1B350:
 		move.w	$E(a0),$38(a1)
 		adda.w	#$20,a0
 		adda.w	#$48,a1
-		rts	
+		rts
 ; End of function SS_AniWallsRings
 
 ; ===========================================================================
@@ -7682,7 +7681,7 @@ loc_1B4C4:
 		dbf	d0,loc_1B4C4
 
 locret_1B4CE:
-		rts	
+		rts
 ; End of function SS_RemoveCollectedItem
 
 ; ---------------------------------------------------------------------------
@@ -7737,7 +7736,7 @@ SS_AniRingSparks:
 		clr.l	4(a0)
 
 locret_1B530:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniRingData:	dc.b $42, $43, $44, $45, 0, 0
 ; ===========================================================================
@@ -7755,14 +7754,14 @@ SS_AniBumper:
 		clr.l	(a0)
 		clr.l	4(a0)
 		move.b	#$25,(a1)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1B564:
 		move.b	d0,(a1)
 
 locret_1B566:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniBumpData:	dc.b $32, $33, $32, $33, 0, 0
 ; ===========================================================================
@@ -7782,7 +7781,7 @@ SS_Ani1Up:
 		clr.l	4(a0)
 
 locret_1B596:
-		rts	
+		rts
 ; ===========================================================================
 SS_Ani1UpData:	dc.b $46, $47, $48, $49, 0, 0
 ; ===========================================================================
@@ -7800,14 +7799,14 @@ SS_AniReverse:
 		clr.l	(a0)
 		clr.l	4(a0)
 		move.b	#$2B,(a1)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1B5CA:
 		move.b	d0,(a1)
 
 locret_1B5CC:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniRevData:	dc.b $2B, $31, $2B, $31, 0, 0
 ; ===========================================================================
@@ -7829,7 +7828,7 @@ SS_AniEmeraldSparks:
 		sfx	sfx_SSGoal,0,0,0	; play special stage GOAL sound
 
 locret_1B60C:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniEmerData:	dc.b $46, $47, $48, $49, 0, 0
 ; ===========================================================================
@@ -7850,7 +7849,7 @@ SS_AniGlassBlock:
 		clr.l	4(a0)
 
 locret_1B640:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniGlassData:dc.b $4B, $4C, $4D, $4E, $4B, $4C, $4D,	$4E, 0,	0
 
@@ -7895,7 +7894,7 @@ SS_ChkEmldNum:
 		blo.s	SS_LoadData
 		lea	(v_emldlist).w,a3 ; check which emeralds you have
 
-SS_ChkEmldLoop:	
+SS_ChkEmldLoop:
 		cmp.b	(a3,d1.w),d0
 		bne.s	SS_ChkEmldRepeat
 		bra.s	SS_Load
@@ -7953,7 +7952,7 @@ loc_1B730:
 		clr.l	(a1)+
 		dbf	d1,loc_1B730
 
-		rts	
+		rts
 ; End of function SS_Load
 
 ; ===========================================================================

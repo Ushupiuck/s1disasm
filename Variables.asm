@@ -8,7 +8,7 @@ v_regbuffer	= ramaddr ( $FFFFFC00 )	; stores registers d0-a7 during an error eve
 v_spbuffer	= ramaddr ( $FFFFFC40 )	; stores most recent sp address (4 bytes)
 v_errortype	= ramaddr ( $FFFFFC44 )	; error type
 
-v_128x128:	= ramaddr ( $FF0000 )	; 128x128 tile mappings ($8000 bytes)
+v_128x128	= ramaddr ( $FF0000 )	; 128x128 tile mappings ($8000 bytes)
 v_16x16		= ramaddr ( $FFFF8000 )	; 16x16 tile mappings ($1800 bytes)
 v_lvllayoutfg	= ramaddr ( $FFFF9800 )	; level layout ROM address (4 bytes)
 v_lvllayoutbg	= ramaddr ( $FFFF9804 )	; background layout ROM address (4 bytes)
@@ -129,6 +129,8 @@ v_hbla_hreg	= ramaddr ( $FFFFF624 )	; VDP H.interrupt register buffer (8Axx) (2 
 v_hbla_line	= ramaddr ( $FFFFF625 )	; screen line where water starts and palette is changed by HBlank
 v_pfade_start	= ramaddr ( $FFFFF626 )	; palette fading - start position in bytes
 v_pfade_size	= ramaddr ( $FFFFF627 )	; palette fading - number of colours
+
+v_int0E_Counter = ramaddr ( $FFFFF628 )	; (1 byte)
 v_vbla_routine	= ramaddr ( $FFFFF62A )	; VBlank - routine counter
 v_spritecount	= ramaddr ( $FFFFF62C )	; number of sprites on-screen
 v_pcyc_num	= ramaddr ( $FFFFF632 )	; palette cycling - current reference number (2 bytes)
@@ -143,7 +145,7 @@ v_waterpos3	= ramaddr ( $FFFFF64A )	; water height, next target (2 bytes)
 f_water	= ramaddr ( $FFFFF64C )	; flag set for water
 v_wtr_routine	= ramaddr ( $FFFFF64D )	; water event - routine counter
 f_wtr_state	= ramaddr ( $FFFFF64E )	; water palette state when water is above/below the screen (00 = partly/all dry; 01 = all underwater)
-v_hint_update	= ramaddr ( $FFFFF64E ) ; (1 byte)
+v_int_update	= ramaddr ( $FFFFF64E ) ; (1 byte)
 v_pal_buffer	= ramaddr ( $FFFFF650 )	; palette data buffer (used for palette cycling) ($30 bytes)
 v_plc_buffer	= ramaddr ( $FFFFF680 )	; pattern load cues buffer (maximum $10 PLCs) ($60 bytes)
 v_ptrnemcode	= ramaddr ( $FFFFF6E0 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
@@ -359,7 +361,7 @@ f_debugcheat	= ramaddr ( $FFFFFFE2 )	; debug mode cheat flag
 f_creditscheat	= ramaddr ( $FFFFFFE3 )	; hidden credits & press start cheat flag
 v_title_dcount	= ramaddr ( $FFFFFFE4 )	; number of times the d-pad is pressed on title screen (2 bytes)
 v_title_ccount	= ramaddr ( $FFFFFFE6 )	; number of times C is pressed on title screen (2 bytes)
-
+; Free space	= ramaddr ( $FFFFFFE8-EF) (7 bytes)
 f_demo		= ramaddr ( $FFFFFFF0 )	; demo mode flag (0 = no; 1 = yes; $8001 = ending) (2 bytes)
 v_demonum	= ramaddr ( $FFFFFFF2 )	; demo level number (not the same as the level number) (2 bytes)
 v_creditsnum	= ramaddr ( $FFFFFFF4 )	; credits index number (2 bytes)
