@@ -16,10 +16,6 @@ v_bgscroll_buffer	= ramaddr( $FFFF9808 )	; background scroll buffer ($200 bytes)
 v_ngfx_buffer	= ramaddr ( $FFFF9A08 )	; Nemesis graphics decompression buffer ($200 bytes)
 v_spritequeue	= ramaddr ( $FFFF9C08 )	; sprite display queue, in order of priority ($400 bytes)
 
-;v_opl_routine	= ramaddr ( $FFFFA008 )	; ObjPosLoad - routine counter
-;v_opl_screen	= ramaddr ( $FFFFA00C )	; ObjPosLoad - screen variable
-;v_opl_data	= ramaddr ( $FFFFA010 )	; ObjPosLoad - data buffer ($10 bytes)
-
 v_sgfx_buffer	= ramaddr ( $FFFFC800 )	; buffered Sonic graphics ($17 cells) ($2E0 bytes)
 v_tracksonic	= ramaddr ( $FFFFCB00 )	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer	= ramaddr ( $FFFFCC00 )	; scrolling table data (actually $380 bytes, but $400 is reserved for it)
