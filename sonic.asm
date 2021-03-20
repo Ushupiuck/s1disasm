@@ -104,12 +104,8 @@ Console:	dc.b "SEGA MEGA DRIVE " ; Hardware system ID (Console name)
 _Date:		dc.b "(C)SEGA 1991.APR" ; Copyright holder and release date (generally year)
 Title_Local:	dc.b "SONIC THE               HEDGEHOG                " ; Domestic name
 Title_Int:	dc.b "SONIC THE               HEDGEHOG                " ; International name
-Serial:		if Revision=0
-		dc.b "GM 00001009-00"   ; Serial/version number (Rev 0)
-		else
-			dc.b "GM 00004049-01" ; Serial/version number (Rev non-0)
-		endif
-Checksum: dc.w $0
+Serial:		dc.b "GM 00004049-01" ; Serial/version number (Rev non-0)
+Checksum:	dc.w $0
 		dc.b "J               " ; I/O support
 RomStartLoc:	dc.l StartOfRom		; Start address of ROM
 RomEndLoc:	dc.l EndOfRom-1		; End address of ROM
@@ -4729,35 +4725,8 @@ DrawFlipXY:
 		eori.l	#$18001800,d5
 		swap	d5
 		move.l	d5,(a6)
-		rts	
+		rts
 ; End of function DrawBlocks
-
-; ===========================================================================
-; unused garbage
-		if Revision=0
-; This is interesting. It draws a block, but not before
-; incrementing its palette lines by 1. This may have been
-; a debug function to discolour mirrored tiles, to test
-; if they're loading properly.
-		rts
-		move.l	d0,(a5)
-		move.w	#$2000,d5
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		add.l	d7,d0
-		move.l	d0,(a5)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		rts
-		endif
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -8151,11 +8120,11 @@ Nem_LzSonic:	binclude	"artnem/Unused - LZ Sonic.bin" ; Sonic holding his breath
 		even
 Nem_UnkFire:	binclude	"artnem/Unused - Fireball.bin" ; unused fireball
 		even
-Nem_Warp:	binclude	"artnem/Unused - SStage Flash.bin" ; entry to special stage flash
-		even
 Nem_Goggle:	binclude	"artnem/Unused - Goggles.bin" ; unused goggles
 		even
 		endif
+Nem_Warp:	binclude	"artnem/Unused - SStage Flash.bin" ; entry to special stage flash
+		even
 
 Map_SSWalls:	include	"_maps/SS Walls.asm"
 
@@ -8457,11 +8426,7 @@ Blk16_MZ:	binclude	"map16/MZ.bin"
 		even
 Nem_MZ:		binclude	"artnem/8x8 - MZ.bin"	; MZ primary patterns
 		even
-Blk128_MZ:	if Revision=0
-		binclude	"map128/MZ.bin"
-		else
-		binclude	"map128/MZ (JP1).bin"
-		endif
+Blk128_MZ:	binclude	"map128/MZ (JP1).bin"
 		even
 Blk16_SLZ:	binclude	"map16/SLZ.bin"
 		even
@@ -8479,11 +8444,7 @@ Blk16_SBZ:	binclude	"map16/SBZ.bin"
 		even
 Nem_SBZ:	binclude	"artnem/8x8 - SBZ.bin"	; SBZ primary patterns
 		even
-Blk128_SBZ:	if Revision=0
-		binclude	"map128/SBZ.bin"
-		else
-		binclude	"map128/SBZ (JP1).bin"
-		endif
+Blk128_SBZ:	binclude	"map128/SBZ (JP1).bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - bosses and ending sequence
@@ -8510,8 +8471,8 @@ Nem_TryAgain:	binclude	"artnem/Ending - Try Again.bin"
 		even
 Nem_EndEggman:	if Revision=0
 		binclude	"artnem/Unused - Eggman Ending.bin"
-		endif
 		even
+		endif
 EndFlowers:	binclude	"artkos/Flowers at Ending.unc" ; ending sequence animated flowers
 		even
 Nem_EndFlower:	binclude	"artnem/Ending - Flowers.bin"
@@ -8537,9 +8498,9 @@ Col_LZ_1:	binclude	"collide/LZ1.bin"	; LZ index 1
 		even
 Col_LZ_2:	binclude	"collide/LZ2.bin"	; LZ index 2
 		even
-Col_MZ_1:		binclude	"collide/MZ1.bin"	; MZ index 1
+Col_MZ_1:	binclude	"collide/MZ1.bin"	; MZ index 1
 		even
-Col_MZ_2:		binclude	"collide/MZ2.bin"	; MZ index 2
+Col_MZ_2:	binclude	"collide/MZ2.bin"	; MZ index 2
 		even
 Col_SLZ_1:	binclude	"collide/SLZ1.bin"	; SLZ index 1
 		even
