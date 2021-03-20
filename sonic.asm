@@ -694,7 +694,7 @@ VBla_08:
 		movem.l	d0-d1,(v_fg_scroll_flags_dup).w
 		cmpi.b	#96,(v_hbla_line).w
 		bhs.s	Demo_Time
-		move.b	#1,($FFFFF64F).w
+		move.b	#1,(v_hint_update).w
 		addq.l	#4,sp
 		bra.w	VBla_Exit
 
@@ -885,7 +885,7 @@ HBlank:
 		move.l	(a0)+,(a1)
 		move.w	#$8A00+223,4(a1) ; reset HBlank register
 		movem.l	(sp)+,a0-a1
-		tst.b	($FFFFF64F).w
+		tst.b	(v_hint_update).w
 		bne.s	loc_119E
 
 .nochg:
@@ -893,7 +893,7 @@ HBlank:
 ; ===========================================================================
 
 loc_119E:
-		clr.b	($FFFFF64F).w
+		clr.b	(v_hint_update).w
 		movem.l	d0-a6,-(sp)
 		bsr.w	Demo_Time
 		jsr	(UpdateMusic).l
