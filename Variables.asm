@@ -235,12 +235,12 @@ v_lani5_frame	= ramaddr ( $FFFFF7BA )	; level graphics animation 5 - current fra
 v_lani5_time	= ramaddr ( $FFFFF7BB )	; level graphics animation 5 - time until next frame
 v_gfxbigring	= ramaddr ( $FFFFF7BE )	; settings for giant ring graphics loading (2 bytes)
 f_conveyrev	= ramaddr ( $FFFFF7C0 )	; flag set to reverse conveyor belts in LZ/SBZ
-v_obj63	= ramaddr ( $FFFFF7C1 )	; object 63 (LZ/SBZ platforms) variables (6 bytes)
+v_obj63		= ramaddr ( $FFFFF7C1 )	; object 63 (LZ/SBZ platforms) variables (6 bytes)
 f_wtunnelmode	= ramaddr ( $FFFFF7C7 )	; LZ water tunnel mode
 f_lockmulti	= ramaddr ( $FFFFF7C8 )	; flag set to lock controls, lock Sonic's position & animation
 f_wtunnelallow	= ramaddr ( $FFFFF7C9 )	; LZ water tunnels (00 = enabled; 01 = disabled)
 f_jumponly	= ramaddr ( $FFFFF7CA )	; flag set to lock controls apart from jumping
-v_obj6B	= ramaddr ( $FFFFF7CB )	; object 6B (SBZ stomper) variable
+v_obj6B		= ramaddr ( $FFFFF7CB )	; object 6B (SBZ stomper) variable
 f_lockctrl	= ramaddr ( $FFFFF7CC )	; flag set to lock controls during ending sequence
 f_bigring	= ramaddr ( $FFFFF7CD )	; flag set when Sonic collects the giant ring
 v_itembonus	= ramaddr ( $FFFFF7D0 )	; item bonus from broken enemies, blocks etc. (2 bytes)
@@ -275,7 +275,7 @@ v_vbla_word	= v_vbla_count+2 ; low word for vertical interrupt counter (2 bytes)
 v_vbla_byte	= v_vbla_word+1	; low byte for vertical interrupt counter
 v_zone		= ramaddr ( $FFFFFE10 )	; current zone number
 v_act		= ramaddr ( $FFFFFE11 )	; current act number
-v_lives	= ramaddr ( $FFFFFE12 )	; number of lives
+v_lives		= ramaddr ( $FFFFFE12 )	; number of lives
 v_air		= ramaddr ( $FFFFFE14 )	; air remaining while underwater (2 bytes)
 v_airbyte	= v_air+1	; low byte for air
 v_lastspecial	= ramaddr ( $FFFFFE16 )	; last special stage number
@@ -286,16 +286,16 @@ f_lifecount	= ramaddr ( $FFFFFE1C )	; lives counter update flag
 f_ringcount	= ramaddr ( $FFFFFE1D )	; ring counter update flag
 f_timecount	= ramaddr ( $FFFFFE1E )	; time counter update flag
 f_scorecount	= ramaddr ( $FFFFFE1F )	; score counter update flag
-v_rings	= ramaddr ( $FFFFFE20 )	; rings (2 bytes)
+v_rings		= ramaddr ( $FFFFFE20 )	; rings (2 bytes)
 v_ringbyte	= v_rings+1	; low byte for rings
 v_time		= ramaddr ( $FFFFFE22 )	; time (4 bytes)
 v_timemin	= ramaddr ( $FFFFFE23 )	; time - minutes
 v_timesec	= ramaddr ( $FFFFFE24 )	; time - seconds
 v_timecent	= ramaddr ( $FFFFFE25 )	; time - centiseconds
-v_score	= ramaddr ( $FFFFFE26 )	; score (4 bytes)
+v_score		= ramaddr ( $FFFFFE26 )	; score (4 bytes)
 v_shield	= ramaddr ( $FFFFFE2C )	; shield status (00 = no; 01 = yes)
 v_invinc	= ramaddr ( $FFFFFE2D )	; invinciblity status (00 = no; 01 = yes)
-v_shoes	= ramaddr ( $FFFFFE2E )	; speed shoes status (00 = no; 01 = yes)
+v_shoes		= ramaddr ( $FFFFFE2E )	; speed shoes status (00 = no; 01 = yes)
 v_lastlamp	= ramaddr ( $FFFFFE30 )	; number of the last lamppost you hit
 v_savedlastlamp	= v_lastlamp+1	; last lamppost you hit
 v_lamp_xpos	= v_lastlamp+2	; x-axis for Sonic to respawn at lamppost (2 bytes)
