@@ -687,6 +687,8 @@ VBla_08:
 		move.b	#0,(f_sonframechg).w
 
 .nochg:
+		move	#$83,(v_vdp_buffer2).w
+		jsr	Process_DMA_Queue
 		startZ80
 		movem.l	(v_screenposx).w,d0-d7
 		movem.l	d0-d7,(v_screenposx_dup).w
@@ -898,7 +900,7 @@ loc_119E:
 		bsr.w	Demo_Time
 		jsr	(UpdateMusic).l
 		movem.l	(sp)+,d0-a6
-		rte	
+		rte
 ; End of function HBlank
 
 ; ---------------------------------------------------------------------------
@@ -939,7 +941,7 @@ ReadJoypads:
 		lsl.b	#2,d0
 		andi.b	#$C0,d0
 		move.b	#$40,(a1)
-		nop	
+		nop
 		nop	
 		move.b	(a1),d1
 		andi.b	#$3F,d1
@@ -1057,7 +1059,7 @@ ClearScreen:
 .clearhscroll:
 		move.l	d0,(a1)+
 		dbf	d1,.clearhscroll ; clear hscroll table (in RAM)
-		rts	
+		rts
 ; End of function ClearScreen
 
 ; ---------------------------------------------------------------------------
@@ -1068,20 +1070,20 @@ ClearScreen:
 
 
 SoundDriverLoad:
-		nop	
+		nop
 		stopZ80
 		resetZ80
 		lea	(Kos_Z80).l,a0	; load sound driver
 		lea	(z80_ram).l,a1	; target Z80 RAM
 		bsr.w	KosDec		; decompress
 		resetZ80a
-		nop	
-		nop	
-		nop	
-		nop	
+		nop
+		nop
+		nop
+		nop
 		resetZ80
 		startZ80
-		rts	
+		rts
 ; End of function SoundDriverLoad
 
 		include	"_incObj/sub PlaySound.asm"
@@ -1113,11 +1115,11 @@ Tilemap_Cell:
 		dbf	d3,Tilemap_Cell	; next tile
 		add.l	d4,d0		; goto next line
 		dbf	d2,Tilemap_Line	; next line
-		rts	
+		rts
 ; End of function TilemapToVRAM
 
+		include	"_inc/DMA Queue.asm"
 		include	"_inc/Nemesis Decompression.asm"
-
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to load pattern load cues (aka to queue pattern load requests)
@@ -1313,7 +1315,7 @@ loc_16AA:
 		move.l	d6,($FFFFF6F4).w
 
 locret_16DA:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_16DC:
@@ -2169,7 +2171,7 @@ Tit_LoadText:
 		copyTilemap	$FF0000,$C206,$21,$15
 
 		locVRAM	0
-		lea	(Nem_GHZ_1st).l,a0 ; load GHZ patterns
+		lea	(Nem_Title).l,a0 ; load Tittle patterns
 		bsr.w	NemDec
 		moveq	#palid_Title,d0	; load title screen palette
 		bsr.w	PalLoad1
@@ -2826,6 +2828,7 @@ Level_SkipTtlCard:
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
 		bset	#2,(v_fg_scroll_flags).w
+		bsr.w	LoadZoneTiles	; load level art
 		bsr.w	LevelDataLoad ; load block mappings and palettes
 		bsr.w	LoadTilesFromStart
 		bsr.w	ColIndexLoad
@@ -3805,6 +3808,7 @@ End_LoadData:
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
 		bset	#2,(v_fg_scroll_flags).w
+		bsr.w	LoadZoneTiles	; load level art
 		bsr.w	LevelDataLoad
 		bsr.w	LoadTilesFromStart
 		move.l	#Col_GHZ_1,(v_colladdr1).w ; MJ: Set first collision for ending
@@ -4802,30 +4806,6 @@ Calc_VRAM_Pos_2:
 		rts
 ; End of function Calc_VRAM_Pos
 
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-; not used
-
-; This is just like Calc_VRAM_Pos, but seemingly for an earlier
-; VRAM layout: the only difference is the high bits of the
-; plane's VRAM address, which are 10 instead of 11.
-; Both the foreground and background are at $C000 and $E000
-; respectively, so this one starting at $8000 makes no sense.
-; sub_6C3C:
-Calc_VRAM_Pos_Unknown:
-		add.w	4(a3),d4
-		add.w	(a3),d5
-		andi.w	#$F0,d4
-		andi.w	#$1F0,d5
-		lsl.w	#4,d4
-		lsr.w	#2,d5
-		add.w	d5,d4
-		moveq	#2,d0
-		swap	d0
-		move.w	d4,d0
-		rts
-; End of function Calc_VRAM_Pos_Unknown
-
 ; ---------------------------------------------------------------------------
 ; Subroutine to	load tiles as soon as the level	appears
 ; ---------------------------------------------------------------------------
@@ -4949,6 +4929,46 @@ locj_72EE:
 ; ---------------------------------------------------------------------------
 ; Subroutine to load basic level data
 ; ---------------------------------------------------------------------------
+LoadZoneTiles:
+		moveq	#0,d0			; Clear d0
+		move.b	(v_zone).w,d0		; Load number of current zone to d0
+		lsl.w	#4,d0			; Multiply by $10, converting the zone ID into an offset
+		lea	(LevelHeaders).l,a2	; Load LevelHeaders's address into a2
+		lea	(a2,d0.w),a2		; Offset LevelHeaders by the zone-offset, and load the resultant address to a2
+		move.l	(a2)+,d0		; Move the first longword of data that a2 points to to d0, this contains the zone's first PLC ID and its art's address.
+						; The auto increment is pointless as a2 is overwritten later, and nothing reads from a2 before then
+		andi.l	#$FFFFFF,d0    		; Filter out the first byte, which contains the first PLC ID, leaving the address of the zone's art in d0
+		movea.l	d0,a0			; Load the address of the zone's art into a0 (source)
+		lea	(v_128x128).l,a1	; Load v_128x128/StartOfRAM (in this context, an art buffer) into a1 (destination)
+		bsr.w	KosDec			; Decompress a0 to a1 (Kosinski compression)
+
+		move.w	a1,d3			; Move a word of a1 to d3, note that a1 doesn't exactly contain the address of v_128x128/StartOfRAM anymore, after KosDec, a1 now contains v_256x256/StartOfRAM + the size of the file decompressed to it, d3 now contains the length of the file that was decompressed
+		move.w	d3,d7			; Move d3 to d7, for use in seperate calculations
+
+		andi.w	#$FFF,d3		; Remove the high nibble of the high byte of the length of decompressed file, this nibble is how many $1000 bytes the decompressed art is
+		lsr.w	#1,d3			; Half the value of 'length of decompressed file', d3 becomes the 'DMA transfer length'
+
+		rol.w	#4,d7			; Rotate (left) length of decompressed file by one nibble
+		andi.w	#$F,d7			; Only keep the low nibble of low byte (the same one filtered out of d3 above), this nibble is how many $1000 bytes the decompressed art is
+
+-		move.w	d7,d2			; Move d7 to d2, note that the ahead dbf removes 1 byte from d7 each time it loops, meaning that the following calculations will have different results each time
+		lsl.w	#7,d2
+		lsl.w	#5,d2			; Shift (left) d2 by $C, making it high nibble of the high byte, d2 is now the size of the decompressed file rounded down to the nearest $1000 bytes, d2 becomes the 'destination address'
+
+		move.l	#$FFFFFF,d1		; Fill d1 with $FF
+		move.w	d2,d1			; Move d2 to d1, overwriting the last word of $FF's with d2, this turns d1 into 'StartOfRAM'+'However many $1000 bytes the decompressed art is', d1 becomes the 'source address'
+
+		jsr	(QueueDMATransfer).l	; Use d1, d2, and d3 to locate the decompressed art and ready for transfer to VRAM
+		move.w	d7,-(sp)		; Store d7 in the Stack
+		move.b	#$C,(v_vbla_routine).w
+		bsr.w	WaitForVBla
+		bsr.w	RunPLC
+		move.w	(sp)+,d7		; Restore d7 from the Stack
+		move.w	#$800,d3		; Force the DMA transfer length to be $1000/2 (the first cycle is dynamic because the art's DMA'd backwards)
+		dbf	d7,-			; Loop for each $1000 bytes the decompressed art is
+
+		rts
+; End of function LoadZoneTiles
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -5188,7 +5208,7 @@ loc_75E0:
 		bclr	#3,obStatus(a0)
 
 locret_75F2:
-		rts	
+		rts
 ; End of function ExitPlatform
 
 		include	"_incObj/11 Bridge (part 3).asm"
@@ -8407,39 +8427,39 @@ Nem_Squirrel:	binclude	"artnem/Animal Squirrel.bin"
 ; ---------------------------------------------------------------------------
 Blk16_GHZ:	binclude	"map16/GHZ.bin"
 		even
-Nem_GHZ_1st:	binclude	"artnem/8x8 - GHZ1.bin"	; GHZ primary patterns
+Nem_Title:	binclude	"artnem/8x8 - Tittle.bin"	; Tittle patterns
 		even
-Nem_GHZ_2nd:	binclude	"artnem/8x8 - GHZ2.bin"	; GHZ secondary patterns
+Kos_GHZ:	binclude	"artkos/8x8 - GHZ.bin"	; GHZ primary patterns
 		even
 Blk128_GHZ:	binclude	"map128/GHZ.bin"
 		even
 Blk16_LZ:	binclude	"map16/LZ.bin"
 		even
-Nem_LZ:		binclude	"artnem/8x8 - LZ.bin"	; LZ primary patterns
+Kos_LZ:		binclude	"artkos/8x8 - LZ.bin"	; LZ primary patterns
 		even
 Blk128_LZ:	binclude	"map128/LZ.bin"
 		even
 Blk16_MZ:	binclude	"map16/MZ.bin"
 		even
-Nem_MZ:		binclude	"artnem/8x8 - MZ.bin"	; MZ primary patterns
+Kos_MZ:		binclude	"artkos/8x8 - MZ.bin"	; MZ primary patterns
 		even
 Blk128_MZ:	binclude	"map128/MZ (JP1).bin"
 		even
 Blk16_SLZ:	binclude	"map16/SLZ.bin"
 		even
-Nem_SLZ:	binclude	"artnem/8x8 - SLZ.bin"	; SLZ primary patterns
+Kos_SLZ:	binclude	"artkos/8x8 - SLZ.bin"	; SLZ primary patterns
 		even
 Blk128_SLZ:	binclude	"map128/SLZ.bin"
 		even
 Blk16_SYZ:	binclude	"map16/SYZ.bin"
 		even
-Nem_SYZ:	binclude	"artnem/8x8 - SYZ.bin"	; SYZ primary patterns
+Kos_SYZ:	binclude	"artkos/8x8 - SYZ.bin"	; SYZ primary patterns
 		even
 Blk128_SYZ:	binclude	"map128/SYZ.bin"
 		even
 Blk16_SBZ:	binclude	"map16/SBZ.bin"
 		even
-Nem_SBZ:	binclude	"artnem/8x8 - SBZ.bin"	; SBZ primary patterns
+Kos_SBZ:	binclude	"artkos/8x8 - SBZ.bin"	; SBZ primary patterns
 		even
 Blk128_SBZ:	binclude	"map128/SBZ (JP1).bin"
 		even

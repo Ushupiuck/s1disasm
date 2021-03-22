@@ -16,6 +16,8 @@ v_spritequeue	= ramaddr ( $FFFF9C00 )	; sprite display queue, in order of priori
 v_sgfx_buffer	= ramaddr ( $FFFFA000 )	; buffered Sonic graphics ($17 cells) ($2E0 bytes)
 v_tracksonic	= ramaddr ( $FFFFA300 )	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer	= ramaddr ( $FFFFA400 )	; scrolling table data (actually $380 bytes, but $400 is reserved for it)
+VDP_Command_Buffer	= ramaddr ( $FFFFA800 )	; stores 18 ($12) VDP commands to issue the next time ProcessDMAQueue is called ($FC bytes)
+VDP_Command_Buffer_Slot	= ramaddr ( $FFFFA8FC )
 ; $2800 bytes of free V-ram!~ (And 2900 as soon as DMA is ported)
 v_objspace	= ramaddr ( $FFFFD000 )	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player	= v_objspace	; object variable space for Sonic ($40 bytes)
