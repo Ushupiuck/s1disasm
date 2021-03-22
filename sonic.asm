@@ -8470,7 +8470,7 @@ Nem_EndEggman:	if Revision=0
 		binclude	"artnem/Unused - Eggman Ending.bin"
 		even
 		endif
-EndFlowers:	binclude	"artkos/Flowers at Ending.unc" ; ending sequence animated flowers
+EndFlowers:	binclude	"artunc/Flowers at Ending.bin" ; ending sequence animated flowers
 		even
 Nem_EndFlower:	binclude	"artnem/Ending - Flowers.bin"
 		even
