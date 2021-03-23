@@ -329,6 +329,7 @@ GameInit:
 		move.l	d7,(a6)+
 		dbf	d6,.clearRAM	; clear RAM ($0000-$FDFF)
 
+		jsr	(InitDMAQueue).l
 		bsr.w	VDPSetupGame
 		bsr.w	SoundDriverLoad
 		bsr.w	JoypadInit
@@ -366,6 +367,7 @@ ptr_GM_Credits:	bra.w	GM_Credits	; Credits ($1C)
 ; ===========================================================================
 
 CheckSumError:
+		jsr	(InitDMAQueue).l
 		bsr.w	VDPSetupGame
 		move.l	#$C0000000,(vdp_control_port).l ; set VDP to CRAM write
 		moveq	#$3F,d7
@@ -680,6 +682,7 @@ VBla_08:
 
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
+		jsr	Process_DMA_Queue
 		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
 		beq.s	.nochg		; if not, branch
 
@@ -687,8 +690,6 @@ VBla_08:
 		move.b	#0,(f_sonframechg).w
 
 .nochg:
-		move	#$83,(v_vdp_buffer2).w
-		jsr	Process_DMA_Queue
 		startZ80
 		movem.l	(v_screenposx).w,d0-d7
 		movem.l	d0-d7,(v_screenposx_dup).w
@@ -731,6 +732,7 @@ VBla_0A:
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
 		bsr.w	PalCycle_SS
+		jsr	Process_DMA_Queue
 		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
 		beq.s	.nochg		; if not, branch
 
@@ -763,6 +765,7 @@ VBla_0C:
 		move.w	(v_hbla_hreg).w,(a5)
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
+		jsr	Process_DMA_Queue
 		tst.b	(f_sonframechg).w
 		beq.s	.nochg
 		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic
@@ -802,6 +805,7 @@ VBla_16:
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
+		jsr	Process_DMA_Queue
 		tst.b	(f_sonframechg).w
 		beq.s	.nochg
 		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic
@@ -2754,6 +2758,7 @@ Level_ClrVars3:
 		move.w	#$8720,(a6)		; set background colour (line 3; colour 0)
 		move.w	#$8A00+223,(v_hbla_hreg).w ; set palette change position (for water)
 		move.w	(v_hbla_hreg).w,(a6)
+		ResetDMAQueue
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ?
 		bne.s	Level_LoadPal	; if not, branch
 
@@ -3310,6 +3315,7 @@ loc_47D4:
 		lea	(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
 		jsr	(Hud_Base).l
+		ResetDMAQueue
 		enable_ints
 		moveq	#palid_SSResult,d0
 		bsr.w	PalLoad2	; load results screen palette
@@ -4937,7 +4943,7 @@ LoadZoneTiles:
 		lea	(a2,d0.w),a2		; Offset LevelHeaders by the zone-offset, and load the resultant address to a2
 		move.l	(a2)+,d0		; Move the first longword of data that a2 points to to d0, this contains the zone's first PLC ID and its art's address.
 						; The auto increment is pointless as a2 is overwritten later, and nothing reads from a2 before then
-		andi.l	#$FFFFFF,d0    		; Filter out the first byte, which contains the first PLC ID, leaving the address of the zone's art in d0
+		;andi.l	#$FFFFFF,d0    		; Filter out the first byte, which contains the first PLC ID, leaving the address of the zone's art in d0
 		movea.l	d0,a0			; Load the address of the zone's art into a0 (source)
 		lea	(v_128x128).l,a1	; Load v_128x128/StartOfRAM (in this context, an art buffer) into a1 (destination)
 		bsr.w	KosDec			; Decompress a0 to a1 (Kosinski compression)
