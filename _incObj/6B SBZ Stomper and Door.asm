@@ -35,38 +35,38 @@ Sto_Main:	; Routine 0
 		lsr.w	#2,d0
 		move.b	d0,obFrame(a0)
 		move.l	#Map_Stomp,obMap(a0)
-		move.w	#$22C0,obGfx(a0)
-		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ/SBZ3
-		bne.s	.isSBZ12	; if not, branch
-		bset	#0,(v_obj6B).w
-		beq.s	.isSBZ3
-
-.chkdel:
-		lea	(v_objstate).w,a2
-		moveq	#0,d0
-		move.b	obRespawnNo(a0),d0
-		beq.s	.delete
-		bclr	#7,2(a2,d0.w)
-
-.delete:
-		jmp	(DeleteObject).l
+		move.w	#($5800/$20),obGfx(a0)
+;		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ/SBZ3
+;		bne.s	.isSBZ12	; if not, branch
+;		bset	#0,(v_obj6B).w
+;		beq.s	.isSBZ3
+;
+;.chkdel:
+;		lea	(v_objstate).w,a2
+;		moveq	#0,d0
+;		move.b	obRespawnNo(a0),d0
+;		beq.s	.delete
+;		bclr	#7,2(a2,d0.w)
+;
+;.delete:
+;		jmp	(DeleteObject).l
 ; ===========================================================================
-
-.isSBZ3:
-		move.w	#$41F0,obGfx(a0)
-		cmpi.w	#$A80,obX(a0)
-		bne.s	.isSBZ12
-		lea	(v_objstate).w,a2
-		moveq	#0,d0
-		move.b	obRespawnNo(a0),d0
-		beq.s	.isSBZ12
-		btst	#0,2(a2,d0.w)
-		beq.s	.isSBZ12
-		clr.b	(v_obj6B).w
-		bra.s	.chkdel
+;
+;.isSBZ3:
+;		move.w	#($3E00/$20),obGfx(a0)
+;		cmpi.w	#$A80,obX(a0)
+;		bne.s	.isSBZ12
+;		lea	(v_objstate).w,a2
+;		moveq	#0,d0
+;		move.b	obRespawnNo(a0),d0
+;		beq.s	.isSBZ12
+;		btst	#0,2(a2,d0.w)
+;		beq.s	.isSBZ12
+;		clr.b	(v_obj6B).w
+;		bra.s	.chkdel
 ; ===========================================================================
-
-.isSBZ12:
+;
+;.isSBZ12:
 		ori.b	#4,obRender(a0)
 		move.b	#4,obPriority(a0)
 		move.w	obX(a0),sto_origX(a0)
@@ -116,21 +116,11 @@ Sto_Action:	; Routine 2
 		jmp	(DisplaySprite).l
 
 .chkgone:
-		cmpi.b	#id_LZ,(v_zone).w
-		bne.s	.delete
-		clr.b	(v_obj6B).w
-		lea	(v_objstate).w,a2
-		moveq	#0,d0
-		move.b	obRespawnNo(a0),d0
-		beq.s	.delete
-		bclr	#7,2(a2,d0.w)
-
-.delete:
 		jmp	(DeleteObject).l
 ; ===========================================================================
 .index:		dc.w .type00-.index, .type01-.index
 		dc.w .type02-.index, .type03-.index
-		dc.w .type04-.index, .type05-.index
+		dc.w .type04-.index
 ; ===========================================================================
 
 .type00:
@@ -138,47 +128,6 @@ Sto_Action:	; Routine 2
 ; ===========================================================================
 
 .type01:
-		tst.b	sto_active(a0)
-		bne.s	.isactive01
-		lea	(f_switch).w,a2
-		moveq	#0,d0
-		move.b	$3E(a0),d0
-		btst	#0,(a2,d0.w)
-		beq.s	.loc_15DC2
-		move.b	#1,sto_active(a0)
-
-.isactive01:
-		move.w	$3C(a0),d0
-		cmp.w	$3A(a0),d0
-		beq.s	.loc_15DE0
-		addq.w	#2,$3A(a0)
-
-.loc_15DC2:
-		move.w	$3A(a0),d0
-		btst	#0,obStatus(a0)
-		beq.s	.noflip01
-		neg.w	d0
-		addi.w	#$80,d0
-
-.noflip01:
-		move.w	sto_origX(a0),d1
-		sub.w	d0,d1
-		move.w	d1,obX(a0)
-		rts	
-; ===========================================================================
-
-.loc_15DE0:
-		addq.b	#1,obSubtype(a0)
-		move.w	#$B4,$36(a0)
-		clr.b	sto_active(a0)
-		lea	(v_objstate).w,a2
-		moveq	#0,d0
-		move.b	obRespawnNo(a0),d0
-		beq.s	.loc_15DC2
-		bset	#0,2(a2,d0.w)
-		bra.s	.loc_15DC2
-; ===========================================================================
-
 .type02:
 		tst.b	sto_active(a0)
 		bne.s	.isactive02
@@ -202,7 +151,7 @@ Sto_Action:	; Routine 2
 		move.w	sto_origX(a0),d1
 		sub.w	d0,d1
 		move.w	d1,obX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .loc_15E3C:
@@ -249,7 +198,7 @@ Sto_Action:	; Routine 2
 		move.w	sto_origY(a0),d1
 		add.w	d0,d1
 		move.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .type04:
@@ -292,36 +241,4 @@ Sto_Action:	; Routine 2
 		move.w	sto_origY(a0),d1
 		add.w	d0,d1
 		move.w	d1,obY(a0)
-		rts	
-; ===========================================================================
-
-.type05:
-		tst.b	sto_active(a0)
-		bne.s	.loc_15F3E
-		lea	(f_switch).w,a2
-		moveq	#0,d0
-		move.b	$3E(a0),d0
-		btst	#0,(a2,d0.w)
-		beq.s	.locret_15F5C
-		move.b	#1,sto_active(a0)
-		lea	(v_objstate).w,a2
-		moveq	#0,d0
-		move.b	obRespawnNo(a0),d0
-		beq.s	.loc_15F3E
-		bset	#0,2(a2,d0.w)
-
-.loc_15F3E:
-		subi.l	#$10000,obX(a0)
-		addi.l	#$8000,obY(a0)
-		move.w	obX(a0),sto_origX(a0)
-		cmpi.w	#$980,obX(a0)
-		beq.s	.loc_15F5E
-
-.locret_15F5C:
-		rts	
-; ===========================================================================
-
-.loc_15F5E:
-		clr.b	obSubtype(a0)
-		clr.b	sto_active(a0)
-		rts	
+		rts

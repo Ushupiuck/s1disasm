@@ -32,14 +32,15 @@ Sonic_Animate:
 		moveq	#0,d1
 		move.b	obAniFrame(a0),d1 ; load current frame number
 		move.b	1(a1,d1.w),d0	; read sprite number from script
-		bmi.s	.end_FF		; if animation is complete, branch
+		cmp.b	#$FD,d0		; MJ: is it a flag from FD to FF?
+		bhs.s	.end_FF		; MJ: if so, branch to flag routines
 
 .next:
 		move.b	d0,obFrame(a0)	; load sprite number
 		addq.b	#1,obAniFrame(a0) ; next frame number
 
 .delay:
-		rts	
+		rts
 ; ===========================================================================
 
 .end_FF:
@@ -66,7 +67,7 @@ Sonic_Animate:
 		move.b	2(a1,d1.w),obAnim(a0) ; read next byte, run that animation
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 .walkrunroll:
@@ -122,7 +123,7 @@ Sonic_Animate:
 		move.b	d2,obTimeFrame(a0) ; modify frame duration
 		bsr.w	.loadframe
 		add.b	d3,obFrame(a0)	; modify frame number
-		rts	
+		rts
 ; ===========================================================================
 
 .rolljump:
@@ -161,7 +162,7 @@ Sonic_Animate:
 
 .negspeed:
 		addi.w	#$800,d2
-		bpl.s	.belowmax3	
+		bpl.s	.belowmax3
 		moveq	#0,d2
 
 .belowmax3:

@@ -329,6 +329,7 @@ GameInit:
 		move.l	d7,(a6)+
 		dbf	d6,.clearRAM	; clear RAM ($0000-$FDFF)
 
+		jsr	(InitDMAQueue).l
 		bsr.w	VDPSetupGame
 		bsr.w	SoundDriverLoad
 		bsr.w	JoypadInit
@@ -366,7 +367,9 @@ ptr_GM_Credits:	bra.w	GM_Credits	; Credits ($1C)
 ; ===========================================================================
 
 CheckSumError:
+		move.l	d1,-(sp)
 		bsr.w	VDPSetupGame
+		move.l	(sp)+,d1
 		move.l	#$C0000000,(vdp_control_port).l ; set VDP to CRAM write
 		moveq	#$3F,d7
 
@@ -512,7 +515,7 @@ ShowErrorValue:
 		rol.l	#4,d0
 		bsr.s	.shownumber	; display 8 numbers
 		dbf	d2,.loop
-		rts	
+		rts
 ; End of function ShowErrorValue
 
 
@@ -529,7 +532,7 @@ ShowErrorValue:
 .chars0to9:
 		addi.w	#$7C0,d1
 		move.w	d1,(a6)
-		rts	
+		rts
 ; End of function sub_5CA
 
 
@@ -680,15 +683,9 @@ VBla_08:
 
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
-		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
-		beq.s	.nochg		; if not, branch
-
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic ; load new Sonic gfx
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 .nochg:
-		move	#$83,(v_vdp_buffer2).w
-		jsr	Process_DMA_Queue
 		startZ80
 		movem.l	(v_screenposx).w,d0-d7
 		movem.l	d0-d7,(v_screenposx_dup).w
@@ -731,11 +728,7 @@ VBla_0A:
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
 		bsr.w	PalCycle_SS
-		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
-		beq.s	.nochg		; if not, branch
-
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic ; load new Sonic gfx
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 .nochg:
 		tst.w	(v_demolength).w	; is there time left on the demo?
@@ -763,10 +756,7 @@ VBla_0C:
 		move.w	(v_hbla_hreg).w,(a5)
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
-		tst.b	(f_sonframechg).w
-		beq.s	.nochg
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 .nochg:
 		startZ80
@@ -802,10 +792,7 @@ VBla_16:
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
-		tst.b	(f_sonframechg).w
-		beq.s	.nochg
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 .nochg:
 		tst.w	(v_demolength).w
@@ -936,7 +923,7 @@ ReadJoypads:
 .read:
 		move.b	#0,(a1)
 		nop	
-		nop	
+		nop
 		move.b	(a1),d0
 		lsl.b	#2,d0
 		andi.b	#$C0,d0
@@ -1212,7 +1199,7 @@ ClearPLC:
 .loop:
 		clr.l	(a2)+
 		dbf	d0,.loop
-		rts	
+		rts
 ; End of function ClearPLC
 
 ; ---------------------------------------------------------------------------
@@ -1353,7 +1340,7 @@ Qplc_Loop:
 		move.l	d0,(vdp_control_port).l ; converted VRAM address to VDP format
 		bsr.w	NemDec		; decompress
 		dbf	d1,Qplc_Loop	; repeat for length of PLC
-		rts	
+		rts
 ; End of function QuickPLC
 
 		include	"_inc/Enigma Decompression.asm"
@@ -1486,7 +1473,7 @@ FadeIn_AddColour:
 
 .next:
 		addq.w	#2,a0		; next colour
-		rts	
+		rts
 ; End of function FadeIn_AddColour
 
 
@@ -1758,7 +1745,7 @@ WhiteOut_AddColour:
 		cmpi.w	#cBlue,d1
 		beq.s	.next
 		addi.w	#$200,(a0)+	; increase blue	value
-		rts	
+		rts
 ; ===========================================================================
 
 .next:
@@ -1890,7 +1877,7 @@ PalLoad1:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad1
 
 
@@ -2754,6 +2741,7 @@ Level_ClrVars3:
 		move.w	#$8720,(a6)		; set background colour (line 3; colour 0)
 		move.w	#$8A00+223,(v_hbla_hreg).w ; set palette change position (for water)
 		move.w	(v_hbla_hreg).w,(a6)
+		ResetDMAQueue
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ?
 		bne.s	Level_LoadPal	; if not, branch
 
@@ -2979,7 +2967,7 @@ Level_SkipScroll:
 		beq.s	Level_ChkDemo	; if mode is 8 (demo), branch
 		cmpi.b	#id_Level,(v_gamemode).w
 		beq.w	Level_MainLoop	; if mode is $C (level), branch
-		rts	
+		rts
 ; ===========================================================================
 
 Level_ChkDemo:
@@ -2990,7 +2978,7 @@ Level_ChkDemo:
 		cmpi.b	#id_Demo,(v_gamemode).w
 		beq.w	Level_MainLoop	; if mode is 8 (demo), branch
 		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
-		rts	
+		rts
 ; ===========================================================================
 
 Level_EndDemo:
@@ -3021,7 +3009,7 @@ Level_FDLoop:
 loc_3BC8:
 		tst.w	(v_demolength).w
 		bne.s	Level_FDLoop
-		rts	
+		rts
 ; ===========================================================================
 
 		include	"_inc/LZWaterFeatures.asm"
@@ -3145,7 +3133,7 @@ SignpostArtLoad:
 		bra.w	NewPLC		; load signpost	patterns
 
 .exit:
-		rts	
+		rts
 ; End of function SignpostArtLoad
 
 ; ===========================================================================
@@ -3171,6 +3159,7 @@ GM_Special:
 		move.w	(v_vdp_buffer1).w,d0
 		andi.b	#$BF,d0
 		move.w	d0,(vdp_control_port).l
+		ResetDMAQueue
 		bsr.w	ClearScreen
 		enable_ints
 		fillVRAM	0,$6FFF,$5000
@@ -3310,6 +3299,7 @@ loc_47D4:
 		lea	(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
 		jsr	(Hud_Base).l
+		ResetDMAQueue
 		enable_ints
 		moveq	#palid_SSResult,d0
 		bsr.w	PalLoad2	; load results screen palette
@@ -3631,7 +3621,7 @@ loc_4CA4:
 		andi.w	#$3FC,d2
 		dbf	d1,loc_4CA4
 		dbf	d3,loc_4C9A
-		rts	
+		rts
 ; End of function SS_BGAnimate
 
 ; ===========================================================================
@@ -6048,8 +6038,9 @@ loc_D700:
 		btst	#5,d4
 		bne.s	loc_D71C
 		move.b	obFrame(a0),d1
-		add.b	d1,d1
+		add.w	d1,d1			; MJ: changed from byte to word (we want more than 7F sprites)
 		adda.w	(a1,d1.w),a1
+		moveq	#0,d1			; MJ: clear d1 (because of our byte to word change)
 		move.b	(a1)+,d1
 		subq.b	#1,d1
 		bmi.s	loc_D720

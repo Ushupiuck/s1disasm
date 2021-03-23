@@ -87,7 +87,7 @@ AssumeSourceAddressInBytes = 1
 ; source address is given to the function in a way that makes them safe to use
 ; with RAM sources. You need to edit all callers to ensure this.
 ; Enabling this option turns off UseRAMSourceSafeDMA, and saves 14(2/0).
-AssumeSourceAddressIsRAMSafe = 0
+AssumeSourceAddressIsRAMSafe = 1
 ; ===========================================================================
 ; option: UseRAMSourceSafeDMA
 ;
@@ -102,7 +102,7 @@ UseRAMSourceSafeDMA = 1&(AssumeSourceAddressIsRAMSafe==0)
 ; disabled by default because you can simply align the art in ROM and avoid the
 ; issue altogether. It is here so that you have a high-performance routine to do
 ; the job in situations where you can't align it in ROM.
-Use128kbSafeDMA = 1
+Use128kbSafeDMA = 0
 ; ===========================================================================
 ; option UseVIntSafeDMA
 ;
@@ -111,7 +111,7 @@ Use128kbSafeDMA = 1
 ; handle these race conditions would be to make unsafe callers (such as S3&K's
 ; KosM decoder) prevent these by masking off interrupts before calling and then
 ; restore interrupts after.
-UseVIntSafeDMA = 0
+UseVIntSafeDMA = 1
 ; ===========================================================================
 ; Convenience macros, for increased maintainability of the code.
 	ifndef DMA
