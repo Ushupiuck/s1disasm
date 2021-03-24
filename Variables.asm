@@ -239,9 +239,9 @@ f_wtunnelmode	= ramaddr ( $FFFFF7C7 )	; LZ water tunnel mode
 f_lockmulti	= ramaddr ( $FFFFF7C8 )	; flag set to lock controls, lock Sonic's position & animation
 f_wtunnelallow	= ramaddr ( $FFFFF7C9 )	; LZ water tunnels (00 = enabled; 01 = disabled)
 f_jumponly	= ramaddr ( $FFFFF7CA )	; flag set to lock controls apart from jumping
-v_obj6B		= ramaddr ( $FFFFF7CB )	; object 6B (SBZ stomper) variable
-f_lockctrl	= ramaddr ( $FFFFF7CC )	; flag set to lock controls during ending sequence
-f_bigring	= ramaddr ( $FFFFF7CD )	; flag set when Sonic collects the giant ring
+f_lockctrl	= ramaddr ( $FFFFF7CB )	; flag set to lock controls during ending sequence
+f_bigring	= ramaddr ( $FFFFF7CC )	; flag set when Sonic collects the giant ring
+v_syz3door	= ramaddr ( $FFFFF7CD )	; flag to move the blockade at SYZ act 3 (1 byte)
 v_itembonus	= ramaddr ( $FFFFF7D0 )	; item bonus from broken enemies, blocks etc. (2 bytes)
 v_timebonus	= ramaddr ( $FFFFF7D2 )	; time bonus at the end of an act (2 bytes)
 v_ringbonus	= ramaddr ( $FFFFF7D4 )	; ring bonus at the end of an act (2 bytes)

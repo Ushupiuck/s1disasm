@@ -8102,40 +8102,27 @@ Eni_JapNames:	binclude	"tilemaps/Hidden Japanese Credits.bin" ; Japanese credits
 Nem_JapNames:	binclude	"artnem/Hidden Japanese Credits.bin"
 		even
 
-Map_Sonic:	include	"_maps/Sonic.asm"
-SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
 
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics	- Sonic
 ; ---------------------------------------------------------------------------
 Art_Sonic:	binclude	"artunc/Sonic.bin"	; Sonic
 		even
+Map_Sonic:	include	"_maps/Sonic.asm"
+SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - various
 ; ---------------------------------------------------------------------------
 		if Revision=0
 Nem_Smoke:	binclude	"artnem/Unused - Smoke.bin"
 		even
-Nem_SyzSparkle:	binclude	"artnem/Unused - SYZ Sparkles.bin"
-		even
 		endif
 Nem_Shield:	binclude	"artnem/Shield.bin"
 		even
 Nem_Stars:	binclude	"artnem/Invincibility Stars.bin"
 		even
-		if Revision=0
-Nem_LzSonic:	binclude	"artnem/Unused - LZ Sonic.bin" ; Sonic holding his breath
-		even
-Nem_UnkFire:	binclude	"artnem/Unused - Fireball.bin" ; unused fireball
-		even
-Nem_Goggle:	binclude	"artnem/Unused - Goggles.bin" ; unused goggles
-		even
-		endif
 Nem_Warp:	binclude	"artnem/Unused - SStage Flash.bin" ; entry to special stage flash
 		even
-
-Map_SSWalls:	include	"_maps/SS Walls.asm"
-
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - special stage
 ; ---------------------------------------------------------------------------
@@ -8183,6 +8170,7 @@ Nem_SSGlass:	binclude	"artnem/Special Glass.bin" ; special stage destroyable gla
 		even
 Nem_ResultEm:	binclude	"artnem/Special Result Emeralds.bin" ; chaos emeralds on special stage results screen
 		even
+Map_SSWalls:	include	"_maps/SS Walls.asm"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - GHZ stuff
 ; ---------------------------------------------------------------------------
@@ -8192,13 +8180,9 @@ Nem_Swing:	binclude	"artnem/GHZ Swinging Platform.bin"
 		even
 Nem_Bridge:	binclude	"artnem/GHZ Bridge.bin"
 		even
-Nem_GhzUnkBlock:binclude	"artnem/Unused - GHZ Block.bin"
-		even
 Nem_Ball:	binclude	"artnem/GHZ Giant Ball.bin"
 		even
 Nem_Spikes:	binclude	"artnem/Spikes.bin"
-		even
-Nem_GhzLog:	binclude	"artnem/Unused - GHZ Log.bin"
 		even
 Nem_SpikePole:	binclude	"artnem/GHZ Spiked Log.bin"
 		even
@@ -8235,8 +8219,8 @@ Nem_LzWheel:	binclude	"artnem/LZ Wheel.bin"
 		even
 Nem_Gargoyle:	binclude	"artnem/LZ Gargoyle & Fireball.bin"
 		even
-Nem_LzBlock2:	binclude	"artnem/LZ Blocks.bin"
-		even
+;Nem_LzBlock2:	binclude	"artnem/LZ Blocks.bin"
+;		even
 Nem_LzPlatfm:	binclude	"artnem/LZ Rising Platform.bin"
 		even
 Nem_Cork:	binclude	"artnem/LZ Cork.bin"
@@ -8252,15 +8236,11 @@ Nem_MzSwitch:	binclude	"artnem/MZ Switch.bin"
 		even
 Nem_MzGlass:	binclude	"artnem/MZ Green Glass Block.bin"
 		even
-Nem_UnkGrass:	binclude	"artnem/Unused - Grass.bin"
-		even
 Nem_MzFire:	binclude	"artnem/Fireballs.bin"
 		even
 Nem_Lava:	binclude	"artnem/MZ Lava.bin"
 		even
 Nem_MzBlock:	binclude	"artnem/MZ Green Pushable Block.bin"
-		even
-Nem_MzUnkBlock:	binclude	"artnem/Unused - MZ Background.bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - SLZ stuff
@@ -8416,41 +8396,41 @@ Nem_Squirrel:	binclude	"artnem/Animal Squirrel.bin"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - primary patterns and block mappings
 ; ---------------------------------------------------------------------------
-Blk16_GHZ:	binclude	"map16/GHZ.bin"
-		even
 Nem_Title:	binclude	"artnem/8x8 - Tittle.bin"	; Tittle patterns
 		even
 Kos_GHZ:	binclude	"artkos/8x8 - GHZ.bin"	; GHZ primary patterns
 		even
-Blk128_GHZ:	binclude	"map128/GHZ.bin"
+Blk16_GHZ:	binclude	"map16/GHZ.bin"
 		even
-Blk16_LZ:	binclude	"map16/LZ.bin"
+Blk128_GHZ:	binclude	"map128/GHZ.bin"
 		even
 Kos_LZ:		binclude	"artkos/8x8 - LZ.bin"	; LZ primary patterns
 		even
-Blk128_LZ:	binclude	"map128/LZ.bin"
+Blk16_LZ:	binclude	"map16/LZ.bin"
 		even
-Blk16_MZ:	binclude	"map16/MZ.bin"
+Blk128_LZ:	binclude	"map128/LZ.bin"
 		even
 Kos_MZ:		binclude	"artkos/8x8 - MZ.bin"	; MZ primary patterns
 		even
-Blk128_MZ:	binclude	"map128/MZ (JP1).bin"
+Blk16_MZ:	binclude	"map16/MZ.bin"
 		even
-Blk16_SLZ:	binclude	"map16/SLZ.bin"
+Blk128_MZ:	binclude	"map128/MZ (JP1).bin"
 		even
 Kos_SLZ:	binclude	"artkos/8x8 - SLZ.bin"	; SLZ primary patterns
 		even
-Blk128_SLZ:	binclude	"map128/SLZ.bin"
+Blk16_SLZ:	binclude	"map16/SLZ.bin"
 		even
-Blk16_SYZ:	binclude	"map16/SYZ.bin"
+Blk128_SLZ:	binclude	"map128/SLZ.bin"
 		even
 Kos_SYZ:	binclude	"artkos/8x8 - SYZ.bin"	; SYZ primary patterns
 		even
+Blk16_SYZ:	binclude	"map16/SYZ.bin"
+		even
 Blk128_SYZ:	binclude	"map128/SYZ.bin"
 		even
-Blk16_SBZ:	binclude	"map16/SBZ.bin"
-		even
 Kos_SBZ:	binclude	"artkos/8x8 - SBZ.bin"	; SBZ primary patterns
+		even
+Blk16_SBZ:	binclude	"map16/SBZ.bin"
 		even
 Blk128_SBZ:	binclude	"map128/SBZ (JP1).bin"
 		even

@@ -34,7 +34,7 @@ Sto_Main:	; Routine 0
 		lsr.w	#2,d0
 		move.b	d0,obFrame(a0)
 		move.l	#Map_Stomp,obMap(a0)
-		move.w	#($5800/$20),obGfx(a0)
+		move.w	#$22C0,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#4,obPriority(a0)
 		move.w	obX(a0),sto_origX(a0)
