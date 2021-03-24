@@ -15,9 +15,9 @@ v_ngfx_buffer	= ramaddr ( $FFFF9A00 )	; Nemesis graphics decompression buffer ($
 v_spritequeue	= ramaddr ( $FFFF9C00 )	; sprite display queue, in order of priority ($400 bytes)
 VDP_Command_Buffer	= ramaddr ( $FFFFA000 )	; stores 18 ($12) VDP commands to issue the next time ProcessDMAQueue is called ($FC bytes)
 VDP_Command_Buffer_Slot	= ramaddr ( $FFFFA0FC )	; stores the address of the next open slot for a queued VDP command ($4 bytes)
-v_tracksonic	= ramaddr ( $FFFFA300 )	; position tracking data for Sonic ($100 bytes)
-v_hscrolltablebuffer	= ramaddr ( $FFFFA400 )	; scrolling table data (actually $380 bytes, but $400 is reserved for it)
-; $2800 bytes of free ram!~ (And 2900 as soon as DMA is ported)
+v_tracksonic	= ramaddr ( $FFFFA100 )	; position tracking data for Sonic ($100 bytes)
+v_hscrolltablebuffer	= ramaddr ( $FFFFA200 )	; scrolling table data (actually $380 bytes, but $400 is reserved for it)
+; $2A00 bytes of free ram starting at A600!~
 v_objspace	= ramaddr ( $FFFFD000 )	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player	= v_objspace	; object variable space for Sonic ($40 bytes)
 v_lvlobjspace	= ramaddr ( $FFFFD800 )	; level object variable space ($1800 bytes)
