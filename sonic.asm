@@ -6270,7 +6270,6 @@ OPL_Main:
 		adda.w	(a0,d0.w),a0
 		move.l	a0,(v_opl_data).w
 		move.l	a0,(v_opl_data+4).w
-;		adda.w	2(a1,d0.w),a1
 		move.l	a0,(v_opl_data+8).w	; Changed from a1 to a0
 		move.l	a0,(v_opl_data+$C).w	; Changed from a1 to a0
 		lea	(v_objstate).w,a2
@@ -6294,7 +6293,7 @@ loc_D93C:
 loc_D944:
 		cmp.w	(a0),d6		; is object's x position >= d6?
 		bls.s	loc_D956	; if yes, branch
-		tst.b	4(a0)		; does the object get a respawn table entry?
+		tst.b	2(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_D952	; if not, branch
 		move.b	(a2),d2
 		addq.b	#1,(a2)	; respawn index of next object to the right
@@ -6314,7 +6313,7 @@ loc_D956:
 loc_D964:	; count how many objects are behind the screen that are not in range and need to remember their state
 		cmp.w	(a0),d6		; is object's x position >= d6?
 		bls.s	loc_D976	; if yes, branch
-		tst.b	4(a0)		; does the object get a respawn table entry?
+		tst.b	2(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_D972	; if not, branch
 		addq.b	#1,1(a2)	; respawn index of current object to the left
 
@@ -6351,7 +6350,7 @@ loc_D9A6:	; load all objects left of the screen that are now in range
 		cmp.w	-6(a0),d6	; is the previous object's X pos less than d6?
 		bge.s	loc_D9D2	; if it is, branch
 		subq.w	#6,a0		; get object's address
-		tst.b	4(a0)		; does the object get a respawn table entry?
+		tst.b	2(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_D9BC	; if not, branch
 		subq.b	#1,1(a2)	; respawn index of this object
 		move.b	1(a2),d2
@@ -6364,7 +6363,7 @@ loc_D9BC:
 ; ===========================================================================
 
 loc_D9C6:	; undo a few things, if the object couldn't load
-		tst.b	4(a0)	; does the object get a respawn table entry?
+		tst.b	2(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_D9D0	; if not, branch
 		addq.b	#1,1(a2)	; since we didn't load the object, undo last change
 
@@ -6379,7 +6378,7 @@ loc_D9D2:
 loc_D9DE:	; subtract number of objects that have been moved out of range (from the right side)
 		cmp.w	-6(a0),d6	; is the previous object's X pos less than d6?
 		bgt.s	loc_D9F0	; if it is, branch
-		tst.b	-2(a0)		; does the previous object get a respawn table entry?
+		tst.b	-4(a0)	; does the previous object get a respawn table entry?
 		bpl.s	loc_D9EC	; if not, branch
 		subq.b	#1,(a2)		; respawn index of next object to the right
 
@@ -6401,7 +6400,7 @@ loc_D9F6:
 loc_DA02:	; load all objects right of the screen that are now in range
 		cmp.w	(a0),d6		; is object's x position >= d6?
 		bls.s	loc_DA16	; if yes, branch
-		tst.b	4(a0)	; does the object get a respawn table entry?
+		tst.b	2(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_DA10	; if not, branch
 		move.b	(a2),d2		; respawn index of this object
 		addq.b	#1,(a2)		; respawn index of next object to the right
@@ -6418,7 +6417,7 @@ loc_DA16:
 loc_DA24:	; subtract number of objects that have been moved out of range (from the left)
 		cmp.w	(a0),d6		; is object's x position >= d6?
 		bls.s	loc_DA36	; if yes, branch
-		tst.b	4(a0)	; does the object get a respawn table entry?
+		tst.b	2(a0)	; does the object get a respawn table entry?
 		bpl.s	loc_DA32	; if not, branch
 		addq.b	#1,1(a2)	; respawn index of next object to the left
 
@@ -6448,9 +6447,8 @@ locret_DA3A:
 ; ---------------------------------------------------------------------------
 
 loc_DA3C:
-		tst.b	4(a0)	; does the object get a respawn table entry?
+		tst.b	2(a0)	; does the object get a respawn table entry?
 		bpl.s	OPL_MakeItem	; if not, branch
-;		bset	#7,4(a2,d2.w)	; mark object as loaded
 		bset	#7,2(a2,d2.w)	; mark object as loaded
 		beq.s	OPL_MakeItem		; branch if it wasn't already loaded
 		addq.w	#6,a0	; next object
@@ -6461,24 +6459,20 @@ loc_DA3C:
 OPL_MakeItem:
 		bsr.w	FindFreeObj	; find empty slot
 		bne.s	locret_DA8A	; branch, if there is no room left in the SST
-		move.w	(a0)+,obX(a1)
-		move.w	(a0)+,d0
-		move.w	d0,d1
-		andi.w	#$FFF,d0
-		move.w	d0,obY(a1)
-		rol.w	#2,d1
-		andi.b	#3,d1
-		move.b	d1,obRender(a1)
-		move.b	d1,obStatus(a1)
-		move.b	(a0)+,d0
-		bpl.s	loc_DA80
-;		bset	#7,obGfx(a2,d2.w)	; set as removed
-		andi.b	#$7F,d0
-		move.b	d2,obRespawnNo(a1)
-
-loc_DA80:
-		_move.b	d0,0(a1)
-		move.b	(a0)+,obSubtype(a1)
+		move.w	(a0)+,x_pos(a1)
+		move.w	(a0)+,d0	; there are three things stored in this word
+		bpl.s	+		; branch, if the object doesn't get a respawn table entry
+		move.b	d2,respawn_index(a1)
++
+		move.w	d0,d1		; copy for later
+		andi.w	#$FFF,d0	; get y-position
+		move.w	d0,y_pos(a1)
+		rol.w	#3,d1	; adjust bits
+		andi.b	#3,d1	; get render flags
+		move.b	d1,render_flags(a1)
+		move.b	d1,status(a1)
+		_move.b	(a0)+,0(a1) ; load obj
+		move.b	(a0)+,subtype(a1)
 		moveq	#0,d0
 
 locret_DA8A:
@@ -8672,13 +8666,13 @@ ObjPos_GHZ1:	binclude	"objpos/ghz1.bin"
 		even
 ObjPos_GHZ2:	binclude	"objpos/ghz2.bin"
 		even
-ObjPos_GHZ3:	binclude	"objpos/ghz3 (JP1).bin"
+ObjPos_GHZ3:	binclude	"objpos/ghz3.bin"
 		even
-ObjPos_LZ1:	binclude	"objpos/lz1 (JP1).bin"
+ObjPos_LZ1:	binclude	"objpos/lz1.bin"
 		even
 ObjPos_LZ2:	binclude	"objpos/lz2.bin"
 		even
-ObjPos_LZ3:	binclude	"objpos/lz3 (JP1).bin"
+ObjPos_LZ3:	binclude	"objpos/lz3.bin"
 		even
 ObjPos_SBZ3:	binclude	"objpos/sbz3.bin"
 		even
@@ -8694,7 +8688,7 @@ ObjPos_LZ3pf1:	binclude	"objpos/lz3pf1.bin"
 		even
 ObjPos_LZ3pf2:	binclude	"objpos/lz3pf2.bin"
 		even
-ObjPos_MZ1:	binclude	"objpos/mz1 (JP1).bin"
+ObjPos_MZ1:	binclude	"objpos/mz1.bin"
 		even
 ObjPos_MZ2:	binclude	"objpos/mz2.bin"
 		even
@@ -8710,9 +8704,9 @@ ObjPos_SYZ1:	binclude	"objpos/syz1.bin"
 		even
 ObjPos_SYZ2:	binclude	"objpos/syz2.bin"
 		even
-ObjPos_SYZ3:	binclude	"objpos/syz3 (JP1).bin"
+ObjPos_SYZ3:	binclude	"objpos/syz3.bin"
 		even
-ObjPos_SBZ1:	binclude	"objpos/sbz1 (JP1).bin"
+ObjPos_SBZ1:	binclude	"objpos/sbz1.bin"
 		even
 ObjPos_SBZ2:	binclude	"objpos/sbz2.bin"
 		even
