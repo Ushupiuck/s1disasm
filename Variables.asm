@@ -22,7 +22,7 @@ Secondary_Collision	= ramaddr ( $FFFFA900 )
 v_systemstack	= ramaddr ( $FFFFAD00 )
 ; $2400 bytes of free ram starting at AC00!~
 
-v_lastlamp	= ramaddr ( $FFFFAD00 )	; number of the last lamppost you hit
+v_lastlamp	= ramaddr ( $FFFFAD02 )	; number of the last lamppost you hit
 v_savedlastlamp	= v_lastlamp+1	; last lamppost you hit
 v_lamp_xpos	= v_lastlamp+2	; x-axis for Sonic to respawn at lamppost (2 bytes)
 v_lamp_ypos	= v_lastlamp+4	; y-axis for Sonic to respawn at lamppost (2 bytes)
@@ -43,31 +43,31 @@ v_lamp_wtrrout	= v_lastlamp+$22 ; water routine at lamppost
 v_lamp_wtrstat	= v_lastlamp+$23 ; water state at lamppost
 v_lamp_lives	= v_lastlamp+$24 ; lives counter at lamppost
 
-v_emeralds	= ramaddr ( $FFFFAD25 )	; number of chaos emeralds
-v_emldlist	= ramaddr ( $FFFFAD26 )	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
-v_oscillate	= ramaddr ( $FFFFAD2C )	; values which oscillate - for swinging platforms, et al ($42 bytes)
-v_ani0_time	= ramaddr ( $FFFFAD6E )	; synchronised sprite animation 0 - time until next frame (used for synchronised animations)
-v_ani0_frame	= ramaddr ( $FFFFAD6F )	; synchronised sprite animation 0 - current frame
-v_ani1_time	= ramaddr ( $FFFFAD70 )	; synchronised sprite animation 1 - time until next frame
-v_ani1_frame	= ramaddr ( $FFFFAD71 )	; synchronised sprite animation 1 - current frame
-v_ani2_time	= ramaddr ( $FFFFAD72 )	; synchronised sprite animation 2 - time until next frame
-v_ani2_frame	= ramaddr ( $FFFFAD73 )	; synchronised sprite animation 2 - current frame
-v_ani3_time	= ramaddr ( $FFFFAD74 )	; synchronised sprite animation 3 - time until next frame
-v_ani3_frame	= ramaddr ( $FFFFAD75 )	; synchronised sprite animation 3 - current frame
-v_ani3_buf	= ramaddr ( $FFFFAD76 )	; synchronised sprite animation 3 - info buffer (2 bytes)
-v_limittopdb	= ramaddr ( $FFFFAD78 )	; level upper boundary, buffered for debug mode (2 bytes)
-v_limitbtmdb	= ramaddr ( $FFFFFD7A )	; level bottom boundary, buffered for debug mode (2 bytes)
+v_emeralds	= ramaddr ( $FFFFAD27 )	; number of chaos emeralds
+v_emldlist	= ramaddr ( $FFFFAD28 )	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
+v_oscillate	= ramaddr ( $FFFFAD2E )	; values which oscillate - for swinging platforms, et al ($42 bytes)
+v_ani0_time	= ramaddr ( $FFFFAD70 )	; synchronised sprite animation 0 - time until next frame (used for synchronised animations)
+v_ani0_frame	= ramaddr ( $FFFFAD71 )	; synchronised sprite animation 0 - current frame
+v_ani1_time	= ramaddr ( $FFFFAD72 )	; synchronised sprite animation 1 - time until next frame
+v_ani1_frame	= ramaddr ( $FFFFAD73 )	; synchronised sprite animation 1 - current frame
+v_ani2_time	= ramaddr ( $FFFFAD74 )	; synchronised sprite animation 2 - time until next frame
+v_ani2_frame	= ramaddr ( $FFFFAD75 )	; synchronised sprite animation 2 - current frame
+v_ani3_time	= ramaddr ( $FFFFAD76 )	; synchronised sprite animation 3 - time until next frame
+v_ani3_frame	= ramaddr ( $FFFFAD77 )	; synchronised sprite animation 3 - current frame
+v_ani3_buf	= ramaddr ( $FFFFAD78 )	; synchronised sprite animation 3 - info buffer (2 bytes)
+v_limittopdb	= ramaddr ( $FFFFAD7A )	; level upper boundary, buffered for debug mode (2 bytes)
+v_limitbtmdb	= ramaddr ( $FFFFFD7C )	; level bottom boundary, buffered for debug mode (2 bytes)
 
-v_screenposx_dup	= ramaddr ( $FFFFAD7C )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
-Horiz_scroll_delay_val	= ramaddr ( $FFFFAD7E ) ; ; if its value is a, where a != 0, X scrolling will be based on the player's X position a-1 frames ago
-Camera_Y_pos_bias	= ramaddr ( $FFFFAD70 )	; screen position y (duplicate) (2 bytes)
-v_bgscreenposx_dup	= ramaddr ( $FFFFAD72 )	; background screen position x (duplicate) (8 bytes)
-v_bg2screenposx_dup	= ramaddr ( $FFFFAD7A )	; 8 bytes
-v_bg3screenposx_dup	= ramaddr ( $FFFFAD82 )	; 8 bytes
-v_fg_scroll_flags_dup	= ramaddr ( $FFFFAD8A )
-v_bg1_scroll_flags_dup	= ramaddr ( $FFFFAD8C )
-v_bg2_scroll_flags_dup	= ramaddr ( $FFFFAD8E )
-v_bg3_scroll_flags_dup	= ramaddr ( $FFFFAD90 )
+v_screenposx_dup	= ramaddr ( $FFFFAD7E )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
+Horiz_scroll_delay_val	= ramaddr ( $FFFFAD80 ) ; ; if its value is a, where a != 0, X scrolling will be based on the player's X position a-1 frames ago
+Camera_Y_pos_bias	= ramaddr ( $FFFFAD82 )	; screen position y (duplicate) (2 bytes)
+v_bgscreenposx_dup	= ramaddr ( $FFFFAD84 )	; background screen position x (duplicate) (8 bytes)
+v_bg2screenposx_dup	= ramaddr ( $FFFFAD8C )	; 8 bytes
+v_bg3screenposx_dup	= ramaddr ( $FFFFAD94 )	; 8 bytes
+v_fg_scroll_flags_dup	= ramaddr ( $FFFFAD9C )
+v_bg1_scroll_flags_dup	= ramaddr ( $FFFFAD9E )
+v_bg2_scroll_flags_dup	= ramaddr ( $FFFFADA0 )
+v_bg3_scroll_flags_dup	= ramaddr ( $FFFFADA2 )
 
 v_objspace	= ramaddr ( $FFFFD000 )	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player	= v_objspace	; object variable space for Sonic ($40 bytes)
