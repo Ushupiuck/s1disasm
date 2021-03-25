@@ -19,7 +19,56 @@ v_tracksonic	= ramaddr ( $FFFFA100 )	; position tracking data for Sonic ($100 by
 v_hscrolltablebuffer	= ramaddr ( $FFFFA200 )	; scrolling table data (actually $380 bytes, but $400 is reserved for it)
 Primary_Collision	= ramaddr ( $FFFFA600 )
 Secondary_Collision	= ramaddr ( $FFFFA900 )
+v_systemstack	= ramaddr ( $FFFFAD00 )
 ; $2400 bytes of free ram starting at AC00!~
+
+v_lastlamp	= ramaddr ( $FFFFAD00 )	; number of the last lamppost you hit
+v_savedlastlamp	= v_lastlamp+1	; last lamppost you hit
+v_lamp_xpos	= v_lastlamp+2	; x-axis for Sonic to respawn at lamppost (2 bytes)
+v_lamp_ypos	= v_lastlamp+4	; y-axis for Sonic to respawn at lamppost (2 bytes)
+v_lamp_rings	= v_lastlamp+6	; rings stored at lamppost (2 bytes)
+v_lamp_time	= v_lastlamp+8	; time stored at lamppost (2 bytes)
+v_lamp_dle	= v_lastlamp+$C	; dynamic level event routine counter at lamppost
+v_lamp_limitbtm	= v_lastlamp+$E	; level bottom boundary at lamppost (2 bytes)
+v_lamp_scrx	= v_lastlamp+$10 ; x-axis screen at lamppost (2 bytes)
+v_lamp_scry	= v_lastlamp+$12 ; y-axis screen at lamppost (2 bytes)
+v_lamp_bgscrx	= v_lastlamp+$14 ; x-axis screen at lamppost (2 bytes)
+v_lamp_bgscry	= v_lastlamp+$16 ; y-axis screen at lamppost (2 bytes)
+v_lamp_bg2scrx	= v_lastlamp+$18 ; y-axis screen at lamppost (2 bytes)
+v_lamp_bg2scry	= v_lastlamp+$1A ; y-axis screen at lamppost (2 bytes)
+v_lamp_bg3scrx	= v_lastlamp+$1C ; y-axis screen at lamppost (2 bytes)
+v_lamp_bg3scry	= v_lastlamp+$1E ; y-axis screen at lamppost (2 bytes)
+v_lamp_wtrpos	= v_lastlamp+$20 ; water position at lamppost (2 bytes)
+v_lamp_wtrrout	= v_lastlamp+$22 ; water routine at lamppost
+v_lamp_wtrstat	= v_lastlamp+$23 ; water state at lamppost
+v_lamp_lives	= v_lastlamp+$24 ; lives counter at lamppost
+
+v_emeralds	= ramaddr ( $FFFFAD25 )	; number of chaos emeralds
+v_emldlist	= ramaddr ( $FFFFAD26 )	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
+v_oscillate	= ramaddr ( $FFFFAD2C )	; values which oscillate - for swinging platforms, et al ($42 bytes)
+v_ani0_time	= ramaddr ( $FFFFAD6E )	; synchronised sprite animation 0 - time until next frame (used for synchronised animations)
+v_ani0_frame	= ramaddr ( $FFFFAD6F )	; synchronised sprite animation 0 - current frame
+v_ani1_time	= ramaddr ( $FFFFAD70 )	; synchronised sprite animation 1 - time until next frame
+v_ani1_frame	= ramaddr ( $FFFFAD71 )	; synchronised sprite animation 1 - current frame
+v_ani2_time	= ramaddr ( $FFFFAD72 )	; synchronised sprite animation 2 - time until next frame
+v_ani2_frame	= ramaddr ( $FFFFAD73 )	; synchronised sprite animation 2 - current frame
+v_ani3_time	= ramaddr ( $FFFFAD74 )	; synchronised sprite animation 3 - time until next frame
+v_ani3_frame	= ramaddr ( $FFFFAD75 )	; synchronised sprite animation 3 - current frame
+v_ani3_buf	= ramaddr ( $FFFFAD76 )	; synchronised sprite animation 3 - info buffer (2 bytes)
+v_limittopdb	= ramaddr ( $FFFFAD78 )	; level upper boundary, buffered for debug mode (2 bytes)
+v_limitbtmdb	= ramaddr ( $FFFFFD7A )	; level bottom boundary, buffered for debug mode (2 bytes)
+
+v_screenposx_dup	= ramaddr ( $FFFFAD7C )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
+Horiz_scroll_delay_val	= ramaddr ( $FFFFAD7E ) ; ; if its value is a, where a != 0, X scrolling will be based on the player's X position a-1 frames ago
+Camera_Y_pos_bias	= ramaddr ( $FFFFAD70 )	; screen position y (duplicate) (2 bytes)
+v_bgscreenposx_dup	= ramaddr ( $FFFFAD72 )	; background screen position x (duplicate) (8 bytes)
+v_bg2screenposx_dup	= ramaddr ( $FFFFAD7A )	; 8 bytes
+v_bg3screenposx_dup	= ramaddr ( $FFFFAD82 )	; 8 bytes
+v_fg_scroll_flags_dup	= ramaddr ( $FFFFAD8A )
+v_bg1_scroll_flags_dup	= ramaddr ( $FFFFAD8C )
+v_bg2_scroll_flags_dup	= ramaddr ( $FFFFAD8E )
+v_bg3_scroll_flags_dup	= ramaddr ( $FFFFAD90 )
+
 v_objspace	= ramaddr ( $FFFFD000 )	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player	= v_objspace	; object variable space for Sonic ($40 bytes)
 v_lvlobjspace	= ramaddr ( $FFFFD800 )	; level object variable space ($1800 bytes)
@@ -263,88 +312,6 @@ v_pal_dry	= ramaddr ( $FFFFFB80 )	; main palette ($80 bytes)
 v_pal_dry_dup	= ramaddr ( $FFFFFC00 )	; duplicate palette, used for transitions ($80 bytes)
 v_objstate	= ramaddr ( $FFFFFC80 )	; object state list ($200 bytes)
 
-v_systemstack	= ramaddr ( $FFFFFE00 )
-f_restart	= ramaddr ( $FFFFFE02 )	; restart level flag (2 bytes)
-v_framecount	= ramaddr ( $FFFFFE04 )	; frame counter (adds 1 every frame) (2 bytes)
-v_framebyte	= v_framecount+1; low byte for frame counter
-v_debugitem	= ramaddr ( $FFFFFE06 )	; debug item currently selected (NOT the object number of the item)
-v_debuguse	= ramaddr ( $FFFFFE08 )	; debug mode use & routine counter (when Sonic is a ring/item) (2 bytes)
-v_debugxspeed	= ramaddr ( $FFFFFE0A )	; debug mode - horizontal speed
-v_debugyspeed	= ramaddr ( $FFFFFE0B )	; debug mode - vertical speed
-v_vbla_count	= ramaddr ( $FFFFFE0C )	; vertical interrupt counter (adds 1 every VBlank) (4 bytes)
-v_vbla_word	= v_vbla_count+2 ; low word for vertical interrupt counter (2 bytes)
-v_vbla_byte	= v_vbla_word+1	; low byte for vertical interrupt counter
-v_zone		= ramaddr ( $FFFFFE10 )	; current zone number
-v_act		= ramaddr ( $FFFFFE11 )	; current act number
-v_lives		= ramaddr ( $FFFFFE12 )	; number of lives
-v_air		= ramaddr ( $FFFFFE14 )	; air remaining while underwater (2 bytes)
-v_airbyte	= v_air+1	; low byte for air
-v_lastspecial	= ramaddr ( $FFFFFE16 )	; last special stage number
-v_continues	= ramaddr ( $FFFFFE18 )	; number of continues
-f_timeover	= ramaddr ( $FFFFFE1A )	; time over flag
-v_lifecount	= ramaddr ( $FFFFFE1B )	; lives counter value (for actual number, see "v_lives")
-f_lifecount	= ramaddr ( $FFFFFE1C )	; lives counter update flag
-f_ringcount	= ramaddr ( $FFFFFE1D )	; ring counter update flag
-f_timecount	= ramaddr ( $FFFFFE1E )	; time counter update flag
-f_scorecount	= ramaddr ( $FFFFFE1F )	; score counter update flag
-v_rings		= ramaddr ( $FFFFFE20 )	; rings (2 bytes)
-v_ringbyte	= v_rings+1	; low byte for rings
-v_time		= ramaddr ( $FFFFFE22 )	; time (4 bytes)
-v_timemin	= ramaddr ( $FFFFFE23 )	; time - minutes
-v_timesec	= ramaddr ( $FFFFFE24 )	; time - seconds
-v_timecent	= ramaddr ( $FFFFFE25 )	; time - centiseconds
-v_score		= ramaddr ( $FFFFFE26 )	; score (4 bytes)
-v_shield	= ramaddr ( $FFFFFE2A )	; shield status (00 = no; 01 = yes)
-v_invinc	= ramaddr ( $FFFFFE2B )	; invinciblity status (00 = no; 01 = yes)
-v_shoes		= ramaddr ( $FFFFFE2C )	; speed shoes status (00 = no; 01 = yes)
-; Free space	= ramaddr ( $FFFFFE2D-2F)
-v_lastlamp	= ramaddr ( $FFFFFE30 )	; number of the last lamppost you hit
-v_savedlastlamp	= v_lastlamp+1	; last lamppost you hit
-v_lamp_xpos	= v_lastlamp+2	; x-axis for Sonic to respawn at lamppost (2 bytes)
-v_lamp_ypos	= v_lastlamp+4	; y-axis for Sonic to respawn at lamppost (2 bytes)
-v_lamp_rings	= v_lastlamp+6	; rings stored at lamppost (2 bytes)
-v_lamp_time	= v_lastlamp+8	; time stored at lamppost (2 bytes)
-v_lamp_dle	= v_lastlamp+$C	; dynamic level event routine counter at lamppost
-v_lamp_limitbtm	= v_lastlamp+$E	; level bottom boundary at lamppost (2 bytes)
-v_lamp_scrx	= v_lastlamp+$10 ; x-axis screen at lamppost (2 bytes)
-v_lamp_scry	= v_lastlamp+$12 ; y-axis screen at lamppost (2 bytes)
-v_lamp_bgscrx	= v_lastlamp+$14 ; x-axis screen at lamppost (2 bytes)
-v_lamp_bgscry	= v_lastlamp+$16 ; y-axis screen at lamppost (2 bytes)
-v_lamp_bg2scrx	= v_lastlamp+$18 ; y-axis screen at lamppost (2 bytes)
-v_lamp_bg2scry	= v_lastlamp+$1A ; y-axis screen at lamppost (2 bytes)
-v_lamp_bg3scrx	= v_lastlamp+$1C ; y-axis screen at lamppost (2 bytes)
-v_lamp_bg3scry	= v_lastlamp+$1E ; y-axis screen at lamppost (2 bytes)
-v_lamp_wtrpos	= v_lastlamp+$20 ; water position at lamppost (2 bytes)
-v_lamp_wtrrout	= v_lastlamp+$22 ; water routine at lamppost
-v_lamp_wtrstat	= v_lastlamp+$23 ; water state at lamppost
-v_lamp_lives	= v_lastlamp+$24 ; lives counter at lamppost
-
-v_emeralds	= ramaddr ( $FFFFFE57 )	; number of chaos emeralds
-v_emldlist	= ramaddr ( $FFFFFE58 )	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
-v_oscillate	= ramaddr ( $FFFFFE5E )	; values which oscillate - for swinging platforms, et al ($42 bytes)
-v_ani0_time	= ramaddr ( $FFFFFEC0 )	; synchronised sprite animation 0 - time until next frame (used for synchronised animations)
-v_ani0_frame	= ramaddr ( $FFFFFEC1 )	; synchronised sprite animation 0 - current frame
-v_ani1_time	= ramaddr ( $FFFFFEC2 )	; synchronised sprite animation 1 - time until next frame
-v_ani1_frame	= ramaddr ( $FFFFFEC3 )	; synchronised sprite animation 1 - current frame
-v_ani2_time	= ramaddr ( $FFFFFEC4 )	; synchronised sprite animation 2 - time until next frame
-v_ani2_frame	= ramaddr ( $FFFFFEC5 )	; synchronised sprite animation 2 - current frame
-v_ani3_time	= ramaddr ( $FFFFFEC6 )	; synchronised sprite animation 3 - time until next frame
-v_ani3_frame	= ramaddr ( $FFFFFEC7 )	; synchronised sprite animation 3 - current frame
-v_ani3_buf	= ramaddr ( $FFFFFEC8 )	; synchronised sprite animation 3 - info buffer (2 bytes)
-v_limittopdb	= ramaddr ( $FFFFFEF0 )	; level upper boundary, buffered for debug mode (2 bytes)
-v_limitbtmdb	= ramaddr ( $FFFFFEF2 )	; level bottom boundary, buffered for debug mode (2 bytes)
-
-v_screenposx_dup	= ramaddr ( $FFFFFF10 )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
-Horiz_scroll_delay_val	= ramaddr ( $FFFFFF12 ) ; ; if its value is a, where a != 0, X scrolling will be based on the player's X position a-1 frames ago
-Camera_Y_pos_bias	= ramaddr ( $FFFFFF14 )	; screen position y (duplicate) (2 bytes)
-v_bgscreenposx_dup	= ramaddr ( $FFFFFF18 )	; background screen position x (duplicate) (8 bytes)
-v_bg2screenposx_dup	= ramaddr ( $FFFFFF20 )	; 8 bytes
-v_bg3screenposx_dup	= ramaddr ( $FFFFFF28 )	; 8 bytes
-v_fg_scroll_flags_dup	= ramaddr ( $FFFFFF30 )
-v_bg1_scroll_flags_dup	= ramaddr ( $FFFFFF32 )
-v_bg2_scroll_flags_dup	= ramaddr ( $FFFFFF34 )
-v_bg3_scroll_flags_dup	= ramaddr ( $FFFFFF36 )
-
 v_levseldelay	= ramaddr ( $FFFFFF80 )	; level select - time until change when up/down is held (2 bytes)
 v_levselitem	= ramaddr ( $FFFFFF82 )	; level select - item selected (2 bytes)
 v_levselsound	= ramaddr ( $FFFFFF84 )	; level select - sound selected (2 bytes)
@@ -363,3 +330,37 @@ v_creditsnum	= ramaddr ( $FFFFFF98 )	; credits index number (2 bytes)
 v_megadrive	= ramaddr ( $FFFFFF9A )	; Megadrive machine type
 f_debugmode	= ramaddr ( $FFFFFF9C )	; debug mode flag (sometimes 2 bytes)
 v_init		= ramaddr ( $FFFFFF9E )	; 'init' text string (4 bytes)
+
+f_restart	= ramaddr ( $FFFFFFA2 )	; restart level flag (2 bytes)
+v_framecount	= ramaddr ( $FFFFFFA4 )	; frame counter (adds 1 every frame) (2 bytes)
+v_framebyte	= v_framecount+1; low byte for frame counter
+v_debugitem	= ramaddr ( $FFFFFFA6 )	; debug item currently selected (NOT the object number of the item)
+v_continues	= ramaddr ( $FFFFFFA7 )	; number of continues
+v_debuguse	= ramaddr ( $FFFFFFA8 )	; debug mode use & routine counter (when Sonic is a ring/item) (2 bytes)
+v_debugxspeed	= ramaddr ( $FFFFFFAA )	; debug mode - horizontal speed
+v_debugyspeed	= ramaddr ( $FFFFFFAB )	; debug mode - vertical speed
+v_vbla_count	= ramaddr ( $FFFFFFAC )	; vertical interrupt counter (adds 1 every VBlank) (4 bytes)
+v_vbla_word	= v_vbla_count+2 ; low word for vertical interrupt counter (2 bytes)
+v_vbla_byte	= v_vbla_word+1	; low byte for vertical interrupt counter
+v_zone		= ramaddr ( $FFFFFFB0 )	; current zone number
+v_act		= ramaddr ( $FFFFFFB1 )	; current act number
+v_lives		= ramaddr ( $FFFFFFB2 )	; number of lives
+v_lastspecial	= ramaddr ( $FFFFFFB3 )	; last special stage number
+f_timeover	= ramaddr ( $FFFFFFB4 )	; time over flag
+v_lifecount	= ramaddr ( $FFFFFFB5 )	; lives counter value (for actual number, see "v_lives")
+f_lifecount	= ramaddr ( $FFFFFFB6 )	; lives counter update flag
+f_ringcount	= ramaddr ( $FFFFFFB7 )	; ring counter update flag
+f_timecount	= ramaddr ( $FFFFFFB8 )	; time counter update flag
+f_scorecount	= ramaddr ( $FFFFFFB9 )	; score counter update flag
+v_air		= ramaddr ( $FFFFFFBA )	; air remaining while underwater (2 bytes)
+v_airbyte	= v_air+1	; low byte for air
+v_rings		= ramaddr ( $FFFFFFBC )	; rings (2 bytes)
+v_ringbyte	= v_rings+1	; low byte for rings
+v_score		= ramaddr ( $FFFFFFBE )	; score (4 bytes)
+v_time		= ramaddr ( $FFFFFFC2 )	; time (4 bytes)
+v_timemin	= ramaddr ( $FFFFFFC3 )	; time - minutes
+v_timesec	= ramaddr ( $FFFFFFC4 )	; time - seconds
+v_timecent	= ramaddr ( $FFFFFFC5 )	; time - centiseconds
+v_shield	= ramaddr ( $FFFFFFC6 )	; shield status (00 = no; 01 = yes)
+v_invinc	= ramaddr ( $FFFFFFC7 )	; invinciblity status (00 = no; 01 = yes)
+v_shoes		= ramaddr ( $FFFFFFC8 )	; speed shoes status (00 = no; 01 = yes)
