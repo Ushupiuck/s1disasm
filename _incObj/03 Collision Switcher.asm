@@ -130,18 +130,18 @@ PSwapper_MainX_Alt:
 		bls.s	.locret
 		move.b	#0,-1(a2)
 		move.w	obY(a0),d2
-        move.w	d2,d3
+		move.w	d2,d3
 		move.w	$32(a0),d4
 		sub.w	d4,d2
 		add.w	d4,d3
 		move.w	obY(a1),d4
-        cmp.w	d2,d4
+		cmp.w	d2,d4
 		blt.s	.locret
 		cmp.w	d3,d4
 		bge.s	.locret
 		move.b	obSubtype(a0),d0
 		bpl.s	.jump
-        btst	#1,obStatus(a1)
+		btst	#1,obStatus(a1)
 		bne.s	.locret
 .jump:
 		btst	#0,obRender(a0)
@@ -180,7 +180,7 @@ PSwapper_MainY:
 		move.b	#1,-1(a2)
 		move.w	obX(a0),d2
 		move.w	d2,d3
-        move.w	$32(a0),d4
+		move.w	$32(a0),d4
 		sub.w	d4,d2
 		add.w	d4,d3
 		move.w	obX(a1),d4
@@ -223,7 +223,7 @@ PSwapper_MainY_Alt:
 		move.w	obX(a0),d2
 		move.w	d2,d3
 		move.w	$32(a0),d4
-        sub.w	d4,d2
+		sub.w	d4,d2
 		add.w	d4,d3
 		move.w	obX(a1),d4
 		cmp.w	d2,d4

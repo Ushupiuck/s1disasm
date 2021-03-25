@@ -6,20 +6,17 @@
 
 
 Sonic_Floor:
-		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
+		move.l	#Primary_Collision,(v_collindex).w		; MJ: load first collision data location
 		cmpi.b	#$C,(v_top_solid_bit).w			; MJ: is second collision set to be used?
 		beq.s	.first					; MJ: if not, branch
-		move.l	(v_colladdr2).w,(v_collindex).w		; MJ: load second collision data location
+		move.l	#Secondary_Collision,(v_collindex).w		; MJ: load second collision data location
 .first:
 		move.b	(v_lrb_solid_bit).w,d5			; MJ: load L/R/B soldity bit
 		move.w	obVelX(a0),d1
 		move.w	obVelY(a0),d2
 		jsr	(CalcAngle).l
-;		move.b	d0,($FFFFFFEC).w
 		subi.b	#$20,d0
-;		move.b	d0,($FFFFFFED).w
 		andi.b	#$C0,d0
-;		move.b	d0,($FFFFFFEE).w
 		cmpi.b	#$40,d0
 		beq.w	loc_13680
 		cmpi.b	#$80,d0

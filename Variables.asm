@@ -4,9 +4,9 @@ ramaddr function x,(-(x&$80000000)<<1)|x
 
 ; Variables (v) and Flags (f)
 
-v_regbuffer	= ramaddr ( $FFFFFC00 )	; stores registers d0-a7 during an error event ($40 bytes)
-v_spbuffer	= ramaddr ( $FFFFFC40 )	; stores most recent sp address (4 bytes)
-v_errortype	= ramaddr ( $FFFFFC44 )	; error type
+v_regbuffer	= ramaddr ( $FFFFFC80 )	; stores registers d0-a7 during an error event ($40 bytes)
+v_spbuffer	= ramaddr ( $FFFFFCC0 )	; stores most recent sp address (4 bytes)
+v_errortype	= ramaddr ( $FFFFFCC4 )	; error type
 
 v_128x128	= ramaddr ( $FF0000 )	; 128x128 tile mappings ($8000 bytes)
 v_16x16		= ramaddr ( $FFFF8000 )	; 16x16 tile mappings ($1800 bytes)
@@ -20,9 +20,9 @@ v_hscrolltablebuffer	= ramaddr ( $FFFFA200 )	; scrolling table data (actually $3
 Primary_Collision	= ramaddr ( $FFFFA600 )
 Secondary_Collision	= ramaddr ( $FFFFA900 )
 ; $2400 bytes of free ram starting at AC00!~
-v_objspace	= ramaddr ( $FFFFB000 )	; object variable space ($40 bytes per object) ($2000 bytes)
+v_objspace	= ramaddr ( $FFFFD000 )	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player	= v_objspace	; object variable space for Sonic ($40 bytes)
-v_lvlobjspace	= ramaddr ( $FFFFB800 )	; level object variable space ($1800 bytes)
+v_lvlobjspace	= ramaddr ( $FFFFD800 )	; level object variable space ($1800 bytes)
 
 v_snddriver_ram  = ramaddr ( $FFFFF000 )	; start of RAM for the sound driver data ($5C0 bytes)
 
@@ -208,7 +208,7 @@ v_ssrotate	= ramaddr ( $FFFFF782 )	; Special Stage rotation speed (2 bytes)
 v_btnpushtime1	= ramaddr ( $FFFFF790 )	; button push duration - in level (2 bytes)
 v_btnpushtime2	= ramaddr ( $FFFFF792 )	; button push duration - in demo (2 bytes)
 v_palchgspeed	= ramaddr ( $FFFFF794 )	; palette fade/transition speed (0 is fastest) (2 bytes)
-v_collindex	= ramaddr ( $FFFFF796 )	; ROM address for collision index of current level (4 bytes)
+v_collindex	= ramaddr ( $FFFFF796 )	; RAM address for collision index of current level (4 bytes)
 v_palss_num	= ramaddr ( $FFFFF79A )	; palette cycling in Special Stage - reference number (2 bytes)
 v_palss_time	= ramaddr ( $FFFFF79C )	; palette cycling in Special Stage - time until next change (2 bytes)
 
@@ -257,11 +257,11 @@ v_scroll_block_3_size	= ramaddr ( $FFFFF7F4 )	; unused (2 bytes)
 v_scroll_block_4_size	= ramaddr ( $FFFFF7F6 )	; unused (2 bytes)
 
 v_spritetablebuffer	= ramaddr ( $FFFFF800 ) ; sprite table ($280 bytes, last $80 bytes are overwritten by v_pal_water_dup)
-v_pal_water_dup	= ramaddr ( $FFFFFA00 ) ; duplicate underwater palette, used for transitions ($80 bytes)
-v_pal_water	= ramaddr ( $FFFFFA80 )	; main underwater palette ($80 bytes)
-v_pal_dry	= ramaddr ( $FFFFFB00 )	; main palette ($80 bytes)
-v_pal_dry_dup	= ramaddr ( $FFFFFB80 )	; duplicate palette, used for transitions ($80 bytes)
-v_objstate	= ramaddr ( $FFFFFC00 )	; object state list ($200 bytes)
+v_pal_water_dup	= ramaddr ( $FFFFFA80 ) ; duplicate underwater palette, used for transitions ($80 bytes)
+v_pal_water	= ramaddr ( $FFFFFB00 )	; main underwater palette ($80 bytes)
+v_pal_dry	= ramaddr ( $FFFFFB80 )	; main palette ($80 bytes)
+v_pal_dry_dup	= ramaddr ( $FFFFFC00 )	; duplicate palette, used for transitions ($80 bytes)
+v_objstate	= ramaddr ( $FFFFFC80 )	; object state list ($200 bytes)
 
 v_systemstack	= ramaddr ( $FFFFFE00 )
 f_restart	= ramaddr ( $FFFFFE02 )	; restart level flag (2 bytes)
@@ -348,22 +348,18 @@ v_bg3_scroll_flags_dup	= ramaddr ( $FFFFFF36 )
 v_levseldelay	= ramaddr ( $FFFFFF80 )	; level select - time until change when up/down is held (2 bytes)
 v_levselitem	= ramaddr ( $FFFFFF82 )	; level select - item selected (2 bytes)
 v_levselsound	= ramaddr ( $FFFFFF84 )	; level select - sound selected (2 bytes)
-v_scorecopy	= ramaddr ( $FFFFFFC0 )	; score, duplicate (4 bytes)
-v_scorelife	= ramaddr ( $FFFFFFC0 )	; points required for an extra life (4 bytes) (JP1 only)
-v_colladdr1	= ramaddr ( $FFFFFFD0 )	; (4 bytes)
-v_colladdr2	= ramaddr ( $FFFFFFD4 )	; (4 bytes)
-v_top_solid_bit	= ramaddr ( $FFFFFFD8 )
-v_lrb_solid_bit	= ramaddr ( $FFFFFFD9 )
-f_levselcheat	= ramaddr ( $FFFFFFE0 )	; level select cheat flag
-f_slomocheat	= ramaddr ( $FFFFFFE1 )	; slow motion & frame advance cheat flag
-f_debugcheat	= ramaddr ( $FFFFFFE2 )	; debug mode cheat flag
-f_creditscheat	= ramaddr ( $FFFFFFE3 )	; hidden credits & press start cheat flag
-v_title_dcount	= ramaddr ( $FFFFFFE4 )	; number of times the d-pad is pressed on title screen (2 bytes)
-v_title_ccount	= ramaddr ( $FFFFFFE6 )	; number of times C is pressed on title screen (2 bytes)
-; Free space	= ramaddr ( $FFFFFFE8-EF) (7 bytes)
-f_demo		= ramaddr ( $FFFFFFF0 )	; demo mode flag (0 = no; 1 = yes; $8001 = ending) (2 bytes)
-v_demonum	= ramaddr ( $FFFFFFF2 )	; demo level number (not the same as the level number) (2 bytes)
-v_creditsnum	= ramaddr ( $FFFFFFF4 )	; credits index number (2 bytes)
-v_megadrive	= ramaddr ( $FFFFFFF8 )	; Megadrive machine type
-f_debugmode	= ramaddr ( $FFFFFFFA )	; debug mode flag (sometimes 2 bytes)
-v_init		= ramaddr ( $FFFFFFFC )	; 'init' text string (4 bytes)
+v_scorelife	= ramaddr ( $FFFFFF86 )	; points required for an extra life (4 bytes) (JP1 only)
+v_top_solid_bit	= ramaddr ( $FFFFFF8A )
+v_lrb_solid_bit	= ramaddr ( $FFFFFF8B )
+f_levselcheat	= ramaddr ( $FFFFFF8C )	; level select cheat flag
+f_slomocheat	= ramaddr ( $FFFFFF8D )	; slow motion & frame advance cheat flag
+f_debugcheat	= ramaddr ( $FFFFFF8E )	; debug mode cheat flag
+f_creditscheat	= ramaddr ( $FFFFFF8F )	; hidden credits & press start cheat flag
+v_title_dcount	= ramaddr ( $FFFFFF90 )	; number of times the d-pad is pressed on title screen (2 bytes)
+v_title_ccount	= ramaddr ( $FFFFFF92 )	; number of times C is pressed on title screen (2 bytes)
+f_demo		= ramaddr ( $FFFFFF94 )	; demo mode flag (0 = no; 1 = yes; $8001 = ending) (2 bytes)
+v_demonum	= ramaddr ( $FFFFFF96 )	; demo level number (not the same as the level number) (2 bytes)
+v_creditsnum	= ramaddr ( $FFFFFF98 )	; credits index number (2 bytes)
+v_megadrive	= ramaddr ( $FFFFFF9A )	; Megadrive machine type
+f_debugmode	= ramaddr ( $FFFFFF9C )	; debug mode flag (sometimes 2 bytes)
+v_init		= ramaddr ( $FFFFFF9E )	; 'init' text string (4 bytes)

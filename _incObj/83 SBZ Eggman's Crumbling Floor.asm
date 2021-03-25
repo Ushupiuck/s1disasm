@@ -47,7 +47,7 @@ FFloor_MakeBlock:
 
 FFloor_ExitMake:
 		addq.b	#2,obRoutine(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 FFloor_ChkBreak:; Routine 2
@@ -95,7 +95,7 @@ FFloor_Solid2:
 loc_19C62:	; Routine 6
 		bclr	#3,obStatus(a0)
 		bclr	#3,(v_player+obStatus).w
-		bra.w	loc_1982C
+		jmp	(DeleteObject).l
 ; ===========================================================================
 
 loc_19C72:	; Routine 8
@@ -106,7 +106,7 @@ loc_19C72:	; Routine 8
 
 loc_19C80:	; Routine $A
 		tst.b	obRender(a0)
-		bpl.w	loc_1982C
+		jpl	(DeleteObject).l
 		jsr	(ObjectFall).l
 		jmp	(DisplaySprite).l
 ; ===========================================================================

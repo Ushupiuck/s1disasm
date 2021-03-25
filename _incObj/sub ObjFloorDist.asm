@@ -29,10 +29,10 @@ ObjFloorDist2:
 		cmpi.b	#id_SonicPlayer,(a0)			; MJ: is the parent object Sonic?
 		bne.s	.notsonic				; MJ: if not, branch and only use first collision set
 		move.b	(v_top_solid_bit).w,d5			; MJ: load solid type to check
-		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
+		move.l	#Primary_Collision,(v_collindex).w	; MJ: load first collision data location
 		cmpi.b	#$C,d5					; MJ: is second collision set to be used?
 		beq.s	.first					; MJ: if not, branch
-		move.l	(v_colladdr2).w,(v_collindex).w		; MJ: load second collision data location
+		move.l	#Secondary_Collision,(v_collindex).w	; MJ: load second collision data location
 .first:	
 .notsonic:
 		lea	(v_anglebuffer).w,a4

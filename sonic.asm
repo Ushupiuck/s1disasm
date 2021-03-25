@@ -905,7 +905,7 @@ JoypadInit:
 		move.b	d0,($A1000B).l	; init port 2 (joypad 2)
 		move.b	d0,($A1000D).l	; init port 3 (expansion/extra)
 		startZ80
-		rts	
+		rts
 ; End of function JoypadInit
 
 ; ---------------------------------------------------------------------------
@@ -922,7 +922,7 @@ ReadJoypads:
 
 .read:
 		move.b	#0,(a1)
-		nop	
+		nop
 		nop
 		move.b	(a1),d0
 		lsl.b	#2,d0
@@ -2340,7 +2340,7 @@ LevSel_Credits:
 		move.b	#id_Credits,(v_gamemode).w ; set screen mode to $1C (Credits)
 		sfx	bgm_Credits,0,1,1 ; play credits music
 		move.w	#0,(v_creditsnum).w
-		rts	
+		rts
 ; ===========================================================================
 
 LevSel_Level_SS:
@@ -3025,40 +3025,41 @@ loc_3BC8:
 ColIndexLoad:
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
-		lsl.w	#3,d0					; MJ: multiply by 8 not 4
-		move.l	#Primary_Collision,(v_colladdr1).w
+		lsl.w	#2,d0					; MJ: multiply by 8 not 4
+		move.l	#Primary_Collision,(v_collindex).w
 		move.w	d0,-(sp)
-		movea.l	ColPointers(pc,d0.w),a0
+		movea.l	ColPointers1(pc,d0.w),a0
 		lea	(Primary_Collision).w,a1
 		bsr.w	KosDec
 		move.w	(sp)+,d0
-		move.l	#Secondary_Collision,(v_colladdr2).w
-		move.w	d0,-(sp)
-		movea.l	ColPointers(pc,d0.w),a0
+		movea.l	ColPointers2(pc,d0.w),a0
 		lea	(Secondary_Collision).w,a1
-		bsr.w	KosDec
-		move.w	(sp)+,d0
-		rts
+		bra.w	KosDec
 ; End of function ColIndexLoad
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Collision index pointers
+; Primary Collision index pointers
 ; ---------------------------------------------------------------------------
-ColPointers:	dc.l Col_GHZ_1	; MJ: each zone now has two entries
-		dc.l Col_GHZ_2
+ColPointers1:	dc.l Col_GHZ_1	; MJ: each zone now has two entries
 		dc.l Col_LZ_1
-		dc.l Col_LZ_2
 		dc.l Col_MZ_1
-		dc.l Col_MZ_2
 		dc.l Col_SLZ_1
-		dc.l Col_SLZ_2
 		dc.l Col_SYZ_1
-		dc.l Col_SYZ_2
 		dc.l Col_SBZ_1
-		dc.l Col_SBZ_2
-		zonewarning ColPointers,8
+;		zonewarning ColPointers1,8
 ;		dc.l Col_GHZ_1 ; Pointers for Ending are missing by default.
+
+; ---------------------------------------------------------------------------
+; Secondary Collision index pointers
+; ---------------------------------------------------------------------------
+ColPointers2:	dc.l Col_GHZ_2
+		dc.l Col_LZ_2
+		dc.l Col_MZ_2
+		dc.l Col_SLZ_2
+		dc.l Col_SYZ_2
+		dc.l Col_SBZ_2
+;		zonewarning ColPointers2,8
 ;		dc.l Col_GHZ_2
 
 		include	"_inc/Oscillatory Routines.asm"
@@ -3480,7 +3481,7 @@ loc_4992:
 		move.l	(a1)+,(a2)+
 
 locret_49E6:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_49E8:
@@ -3516,7 +3517,7 @@ loc_4A2E:
 		adda.w	d0,a1
 		move.l	(a1)+,(a2)+
 		move.w	(a1)+,(a2)+
-		rts	
+		rts
 ; End of function PalCycle_SS
 
 ; ===========================================================================
@@ -3810,8 +3811,12 @@ End_LoadData:
 		bsr.w	LoadZoneTiles	; load level art
 		bsr.w	LevelDataLoad
 		bsr.w	LoadTilesFromStart
-		move.l	#Col_GHZ_1,(v_colladdr1).w ; MJ: Set first collision for ending
-		move.l	#Col_GHZ_2,(v_colladdr2).w ; MJ: Set second collision for ending
+		move.l	#Col_GHZ_1,a0	; Store data into a0
+		lea	(Primary_Collision).w,a1	; load indexes
+		bsr.w	KosDec	; Decompress it!
+		move.l	#Col_GHZ_2,a0	; Repeat for secondary collision
+		lea	(Secondary_Collision).w,a1
+		bsr.w	KosDec
 		enable_ints
 ;		lea	(Kos_EndFlowers).l,a0 ;	loaded from ROM now
 		moveq	#palid_Sonic,d0
@@ -4680,7 +4685,7 @@ DrawBlock:
 		add.l	d7,d0		; Next row
 		move.l	d0,(a5)
 		move.l	(a1)+,(a6)	; Write bottom two tiles
-		rts	
+		rts
 ; ===========================================================================
 
 DrawFlipX:
@@ -5256,7 +5261,7 @@ MvSonic2:
 		sub.w	d2,obX(a1)
 
 locret_7B62:
-		rts	
+		rts
 ; End of function MvSonicOnPtfm2
 
 		include	"_incObj/15 Swinging Platforms (part 2).asm"
@@ -6856,10 +6861,10 @@ Map_Splash:	include	"_maps/Water Splash.asm"
 
 
 Sonic_WalkSpeed:
-		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
+		move.l	#Primary_Collision,(v_collindex).w	; MJ: load first collision data location
 		cmpi.b	#$C,(v_top_solid_bit).w			; MJ: is second collision set to be used?
 		beq.s	.first					; MJ: if not, branch
-		move.l	(v_colladdr2).w,(v_collindex).w		; MJ: load second collision data location
+		move.l	#Secondary_Collision,(v_collindex).w	; MJ: load second collision data location
 .first:
 		move.b	(v_lrb_solid_bit).w,d5			; MJ: load L/R/B soldity bit
 		move.l	obX(a0),d3
@@ -6917,10 +6922,10 @@ loc_14D3C:
 
 
 sub_14D48:
-		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
+		move.l	#Primary_Collision,(v_collindex).w	; MJ: load first collision data location
 		cmpi.b	#$C,(v_top_solid_bit).w			; MJ: is second collision set to be used?
 		beq.s	.first					; MJ: if not, branch
-		move.l	(v_colladdr2).w,(v_collindex).w		; MJ: load second collision data location
+		move.l	#Secondary_Collision,(v_collindex).w	; MJ: load second collision data location
 .first:
 		move.b	(v_lrb_solid_bit).w,d5			; MJ: load L/R/B soldity bit
 		move.b	d0,(v_anglebuffer).w
@@ -6944,10 +6949,10 @@ sub_14D48:
 
 
 Sonic_HitFloor:
-		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
+		move.l	#Primary_Collision,(v_collindex).w		; MJ: load first collision data location
 		cmpi.b	#$C,(v_top_solid_bit).w			; MJ: is second collision set to be used?
 		beq.s	.first					; MJ: if not, branch
-		move.l	(v_colladdr2).w,(v_collindex).w		; MJ: load second collision data location
+		move.l	#Secondary_Collision,(v_collindex).w		; MJ: load second collision data location
 .first:
 		move.b	(v_top_solid_bit).w,d5			; MJ: load L/R/B soldity bit
 		move.w	obY(a0),d2
@@ -6998,9 +7003,6 @@ locret_14DE6:
 ; End of function Sonic_HitFloor
 
 ; ===========================================================================
-		move.w	obY(a0),d2
-		move.w	obX(a0),d3
-
 loc_14DF0:
 		addi.w	#$A,d2
 		lea	(v_anglebuffer).w,a4
@@ -7016,7 +7018,7 @@ loc_14E0A:
 		move.b	d2,d3
 
 locret_14E16:
-		rts	
+		rts
 
 		include	"_incObj/sub ObjFloorDist.asm"
 
@@ -7147,8 +7149,6 @@ Sonic_DontRunOnWalls:
 ; End of function Sonic_DontRunOnWalls
 
 ; ===========================================================================
-		move.w	obY(a0),d2
-		move.w	obX(a0),d3
 
 loc_14F7C:
 		subi.w	#$A,d2
@@ -7182,7 +7182,7 @@ ObjHitCeiling:
 		move.b	#-$80,d3
 
 locret_14FD4:
-		rts	
+		rts
 ; End of function ObjHitCeiling
 
 ; ===========================================================================
@@ -7266,7 +7266,7 @@ ObjHitWallLeft:
 		move.b	#$40,d3
 
 locret_15098:
-		rts	
+		rts
 ; End of function ObjHitWallLeft
 
 ; ===========================================================================
@@ -7385,19 +7385,12 @@ Map_BossItems:	include	"_maps/Boss Items.asm"
 		include	"_incObj/77 Boss - Labyrinth.asm"
 		include	"_incObj/73 Boss - Marble.asm"
 		include	"_incObj/74 MZ Boss Fire.asm"
-
-Obj7A_Delete:
-		jmp	(DeleteObject).l
-
 		include	"_incObj/7A Boss - Star Light.asm"
 		include	"_incObj/7B SLZ Boss Spikeball.asm"
 Map_BSBall:	include	"_maps/SLZ Boss Spikeball.asm"
 		include	"_incObj/75 Boss - Spring Yard.asm"
 		include	"_incObj/76 SYZ Boss Blocks.asm"
 Map_BossBlock:	include	"_maps/SYZ Boss Blocks.asm"
-
-loc_1982C:
-		jmp	(DeleteObject).l
 
 		include	"_incObj/82 Eggman - Scrap Brain 2.asm"
 		include	"_anim/Eggman - Scrap Brain 2 & Final.asm"
@@ -8071,7 +8064,7 @@ loc_1C962:
 		move.l	(a3)+,(a6)
 		dbf	d6,ContScr_Loop	; repeat 1 more	time
 
-		rts	
+		rts
 ; End of function ContScrCounter
 
 ; ===========================================================================

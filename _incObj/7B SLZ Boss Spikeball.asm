@@ -13,9 +13,9 @@ BossSpikeball:
 		subi.w	#$80,d1
 		andi.w	#$FF80,d1
 		sub.w	d1,d0
-		bmi.w	Obj7A_Delete
+		jmi	(DeleteObject).l
 		cmpi.w	#$280,d0
-		bhi.w	Obj7A_Delete
+		jhi	(DeleteObject).l
 		jmp	(DisplaySprite).l
 ; ===========================================================================
 Obj7B_Index:	dc.w Obj7B_Main-Obj7B_Index
@@ -359,5 +359,5 @@ Obj7B_MoveFrag:	; Routine $A
 		lsr.w	#2,d0
 		move.b	d0,obFrame(a0)
 		tst.b	1(a0)
-		bpl.w	Obj7A_Delete
-		rts	
+		jpl	(DeleteObject).l
+		rts
