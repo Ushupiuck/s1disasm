@@ -687,21 +687,24 @@ ptr_flgend
 ; ---------------------------------------------------------------------------
 ; Sound_E1: PlaySega:
 PlaySegaSound:
-		move.b	#$88,(z80_dac_sample).l	; Queue Sega PCM
-		startZ80
-		move.w	#$11,d1
-; loc_71FC0:
-.busyloop_outer:
-		move.w	#-1,d0
-; loc_71FC4:
-.busyloop:
-		nop	
-		dbf	d0,.busyloop
-
-		dbf	d1,.busyloop_outer
-
-		addq.w	#4,sp	; Tamper return value so we don't return to caller
-		rts	
+		lea	(SegaPCM).l,a2			; Load the SEGA PCM sample into a2. It's important that we use a2 since a0 and a1 are going to be used up ahead when reading the joypad ports
+		move.l	#(SegaPCM_End-SegaPCM),d3			; Load the size of the SEGA PCM sample into d3
+		move.b	#$2A,(ym2612_a0).l		; $A04000 = $2A -> Write to DAC channel
+PlayPCM_Loop:
+		move.b	(a2)+,(ym2612_d0).l		; Write the PCM data (contained in a2) to $A04001 (YM2612 register D0)
+		move.w	#1,d0				; Write the pitch ($14 in this case) to d0
+		dbf	d0,*				; Decrement d0; jump to itself if not 0. (for pitch control, avoids playing the sample too fast)
+		sub.l	#1,d3				; Subtract 1 from the PCM sample size
+		beq.s	return_PlayPCM			; If d3 = 0, we finished playing the PCM sample, so stop playing, leave this loop, and unfreeze the 68K
+		lea	(v_jpadhold1).w,a0		; address where JoyPad states are written
+		lea	($A10003).l,a1			; address where JoyPad states are read from
+		jsr	(ReadJoypads).w			; Read only the first joypad port. It's important that we do NOT do the two ports, we don't have the cycles for that
+		btst	#7,(v_jpadhold1).w		; Check for Start button
+		bne.s	return_PlayPCM			; If start is pressed, stop playing, leave this loop, and unfreeze the 68K
+		bra.s	PlayPCM_Loop			; Otherwise, continue playing PCM sample
+return_PlayPCM:
+		addq.w	#4,sp
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Play music track $81-$9F
@@ -2665,20 +2668,5 @@ SoundCF:	binclude	"sound/sfx/SndCF - Signpost.bin"
 		even
 SoundD0:	binclude	"sound/sfx/SndD0 - Waterfall.bin"
 		even
-
-		; Don't let Sega sample cross $8000-byte boundary
-		; (DAC driver doesn't switch banks automatically)
-		if ((*)&$7FFF)+Size_of_SegaPCM>$8000
-			align $8000
-		endif
 SegaPCM:	binclude	"sound/dac/sega.pcm"
-SegaPCM_End
-		even
-
-		if SegaPCM_End-SegaPCM>$8000
-			fatal "Sega sound must fit within $8000 bytes, but you have a $\{SegaPCM_End-SegaPCM} byte Sega sound."
-		endif
-		if SegaPCM_End-SegaPCM>Size_of_SegaPCM
-			fatal "Size_of_SegaPCM = $\{Size_of_SegaPCM}, but you have a $\{SegaPCM_End-SegaPCM} byte Sega sound."
-		endif
-
+SegaPCM_end:	even

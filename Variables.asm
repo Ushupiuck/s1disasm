@@ -17,10 +17,12 @@ VDP_Command_Buffer	= ramaddr ( $FFFFA000 )	; stores 18 ($12) VDP commands to iss
 VDP_Command_Buffer_Slot	= ramaddr ( $FFFFA0FC )	; stores the address of the next open slot for a queued VDP command ($4 bytes)
 v_tracksonic	= ramaddr ( $FFFFA100 )	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer	= ramaddr ( $FFFFA200 )	; scrolling table data (actually $380 bytes, but $400 is reserved for it)
-; $2A00 bytes of free ram starting at A600!~
-v_objspace	= ramaddr ( $FFFFD000 )	; object variable space ($40 bytes per object) ($2000 bytes)
+Primary_Collision	= ramaddr ( $FFFFA600 )
+Secondary_Collision	= ramaddr ( $FFFFA900 )
+; $2400 bytes of free ram starting at AC00!~
+v_objspace	= ramaddr ( $FFFFB000 )	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player	= v_objspace	; object variable space for Sonic ($40 bytes)
-v_lvlobjspace	= ramaddr ( $FFFFD800 )	; level object variable space ($1800 bytes)
+v_lvlobjspace	= ramaddr ( $FFFFB800 )	; level object variable space ($1800 bytes)
 
 v_snddriver_ram  = ramaddr ( $FFFFF000 )	; start of RAM for the sound driver data ($5C0 bytes)
 

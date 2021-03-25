@@ -3026,10 +3026,19 @@ ColIndexLoad:
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
 		lsl.w	#3,d0					; MJ: multiply by 8 not 4
-		move.l	ColPointers(pc,d0.w),(v_colladdr1).w	; MJ: get first collision set
-		addq.w	#4,d0					; MJ: increase to next location
-		move.l	ColPointers(pc,d0.w),(v_colladdr2).w	; MJ: get second collision set
-		rts	
+		move.l	#Primary_Collision,(v_colladdr1).w
+		move.w	d0,-(sp)
+		movea.l	ColPointers(pc,d0.w),a0
+		lea	(Primary_Collision).w,a1
+		bsr.w	KosDec
+		move.w	(sp)+,d0
+		move.l	#Secondary_Collision,(v_colladdr2).w
+		move.w	d0,-(sp)
+		movea.l	ColPointers(pc,d0.w),a0
+		lea	(Secondary_Collision).w,a1
+		bsr.w	KosDec
+		move.w	(sp)+,d0
+		rts
 ; End of function ColIndexLoad
 
 ; ===========================================================================
@@ -5020,7 +5029,7 @@ LevelLayoutLoad:
 		lsl.b	#6,d0
 		lsr.w	#4,d0
 		lea	(Level_Index).l,a1
-		movea.l	(a1,d0.w),a1		; MJ: moving the address strait to a1 rather than adding a word to an address
+		movea.l	(a1,d0.w),a1		; MJ: moving the address straight to a1 rather than adding a word to an address
 		move.l	a1,(v_lvllayoutfg).w	; MJ: save location of layout to $FFFFA400
 		lea	$80(a1),a1		; MJ: add 80 (As the BG line is always after the FG line)
 		move.l	a1,(v_lvllayoutbg).w	; MJ: save location of layout to $FFFFA404
@@ -8472,29 +8481,29 @@ CollArray1:	binclude	"collide/Collision Array (Normal).bin"
 		even
 CollArray2:	binclude	"collide/Collision Array (Rotated).bin"
 		even
-Col_GHZ_1:	binclude	"collide/GHZ1.bin"	; GHZ index 1
+Col_GHZ_1:	binclude	"collide/GHZ1.kos"	; GHZ index 1
 		even
-Col_GHZ_2:	binclude	"collide/GHZ2.bin"	; GHZ index 2
+Col_GHZ_2:	binclude	"collide/GHZ2.kos"	; GHZ index 2
 		even
-Col_LZ_1:	binclude	"collide/LZ1.bin"	; LZ index 1
+Col_LZ_1:	binclude	"collide/LZ1.kos"	; LZ index 1
 		even
-Col_LZ_2:	binclude	"collide/LZ2.bin"	; LZ index 2
+Col_LZ_2:	binclude	"collide/LZ2.kos"	; LZ index 2
 		even
-Col_MZ_1:	binclude	"collide/MZ1.bin"	; MZ index 1
+Col_MZ_1:	binclude	"collide/MZ1.kos"	; MZ index 1
 		even
-Col_MZ_2:	binclude	"collide/MZ2.bin"	; MZ index 2
+Col_MZ_2:	binclude	"collide/MZ2.kos"	; MZ index 2
 		even
-Col_SLZ_1:	binclude	"collide/SLZ1.bin"	; SLZ index 1
+Col_SLZ_1:	binclude	"collide/SLZ1.kos"	; SLZ index 1
 		even
-Col_SLZ_2:	binclude	"collide/SLZ2.bin"	; SLZ index 2
+Col_SLZ_2:	binclude	"collide/SLZ2.kos"	; SLZ index 2
 		even
-Col_SYZ_1:	binclude	"collide/SYZ1.bin"	; SYZ index 1
+Col_SYZ_1:	binclude	"collide/SYZ1.kos"	; SYZ index 1
 		even
-Col_SYZ_2:	binclude	"collide/SYZ2.bin"	; SYZ index 2
+Col_SYZ_2:	binclude	"collide/SYZ2.kos"	; SYZ index 2
 		even
-Col_SBZ_1:	binclude	"collide/SBZ1.bin"	; SBZ index 1
+Col_SBZ_1:	binclude	"collide/SBZ1.kos"	; SBZ index 1
 		even
-Col_SBZ_2:	binclude	"collide/SBZ2.bin"	; SBZ index 2
+Col_SBZ_2:	binclude	"collide/SBZ2.kos"	; SBZ index 2
 		even
 ; ---------------------------------------------------------------------------
 ; Special Stage layouts
