@@ -33,7 +33,7 @@ ObjFloorDist2:
 		cmpi.b	#$C,d5					; MJ: is second collision set to be used?
 		beq.s	.first					; MJ: if not, branch
 		move.l	#Secondary_Collision,(v_collindex).w	; MJ: load second collision data location
-.first:	
+.first:
 .notsonic:
 		lea	(v_anglebuffer).w,a4
 		move.b	#0,(a4)
@@ -46,6 +46,6 @@ ObjFloorDist2:
 		move.b	#0,d3
 
 locret_14E4E:
-		rts	
+		rts
 
 ; End of function ObjFloorDist2

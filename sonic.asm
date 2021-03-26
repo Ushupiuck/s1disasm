@@ -1230,12 +1230,12 @@ loc_160E:
 		moveq	#$10,d6
 		moveq	#0,d0
 		move.l	a0,(v_plc_buffer).w
-		move.l	a3,(v_ptrnemcode).w
-		move.l	d0,($FFFFF6E4).w
-		move.l	d0,($FFFFF6E8).w
-		move.l	d0,($FFFFF6EC).w
-		move.l	d5,($FFFFF6F0).w
-		move.l	d6,($FFFFF6F4).w
+		move.l	a3,(v_plc_buffer_reg0).w
+		move.l	d0,(v_plc_buffer_reg4).w
+		move.l	d0,(v_plc_buffer_reg8).w
+		move.l	d0,(v_plc_buffer_regC).w
+		move.l	d5,(v_plc_buffer_reg10).w
+		move.l	d6,(v_plc_buffer_reg14).w
 		move.w	d2,(f_plc_execute).w
 
 Rplc_Exit:
@@ -1249,10 +1249,10 @@ Rplc_Exit:
 sub_1642:
 		tst.w	(f_plc_execute).w
 		beq.w	locret_16DA
-		move.w	#9,($FFFFF6FA).w
+		move.w	#9,(v_plc_buffer_reg1A).w
 		moveq	#0,d0
-		move.w	($FFFFF684).w,d0
-		addi.w	#$120,($FFFFF684).w
+		move.w	(v_plc_buffer+4).w,d0
+		addi.w	#$120,(v_plc_buffer+4).w
 		bra.s	loc_1676
 ; End of function sub_1642
 
@@ -1264,10 +1264,10 @@ sub_1642:
 ProcessDPLC2:
 		tst.w	(f_plc_execute).w
 		beq.s	locret_16DA
-		move.w	#3,($FFFFF6FA).w
+		move.w	#3,(v_plc_buffer_reg1A).w
 		moveq	#0,d0
-		move.w	($FFFFF684).w,d0
-		addi.w	#$60,($FFFFF684).w
+		move.w	(v_plc_buffer+4).w,d0
+		addi.w	#$60,(v_plc_buffer+4).w
 
 loc_1676:
 		lea	(vdp_control_port).l,a4
@@ -1278,12 +1278,12 @@ loc_1676:
 		move.l	d0,(a4)
 		subq.w	#4,a4
 		movea.l	(v_plc_buffer).w,a0
-		movea.l	(v_ptrnemcode).w,a3
-		move.l	($FFFFF6E4).w,d0
-		move.l	($FFFFF6E8).w,d1
-		move.l	($FFFFF6EC).w,d2
-		move.l	($FFFFF6F0).w,d5
-		move.l	($FFFFF6F4).w,d6
+		movea.l	(v_plc_buffer_reg0).w,a3
+		move.l	(v_plc_buffer_reg4).w,d0
+		move.l	(v_plc_buffer_reg8).w,d1
+		move.l	(v_plc_buffer_regC).w,d2
+		move.l	(v_plc_buffer_reg10).w,d5
+		move.l	(v_plc_buffer_reg14).w,d6
 		lea	(v_ngfx_buffer).w,a1
 
 loc_16AA:
@@ -1291,15 +1291,15 @@ loc_16AA:
 		bsr.w	NemPCD_NewRow
 		subq.w	#1,(f_plc_execute).w
 		beq.s	loc_16DC
-		subq.w	#1,($FFFFF6FA).w
+		subq.w	#1,(v_plc_buffer_reg1A).w
 		bne.s	loc_16AA
 		move.l	a0,(v_plc_buffer).w
-		move.l	a3,(v_ptrnemcode).w
-		move.l	d0,($FFFFF6E4).w
-		move.l	d1,($FFFFF6E8).w
-		move.l	d2,($FFFFF6EC).w
-		move.l	d5,($FFFFF6F0).w
-		move.l	d6,($FFFFF6F4).w
+		move.l	a3,(v_plc_buffer_reg0).w
+		move.l	d0,(v_plc_buffer_reg4).w
+		move.l	d1,(v_plc_buffer_reg8).w
+		move.l	d2,(v_plc_buffer_regC).w
+		move.l	d5,(v_plc_buffer_reg10).w
+		move.l	d6,(v_plc_buffer_reg14).w
 
 locret_16DA:
 		rts
@@ -1312,7 +1312,7 @@ loc_16DC:
 loc_16E2:
 		move.l	6(a0),(a0)+
 		dbf	d0,loc_16E2
-		rts	
+		rts
 ; End of function ProcessDPLC2
 
 ; ---------------------------------------------------------------------------
@@ -1936,7 +1936,7 @@ PalLoad4_Water:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad4_Water
 
 ; ===========================================================================
@@ -2705,7 +2705,7 @@ Level_ClrObjRam:
 		move.l	d0,(a1)+
 		dbf	d1,Level_ClrObjRam ; clear object RAM
 
-		lea	($FFFFF628).w,a1
+		lea	(MiscLevelVariables).w,a1
 		moveq	#0,d0
 		move.w	#$15,d1
 
@@ -3346,7 +3346,7 @@ SS_NormalExit:
 		bne.s	SS_NormalExit
 		sfx	sfx_EnterSS,0,1,0 ; play special stage exit sound
 		bsr.w	PaletteWhiteOut
-		rts	
+		rts
 ; ===========================================================================
 
 SS_ToSegaScreen:
@@ -3428,7 +3428,7 @@ loc_491C:
 		moveq	#$3F,d1
 		moveq	#$3F,d2
 		bsr.w	TilemapToVRAM
-		rts	
+		rts
 ; End of function SS_BGLoad
 
 ; ---------------------------------------------------------------------------
@@ -3458,7 +3458,7 @@ loc_4992:
 		move.w	d0,(v_palss_time).w
 		moveq	#0,d0
 		move.b	(a0)+,d0
-		move.w	d0,($FFFFF7A0).w
+		move.w	d0,(v_palss_unknown2).w
 		lea	(byte_4ABC).l,a1
 		lea	(a1,d0.w),a1
 		move.w	#-$7E00,d0
@@ -3485,7 +3485,7 @@ locret_49E6:
 ; ===========================================================================
 
 loc_49E8:
-		move.w	($FFFFF79E).w,d1
+		move.w	(v_palss_unknown).w,d1
 		cmpi.w	#$8A,d0
 		blo.s	loc_49F4
 		addq.w	#1,d1
@@ -3547,7 +3547,7 @@ Pal_SSCyc2:	binclude	"palette/Cycle - Special Stage 2.bin"
 
 
 SS_BGAnimate:
-		move.w	($FFFFF7A0).w,d0
+		move.w	(v_palss_unknown2).w,d0
 		bne.s	loc_4BF6
 		move.w	#0,(v_bgscreenposy).w
 		move.w	(v_bgscreenposy).w,(v_bgscrposy_dup).w
@@ -3723,7 +3723,7 @@ loc_4DF2:
 		tst.w	(v_demolength).w
 		bne.w	Cont_MainLoop
 		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
-		rts	
+		rts
 ; ===========================================================================
 
 Cont_GotoLevel:
@@ -3735,7 +3735,7 @@ Cont_GotoLevel:
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost count
 		subq.b	#1,(v_continues).w ; subtract 1 from continues
-		rts	
+		rts
 ; ===========================================================================
 
 		include	"_incObj/80 Continue Screen Elements.asm"
@@ -3759,7 +3759,7 @@ End_ClrObjRam:
 		move.l	d0,(a1)+
 		dbf	d1,End_ClrObjRam ; clear object	RAM
 
-		lea	($FFFFF628).w,a1
+		lea	(MiscLevelVariables).w,a1
 		moveq	#0,d0
 		move.w	#$15,d1
 End_ClrRam1:
@@ -6685,7 +6685,7 @@ loc_12C7E:
 		bsr.w	Sonic_RecordPosition
 		bsr.w	Sonic_Water
 		move.b	(v_anglebuffer).w,$36(a0)
-		move.b	($FFFFF76A).w,$37(a0)
+		move.b	(v_angledata).w,$37(a0)
 		tst.b	(f_wtunnelmode).w
 		beq.s	loc_12CA6
 		tst.b	obAnim(a0)
@@ -6880,7 +6880,7 @@ Sonic_WalkSpeed:
 		swap	d2
 		swap	d3
 		move.b	d0,(v_anglebuffer).w
-		move.b	d0,($FFFFF76A).w
+		move.b	d0,(v_angledata).w
 		move.b	d0,d1
 		addi.b	#$20,d0
 		bpl.s	loc_14D1A
@@ -6929,7 +6929,7 @@ sub_14D48:
 .first:
 		move.b	(v_lrb_solid_bit).w,d5			; MJ: load L/R/B soldity bit
 		move.b	d0,(v_anglebuffer).w
-		move.b	d0,($FFFFF76A).w
+		move.b	d0,(v_angledata).w
 		addi.b	#$20,d0
 		andi.b	#$C0,d0
 		cmpi.b	#$40,d0
@@ -6978,7 +6978,7 @@ Sonic_HitFloor:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		sub.w	d0,d3
-		lea	($FFFFF76A).w,a4
+		lea	(v_angledata).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindFloor	; MJ: check solidity
@@ -6986,7 +6986,7 @@ Sonic_HitFloor:
 		move.b	#0,d2
 
 loc_14DD0:
-		move.b	($FFFFF76A).w,d3
+		move.b	(v_angledata).w,d3
 		cmp.w	d0,d1
 		ble.s	loc_14DDE
 		move.b	(v_anglebuffer).w,d3
@@ -7050,7 +7050,7 @@ sub_14E50:
 		move.b	obHeight(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	($FFFFF76A).w,a4
+		lea	(v_angledata).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindWall	; MJ: check solidity
@@ -7139,7 +7139,7 @@ Sonic_DontRunOnWalls:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		sub.w	d0,d3
-		lea	($FFFFF76A).w,a4
+		lea	(v_angledata).w,a4
 		movea.w	#-$10,a3
 		move.w	#$800,d6	; MJ: $1000/2
 		bsr.w	FindFloor	; MJ: check solidity
@@ -7213,7 +7213,7 @@ loc_14FD6:
 		ext.w	d0
 		sub.w	d0,d3
 		eori.w	#$F,d3
-		lea	($FFFFF76A).w,a4
+		lea	(v_angledata).w,a4
 		movea.w	#-$10,a3
 		move.w	#$400,d6	; MJ: $800/2
 		bsr.w	FindWall	; MJ: check solidity
