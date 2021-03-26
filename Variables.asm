@@ -169,7 +169,6 @@ v_hbla_line	= ramaddr ( $FFFFF625 )	; screen line where water starts and palette
 v_pfade_start	= ramaddr ( $FFFFF626 )	; palette fading - start position in bytes
 v_pfade_size	= ramaddr ( $FFFFF627 )	; palette fading - number of colours]
 v_vbla_routine	= ramaddr ( $FFFFF628 )	; VBlank - routine counter
-MiscLevelVariables	= v_vbla_routine
 
 v_int0E_Counter = ramaddr ( $FFFFF629 )	; (1 byte)
 v_pcyc_num	= ramaddr ( $FFFFF62A )	; palette cycling - current reference number (2 bytes)
@@ -246,11 +245,10 @@ v_collindex	= ramaddr ( $FFFFF744 )	; RAM address for collision index of current
 v_palss_num	= ramaddr ( $FFFFF748 )	; palette cycling in Special Stage - reference number (2 bytes)
 v_palss_unknown	= ramaddr ( $FFFFF74A ) ; unknown (2 bytes)
 v_palss_unknown2	= ramaddr ( $FFFFF74C ) ; unknown (2 bytes)
-f_lockscreen	= ramaddr ( $FFFFF73E )	; flag set to lock screen during bosses
+f_lockscreen	= ramaddr ( $FFFFF74E )	; flag set to lock screen during bosses
 
 v_obj31ypos	= ramaddr ( $FFFFF750 )	; y-position of object 31 (MZ stomper) (2 bytes)
 v_palss_time	= ramaddr ( $FFFFF750 )	; palette cycling in Special Stage - time until next change (2 bytes)
-v_screenposx_coarse	= ramaddr ( $FFFFF752 )	; (Camera_X_pos - 128) / 256 (2 bytes)
 
 v_lani0_frame	= ramaddr ( $FFFFF751 )	; level graphics animation 0 - current frame
 v_lani0_time	= ramaddr ( $FFFFF752 )	; level graphics animation 0 - time until next frame
@@ -364,7 +362,9 @@ v_fg_scroll_flags	= ramaddr ( $FFFFFE80 )	; screen redraw flags for foreground
 v_bg1_scroll_flags	= ramaddr ( $FFFFFE82 )	; screen redraw flags for background 1
 v_bg2_scroll_flags	= ramaddr ( $FFFFFE84 )	; screen redraw flags for background 2
 v_bg3_scroll_flags	= ramaddr ( $FFFFFE86 )	; screen redraw flags for background 3
+v_screenposx_coarse	= ramaddr ( $FFFFFE88 )	; (Camera_X_pos - 128) / 256 (2 bytes)
 
+MiscLevelVariables	= ramaddr ( $FFFFFE8A )
 
 ;v_scroll_block_1_size	= ramaddr ( $FFFFF766 )	; (2 bytes)
 ;v_scroll_block_2_size	= ramaddr ( $FFFFF768 )	; unused (2 bytes)
