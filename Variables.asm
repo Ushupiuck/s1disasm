@@ -47,16 +47,18 @@ v_emeralds	= ramaddr ( $FFFFAD27 )	; number of chaos emeralds
 v_emldlist	= ramaddr ( $FFFFAD28 )	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
 v_oscillate	= ramaddr ( $FFFFAD2E )	; values which oscillate - for swinging platforms, et al ($42 bytes)
 
-v_screenposx_dup	= ramaddr ( $FFFFAD70 )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
-Horiz_scroll_delay_val	= ramaddr ( $FFFFAD72 ) ; ; if its value is a, where a != 0, X scrolling will be based on the player's X position a-1 frames ago
-Camera_Y_pos_bias	= ramaddr ( $FFFFAD74 )	; screen position y (duplicate) (2 bytes)
-v_bgscreenposx_dup	= ramaddr ( $FFFFAD76 )	; background screen position x (duplicate) (8 bytes)
-v_bg2screenposx_dup	= ramaddr ( $FFFFAD7E )	; 8 bytes
-v_bg3screenposx_dup	= ramaddr ( $FFFFAD86 )	; 8 bytes
-v_fg_scroll_flags_dup	= ramaddr ( $FFFFAD8E )
-v_bg1_scroll_flags_dup	= ramaddr ( $FFFFAD90 )
-v_bg2_scroll_flags_dup	= ramaddr ( $FFFFAD92 )
-v_bg3_scroll_flags_dup	= ramaddr ( $FFFFAD94 )
+Horiz_scroll_delay_val	= ramaddr ( $FFFFAD70 ) ; ; if its value is a, where a != 0, X scrolling will be based on the player's X position a-1 frames ago
+Camera_Y_pos_bias	= ramaddr ( $FFFFAD72 )	; screen position y (duplicate) (2 bytes)
+v_screenposx_dup	= ramaddr ( $FFFFAD74 )	; screen position x (duplicate) (Camera_RAM_copy in Sonic 2) (2 bytes)
+v_bgscreenposx_dup	= ramaddr ( $FFFFAD7C )	; background screen position x (duplicate) (8 bytes)
+v_bg2screenposx_dup	= ramaddr ( $FFFFAD84 )	; 8 bytes
+v_bg3screenposx_dup	= ramaddr ( $FFFFAD8C )	; 8 bytes
+v_fg_scroll_flags_dup	= ramaddr ( $FFFFAD94 )
+v_bg1_scroll_flags_dup	= ramaddr ( $FFFFAD96 )
+v_bg2_scroll_flags_dup	= ramaddr ( $FFFFAD98 )
+v_bg3_scroll_flags_dup	= ramaddr ( $FFFFAD9A )
+v_trackpos	= ramaddr ( $FFFFAD9C )	; position tracking reference number (2 bytes)
+v_trackbyte	= v_trackpos+1		; low byte for position tracking
 
 v_objspace	= ramaddr ( $FFFFD000 )	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player	= v_objspace	; object variable space for Sonic ($40 bytes)
@@ -165,11 +167,11 @@ v_lvllayoutbg	= ramaddr ( $FFFFF620 )	; background layout ROM address (4 bytes)
 v_hbla_hreg	= ramaddr ( $FFFFF624 )	; VDP H.interrupt register buffer (8Axx) (2 bytes)
 v_hbla_line	= ramaddr ( $FFFFF625 )	; screen line where water starts and palette is changed by HBlank
 v_pfade_start	= ramaddr ( $FFFFF626 )	; palette fading - start position in bytes
-v_pfade_size	= ramaddr ( $FFFFF627 )	; palette fading - number of colours
-v_int0E_Counter = ramaddr ( $FFFFF628 )	; (1 byte)
-v_vbla_routine	= ramaddr ( $FFFFF629 )	; VBlank - routine counter
+v_pfade_size	= ramaddr ( $FFFFF627 )	; palette fading - number of colours]
+v_vbla_routine	= ramaddr ( $FFFFF628 )	; VBlank - routine counter
 MiscLevelVariables	= v_vbla_routine
 
+v_int0E_Counter = ramaddr ( $FFFFF629 )	; (1 byte)
 v_pcyc_num	= ramaddr ( $FFFFF62A )	; palette cycling - current reference number (2 bytes)
 v_pcyc_time	= ramaddr ( $FFFFF62C )	; palette cycling - time until the next change (2 bytes)
 v_spritecount	= ramaddr ( $FFFFF62D )	; number of sprites on-screen
@@ -197,66 +199,58 @@ v_plc_buffer_reg1A	= ramaddr ( $FFFFF6EA )	; (2 bytes)
 f_plc_execute	= ramaddr ( $FFFFF6EE )	; flag set for pattern load cue execution (2 bytes)
 
 v_screenposx	= ramaddr ( $FFFFF6F0 )	; screen position x (2 bytes)
-v_screenposy	= ramaddr ( $FFFFF6F2 )	; screen position y (2 bytes)
-v_bgscreenposx	= ramaddr ( $FFFFF6F4 )	; background screen position x (2 bytes)
-v_bgscreenposy	= ramaddr ( $FFFFF6F6 )	; background screen position y (2 bytes)
-v_bg2screenposx	= ramaddr ( $FFFFF6F8 )	; 2 bytes
-v_bg2screenposy	= ramaddr ( $FFFFF6FA )	; 2 bytes
-v_bg3screenposx	= ramaddr ( $FFFFF6FC )	; 2 bytes
-v_bg3screenposy	= ramaddr ( $FFFFF6FE )	; 2 bytes
+v_screenposy	= ramaddr ( $FFFFF6F4 )	; screen position y (2 bytes)
+v_bgscreenposx	= ramaddr ( $FFFFF6F8 )	; background screen position x (2 bytes)
+v_bgscreenposy	= ramaddr ( $FFFFF6FC )	; background screen position y (2 bytes)
+v_bg2screenposx	= ramaddr ( $FFFFF700 )	; 2 bytes
+v_bg2screenposy	= ramaddr ( $FFFFF704 )	; 2 bytes
+v_bg3screenposx	= ramaddr ( $FFFFF708 )	; 2 bytes
+v_bg3screenposy	= ramaddr ( $FFFFF70C )	; 2 bytes
 
-v_limitleft1	= ramaddr ( $FFFFF700 )	; left level boundary (2 bytes)
-v_limitright1	= ramaddr ( $FFFFF702 )	; right level boundary (2 bytes)
-v_limittop1	= ramaddr ( $FFFFF704 )	; top level boundary (2 bytes)
-v_limitbtm1	= ramaddr ( $FFFFF706 )	; bottom level boundary (2 bytes)
-v_limitleft2	= ramaddr ( $FFFFF708 )	; left level boundary (2 bytes)
-v_limitright2	= ramaddr ( $FFFFF70A )	; right level boundary (2 bytes)
-v_limittop2	= ramaddr ( $FFFFF70C )	; top level boundary (2 bytes)
-v_limitbtm2	= ramaddr ( $FFFFF70E )	; bottom level boundary (2 bytes)
-v_dynresize	= ramaddr ( $FFFFF710 ) ; (2 bytes)
-v_limitleft3	= ramaddr ( $FFFFF712 )	; left level boundary, at the end of an act (2 bytes)
-v_scrshiftx	= ramaddr ( $FFFFF714 )	; x-screen shift (new - last) * $100
-v_scrshifty	= ramaddr ( $FFFFF716 )	; y-screen shift (new - last) * $100
-v_lookshift	= ramaddr ( $FFFFF718 )	; screen shift when Sonic looks up/down (2 bytes)
-v_templabel	= ramaddr ( $FFFFF71A )
-v_templabel2	= ramaddr ( $FFFFF71B )
-v_dle_routine	= ramaddr ( $FFFFF71C )	; dynamic level event - routine counter
-f_nobgscroll	= ramaddr ( $FFFFF71D )	; flag set to cancel background scrolling
-v_templabel3	= ramaddr ( $FFFFF71E )
-v_templabel4	= ramaddr ( $FFFFF71F )
+v_limitleft1	= ramaddr ( $FFFFF70E )	; left level boundary (2 bytes)
+v_limitright1	= ramaddr ( $FFFFF710 )	; right level boundary (2 bytes)
+v_limittop1	= ramaddr ( $FFFFF712 )	; top level boundary (2 bytes)
+v_limitbtm1	= ramaddr ( $FFFFF714 )	; bottom level boundary (2 bytes)
+v_limitleft2	= ramaddr ( $FFFFF716 )	; left level boundary (2 bytes)
+v_limitright2	= ramaddr ( $FFFFF718 )	; right level boundary (2 bytes)
+v_limittop2	= ramaddr ( $FFFFF71A )	; top level boundary (2 bytes)
+v_limitbtm2	= ramaddr ( $FFFFF720 )	; bottom level boundary (2 bytes)
+v_scrshiftx	= ramaddr ( $FFFFF722 )	; x-screen shift (new - last) * $100
+v_scrshifty	= ramaddr ( $FFFFF724 )	; y-screen shift (new - last) * $100
+v_lookshift	= ramaddr ( $FFFFF726 )	; screen shift when Sonic looks up/down (2 bytes)
+v_dle_routine	= ramaddr ( $FFFFF728 )	; dynamic level event - routine counter
+f_nobgscroll	= ramaddr ( $FFFFF729 )	; flag set to cancel background scrolling
 
-v_fg_xblock	= ramaddr ( $FFFFF720 )	; foreground x-block parity (for redraw)
-v_fg_yblock	= ramaddr ( $FFFFF721 )	; foreground y-block parity (for redraw)
-v_bg1_xblock	= ramaddr ( $FFFFF722 )	; background x-block parity (for redraw)
-v_bg1_yblock	= ramaddr ( $FFFFF723 )	; background y-block parity (for redraw)
-v_bg2_xblock	= ramaddr ( $FFFFF724 )	; secondary background x-block parity (for redraw)
-v_bg3_xblock	= ramaddr ( $FFFFF725 )	; teritary background x-block parity (for redraw)
-; Moved down since I accidentally aligned it as byte when it was a word & I don't feel like shuffling the addresses again
-f_bgscrollvert	= ramaddr ( $FFFFF72A )	; flag for vertical background scrolling
+v_fg_xblock	= ramaddr ( $FFFFF72A )	; foreground x-block parity (for redraw)
+v_fg_yblock	= ramaddr ( $FFFFF72B )	; foreground y-block parity (for redraw)
+v_bg1_xblock	= ramaddr ( $FFFFF72C )	; background x-block parity (for redraw)
+v_bg1_yblock	= ramaddr ( $FFFFF72D )	; background y-block parity (for redraw)
+v_bg2_xblock	= ramaddr ( $FFFFF72E )	; secondary background x-block parity (for redraw)
+v_bg3_xblock	= ramaddr ( $FFFFF72F )	; teritary background x-block parity (for redraw)
 
-v_sonspeedmax	= ramaddr ( $FFFFF72C )	; Sonic's maximum speed (2 bytes)
-v_sonspeedacc	= ramaddr ( $FFFFF72E )	; Sonic's acceleration (2 bytes)
-v_sonspeeddec	= ramaddr ( $FFFFF730 )	; Sonic's deceleration (2 bytes)
-v_sonframenum	= ramaddr ( $FFFFF731 )	; frame to display for Sonic
-v_anglebuffer	= ramaddr ( $FFFFF732 )	; angle of collision block that Sonic or object is standing on
-v_angledata	= ramaddr ( $FFFFF733 ) ; Maybe Angle Data? unknown (1 byte)
 
-v_ssangle	= ramaddr ( $FFFFF734 )	; Special Stage angle (2 bytes)
-v_ssrotate	= ramaddr ( $FFFFF736 )	; Special Stage rotation speed (2 bytes)
-v_btnpushtime1	= ramaddr ( $FFFFF738 )	; button push duration - in level (2 bytes)
-v_btnpushtime2	= ramaddr ( $FFFFF73A )	; button push duration - in demo (2 bytes)
-v_palchgspeed	= ramaddr ( $FFFFF73C )	; palette fade/transition speed (0 is fastest) (2 bytes)
-v_collindex	= ramaddr ( $FFFFF73E )	; RAM address for collision index of current level (4 bytes)
-v_palss_num	= ramaddr ( $FFFFF742 )	; palette cycling in Special Stage - reference number (2 bytes)
-v_palss_time	= ramaddr ( $FFFFF744 )	; palette cycling in Special Stage - time until next change (2 bytes)
-v_palss_unknown	= ramaddr ( $FFFFF746 ) ; unknown (2 bytes)
-v_palss_unknown2	= ramaddr ( $FFFFF748 ) ; unknown (2 bytes)
+v_sonspeedmax	= ramaddr ( $FFFFF730 )	; Sonic's maximum speed (2 bytes)
+v_sonspeedacc	= ramaddr ( $FFFFF732 )	; Sonic's acceleration (2 bytes)
+v_sonspeeddec	= ramaddr ( $FFFFF734 )	; Sonic's deceleration (2 bytes)
+v_sonframenum	= ramaddr ( $FFFFF736 )	; frame to display for Sonic
+v_anglebuffer	= ramaddr ( $FFFFF737 )	; angle of collision block that Sonic or object is standing on
+v_angledata	= ramaddr ( $FFFFF738 ) ; Maybe Angle Data? unknown (1 byte)
+f_bgscrollvert	= ramaddr ( $FFFFF739 )	; flag for vertical background scrolling
 
-v_obj31ypos	= ramaddr ( $FFFFF74A )	; y-position of object 31 (MZ stomper) (2 bytes)
-v_trackpos	= ramaddr ( $FFFFF74C )	; position tracking reference number (2 bytes)
-v_trackbyte	= v_trackpos+1		; low byte for position tracking
-v_screenposx_coarse	= ramaddr ( $FFFFF74E )	; (Camera_X_pos - 128) / 256 (2 bytes)
-f_lockscreen	= ramaddr ( $FFFFF750 )	; flag set to lock screen during bosses
+v_ssangle	= ramaddr ( $FFFFF73A )	; Special Stage angle (2 bytes)
+v_ssrotate	= ramaddr ( $FFFFF73C )	; Special Stage rotation speed (2 bytes)
+v_btnpushtime1	= ramaddr ( $FFFFF73E )	; button push duration - in level (2 bytes)
+v_btnpushtime2	= ramaddr ( $FFFFF740 )	; button push duration - in demo (2 bytes)
+v_palchgspeed	= ramaddr ( $FFFFF742 )	; palette fade/transition speed (0 is fastest) (2 bytes)
+v_collindex	= ramaddr ( $FFFFF744 )	; RAM address for collision index of current level (4 bytes)
+v_palss_num	= ramaddr ( $FFFFF748 )	; palette cycling in Special Stage - reference number (2 bytes)
+v_palss_unknown	= ramaddr ( $FFFFF74A ) ; unknown (2 bytes)
+v_palss_unknown2	= ramaddr ( $FFFFF74C ) ; unknown (2 bytes)
+f_lockscreen	= ramaddr ( $FFFFF73E )	; flag set to lock screen during bosses
+
+v_obj31ypos	= ramaddr ( $FFFFF750 )	; y-position of object 31 (MZ stomper) (2 bytes)
+v_palss_time	= ramaddr ( $FFFFF750 )	; palette cycling in Special Stage - time until next change (2 bytes)
+v_screenposx_coarse	= ramaddr ( $FFFFF752 )	; (Camera_X_pos - 128) / 256 (2 bytes)
 
 v_lani0_frame	= ramaddr ( $FFFFF751 )	; level graphics animation 0 - current frame
 v_lani0_time	= ramaddr ( $FFFFF752 )	; level graphics animation 0 - time until next frame

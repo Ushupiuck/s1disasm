@@ -468,6 +468,8 @@ ShowErrorMessage:
 		move.w	(a0)+,(a6)
 		dbf	d1,.loadgfx
 
+		move.l	#$C00C0000,4(a6) ; set VDP to CRAM write
+		move.w	#cWhite,(a6) ; set this color to white
 		moveq	#0,d0		; clear	d0
 		move.b	(v_errortype).w,d0 ; load error code
 		move.w	ErrorText(pc,d0.w),d0
@@ -2715,15 +2717,16 @@ Level_ClrVars1:
 
 		lea	(v_screenposx).w,a1
 		moveq	#0,d0
-		move.w	#$3F,d1
+		move.w	#$1F,d1
 
 Level_ClrVars2:
 		move.l	d0,(a1)+
 		dbf	d1,Level_ClrVars2 ; clear misc variables
 
+		clr.w	(v_oscillate).w
 		lea	(v_oscillate+2).w,a1
 		moveq	#0,d0
-		move.w	#$47,d1
+		move.w	#$10,d1
 
 Level_ClrVars3:
 		move.l	d0,(a1)+
@@ -3192,14 +3195,15 @@ SS_ClrObjRam:
 
 		lea	(v_screenposx).w,a1
 		moveq	#0,d0
-		move.w	#$3F,d1
+		move.w	#$1F,d1
 SS_ClrRam1:
 		move.l	d0,(a1)+
 		dbf	d1,SS_ClrRam1	; clear	variables
 
+		clr.w	(v_oscillate).w
 		lea	(v_oscillate+2).w,a1
 		moveq	#0,d0
-		move.w	#$27,d1
+		move.w	#$10,d1
 SS_ClrRam2:
 		move.l	d0,(a1)+
 		dbf	d1,SS_ClrRam2	; clear	variables
@@ -3768,14 +3772,15 @@ End_ClrRam1:
 
 		lea	(v_screenposx).w,a1
 		moveq	#0,d0
-		move.w	#$3F,d1
+		move.w	#$1F,d1
 End_ClrRam2:
 		move.l	d0,(a1)+
 		dbf	d1,End_ClrRam2	; clear	variables
 
+		clr.w	(v_oscillate).w
 		lea	(v_oscillate+2).w,a1
 		moveq	#0,d0
-		move.w	#$47,d1
+		move.w	#$10,d1
 End_ClrRam3:
 		move.l	d0,(a1)+
 		dbf	d1,End_ClrRam3	; clear	variables
