@@ -170,26 +170,26 @@ loc_13024:
 		add.w	d1,obVelX(a0)
 		bset	#5,obStatus(a0)
 		move.w	#0,obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_13060:
 		sub.w	d1,obVelY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_13066:
 		sub.w	d1,obVelX(a0)
 		bset	#5,obStatus(a0)
 		move.w	#0,obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_13078:
 		add.w	d1,obVelY(a0)
 
 locret_1307C:
-		rts	
+		rts
 ; End of function Sonic_Move
 
 
@@ -218,7 +218,7 @@ loc_1309A:
 loc_130A6:
 		move.w	d0,obInertia(a0)
 		move.b	#id_Walk,obAnim(a0) ; use walking animation
-		rts	
+		rts
 ; ===========================================================================
 
 loc_130B2:
@@ -239,7 +239,7 @@ loc_130BA:
 		sfx	sfx_Skid,0,0,0	; play stopping sound
 
 locret_130E8:
-		rts	
+		rts
 ; End of function Sonic_MoveLeft
 
 
@@ -263,7 +263,7 @@ loc_13104:
 loc_1310C:
 		move.w	d0,obInertia(a0)
 		move.b	#id_Walk,obAnim(a0) ; use walking animation
-		rts	
+		rts
 ; ===========================================================================
 
 loc_13118:
@@ -284,5 +284,5 @@ loc_13120:
 		sfx	sfx_Skid,0,0,0	; play stopping sound
 
 locret_1314E:
-		rts	
+		rts
 ; End of function Sonic_MoveRight

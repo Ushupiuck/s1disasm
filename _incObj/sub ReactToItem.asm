@@ -134,7 +134,7 @@ ReactToItem:
 		addq.b	#2,obRoutine(a1) ; advance the object's routine counter
 
 .invincible:
-		rts	
+		rts
 ; ===========================================================================
 
 React_Monitor:
@@ -398,5 +398,5 @@ React_Special:
 
 .D7orE1:
 		addq.b	#1,obColProp(a1)
-		rts	
+		rts
 ; End of function React_Special

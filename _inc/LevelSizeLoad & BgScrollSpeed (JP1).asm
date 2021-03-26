@@ -7,10 +7,10 @@
 
 LevelSizeLoad:
 		moveq	#0,d0
-		move.b	d0,($FFFFF740).w
-		move.b	d0,($FFFFF741).w
-		move.b	d0,($FFFFF746).w
-		move.b	d0,($FFFFF748).w
+		move.b	d0,(v_templabel).w
+		move.b	d0,(v_templabel2).w
+		move.b	d0,(v_templabel3).w
+		move.b	d0,(v_templabel4).w
 		move.b	d0,(v_dle_routine).w
 		move.w	(v_zone).w,d0
 		lsl.b	#6,d0
@@ -20,7 +20,7 @@ LevelSizeLoad:
 		add.w	d1,d0
 		lea	LevelSizeArray(pc,d0.w),a0 ; load level	boundaries
 		move.w	(a0)+,d0
-		move.w	d0,($FFFFF730).w
+		move.w	d0,(v_dynresize).w
 		move.l	(a0)+,d0
 		move.l	d0,(v_limitleft2).w
 		move.l	d0,(v_limitleft1).w

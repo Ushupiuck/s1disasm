@@ -317,7 +317,7 @@ loc_18BC6:
 
 loc_18BE0:
 		tst.b	obRender(a0)
-		bpl.w	Obj7A_Delete
+		jpl	(DeleteObject).l
 
 loc_18BE8:
 		bsr.w	BossMove
@@ -353,7 +353,7 @@ loc_18C1A:
 		bne.s	loc_18C32
 		move.b	#6,obAnim(a0)
 		tst.b	obRender(a0)
-		bpl.w	Obj7A_Delete
+		jpl	(DeleteObject).l
 
 loc_18C32:
 		bra.s	loc_18C6C
@@ -365,7 +365,7 @@ Obj7A_FlameMain:; Routine 6
 		cmpi.b	#$A,ob2ndRout(a1)
 		bne.s	loc_18C56
 		tst.b	obRender(a0)
-		bpl.w	Obj7A_Delete
+		jpl	(DeleteObject).l
 		move.b	#$B,obAnim(a0)
 		bra.s	loc_18C6C
 ; ===========================================================================
@@ -398,7 +398,7 @@ Obj7A_TubeMain:	; Routine 8
 		cmpi.b	#$A,ob2ndRout(a1)
 		bne.s	loc_18CB8
 		tst.b	obRender(a0)
-		bpl.w	Obj7A_Delete
+		jpl	(DeleteObject).l
 
 loc_18CB8:
 		move.l	#Map_BossItems,obMap(a0)

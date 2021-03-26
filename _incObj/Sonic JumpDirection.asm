@@ -57,7 +57,7 @@ loc_132A4:
 
 loc_132C0:
 		move.w	d0,obVelX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_132C6:
@@ -69,5 +69,5 @@ loc_132CE:
 		move.w	d0,obVelX(a0)
 
 locret_132D2:
-		rts	
+		rts
 ; End of function Sonic_JumpDirection

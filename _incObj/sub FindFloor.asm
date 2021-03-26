@@ -164,5 +164,5 @@ FindFloor2:
 		add.w	d1,d0
 		bpl.w	.isblank2
 		not.w	d1
-		rts	
+		rts
 ; End of function FindFloor2
