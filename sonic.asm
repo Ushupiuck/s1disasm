@@ -543,8 +543,8 @@ ShowErrorValue:
 
 ErrorWaitForC:
 		bsr.w	ReadJoypads
-;		cmpi.b	#btnC,(v_jpadpress1).w ; is button C pressed? temporarily commented out
-		cmpi.b	#btnC,(v_jpadhold1).w ; is button C held?
+		cmpi.b	#btnC,(v_jpadpress1).w ; is button C pressed? temporarily commented out
+;		cmpi.b	#btnC,(v_jpadhold1).w ; is button C held?
 		bne.w	ErrorWaitForC	; if not, branch
 		rts
 ; End of function ErrorWaitForC
@@ -1849,7 +1849,7 @@ loc_20B2:
 
 loc_20BC:
 		moveq	#1,d0
-		rts	
+		rts
 ; End of function PalCycle_Sega
 
 ; ===========================================================================
