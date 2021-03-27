@@ -32,7 +32,7 @@ Sonic_Loops:
 		beq.w	Sonic_ChkRoll	; MJ: if so, branch
 
 		bclr	#6,obRender(a0) ; return Sonic to high plane
-		rts
+		rts	
 ; ===========================================================================
 
 .chkifinair:
@@ -40,7 +40,7 @@ Sonic_Loops:
 		beq.s	.chkifleft	; if not, branch
 
 		bclr	#6,obRender(a0)	; return Sonic to high plane
-		rts
+		rts	
 ; ===========================================================================
 
 .chkifleft:
@@ -49,7 +49,7 @@ Sonic_Loops:
 		bcc.s	.chkifright
 
 		bclr	#6,obRender(a0)	; return Sonic to high plane
-		rts
+		rts	
 ; ===========================================================================
 
 .chkifright:
@@ -57,7 +57,7 @@ Sonic_Loops:
 		bcs.s	.chkangle1
 
 		bset	#6,obRender(a0)	; send Sonic to	low plane
-		rts
+		rts	
 ; ===========================================================================
 
 .chkangle1:
@@ -69,7 +69,7 @@ Sonic_Loops:
 		cmpi.b	#$80,d1		; is Sonic upside-down?
 		bhi.s	.done		; if yes, branch
 		bset	#6,obRender(a0)	; send Sonic to	low plane
-		rts
+		rts	
 ; ===========================================================================
 
 .chkangle2:
@@ -80,7 +80,7 @@ Sonic_Loops:
 
 .noloops:
 .done:
-		rts
+		rts	
 ; End of function Sonic_Loops
 
 ; ===========================================================================

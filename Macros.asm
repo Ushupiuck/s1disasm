@@ -1,3 +1,31 @@
+; calculates initial loop counter value for a dbf loop
+; that writes n bytes total at 4 bytes per iteration
+bytesToLcnt function n,n>>2-1
+
+; calculates initial loop counter value for a dbf loop
+; that writes n bytes total at 2 bytes per iteration
+bytesToWcnt function n,n>>1-1
+; fills a region of 68k RAM with 0
+clearRAM macro startaddr,size
+	if ((startaddr)&$8000)==0
+	lea	(startaddr).l,a1
+	else
+	lea	(startaddr).w,a1
+	endif
+	moveq	#0,d0
+	if ((startaddr)&1)
+	move.b	d0,(a1)+
+	endif
+	move.w	#bytesToLcnt((size) - ((startaddr)&1)),d1
+-	move.l	d0,(a1)+
+	dbf	d1,-
+	if (((size) - ((startaddr)&1))&2)
+	move.w	d0,(a1)+
+	endif
+	if (((size) - ((startaddr)&1))&1)
+	move.b	d0,(a1)+
+	endif
+	endm
 ; ---------------------------------------------------------------------------
 ; Set a VRAM address via the VDP control port.
 ; input: 16-bit VRAM address, control port (default is ($C00004).l)
@@ -46,13 +74,17 @@ writeCRAM:	macro source,length,destination
 ; input: value, length, destination
 ; ---------------------------------------------------------------------------
 
-fillVRAM:	macro value,length,loc
+fillVRAM:	macro value,length,loc ; To be replaced
 		lea	(vdp_control_port).l,a5
 		move.w	#$8F01,(a5)
 		move.l	#$94000000+((length&$FF00)<<8)+$9300+(length&$FF),(a5)
 		move.w	#$9780,(a5)
 		move.l	#$40000080+((loc&$3FFF)<<16)+((loc&$C000)>>14),(a5)
 		move.w	#value,(vdp_data_port).l
+-		move.w	(a5),d1
+		btst	#1,d1
+		bne.s	- ; busy loop until the VDP is finished filling...
+		move.w	#$8F02,(a5) ; VRAM pointer increment: $0002
 		endm
 
 ; ---------------------------------------------------------------------------

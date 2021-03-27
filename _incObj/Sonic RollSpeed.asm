@@ -89,7 +89,7 @@ Sonic_RollLeft:
 loc_1320A:
 		bset	#0,obStatus(a0)
 		move.b	#id_Roll,obAnim(a0) ; use "rolling" animation
-		rts
+		rts	
 ; ===========================================================================
 
 loc_13218:
@@ -99,7 +99,7 @@ loc_13218:
 
 loc_13220:
 		move.w	d0,obInertia(a0)
-		rts
+		rts	
 ; End of function Sonic_RollLeft
 
 
@@ -111,7 +111,7 @@ Sonic_RollRight:
 		bmi.s	loc_1323A
 		bclr	#0,obStatus(a0)
 		move.b	#id_Roll,obAnim(a0) ; use "rolling" animation
-		rts
+		rts	
 ; ===========================================================================
 
 loc_1323A:
@@ -121,5 +121,5 @@ loc_1323A:
 
 loc_13242:
 		move.w	d0,obInertia(a0)
-		rts
+		rts	
 ; End of function Sonic_RollRight

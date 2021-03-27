@@ -9,9 +9,6 @@
 
 	cpu 68000
 
-zeroOffsetOptimization = 1
-;	| If 1, makes a handful of zero-offset instructions smaller
-
 	include "MacroSetup.asm"
 	include	"Constants.asm"
 	include	"Variables.asm"
@@ -468,8 +465,6 @@ ShowErrorMessage:
 		move.w	(a0)+,(a6)
 		dbf	d1,.loadgfx
 
-		move.l	#$C00C0000,4(a6) ; set VDP to CRAM write
-		move.w	#cWhite,(a6) ; set this color to white
 		moveq	#0,d0		; clear	d0
 		move.b	(v_errortype).w,d0 ; load error code
 		move.w	ErrorText(pc,d0.w),d0
@@ -543,8 +538,8 @@ ShowErrorValue:
 
 ErrorWaitForC:
 		bsr.w	ReadJoypads
-		cmpi.b	#btnC,(v_jpadpress1).w ; is button C pressed? temporarily commented out
-;		cmpi.b	#btnC,(v_jpadhold1).w ; is button C held?
+;		cmpi.b	#btnC,(v_jpadpress1).w ; is button C pressed? temporarily commented out
+		cmpi.b	#btnC,(v_jpadhold1).w ; is button C held?
 		bne.w	ErrorWaitForC	; if not, branch
 		rts
 ; End of function ErrorWaitForC
@@ -975,12 +970,6 @@ VDPSetupGame:
 		clr.l	(v_scrposx_dup).w
 		move.l	d1,-(sp)
 		fillVRAM	0,$FFFF,0
-
-.waitforDMA:
-		move.w	(a5),d1
-		btst	#1,d1		; is DMA (fillVRAM) still running?
-		bne.s	.waitforDMA	; if yes, branch
-		move.w	#$8F02,(a5)	; set VDP increment size
 		move.l	(sp)+,d1
 		rts
 ; End of function VDPSetupGame
@@ -1015,39 +1004,11 @@ VDPSetupArray:	dc.w $8004		; 8-colour mode
 
 ClearScreen:
 		fillVRAM	0,$FFF,vram_fg ; clear foreground namespace
-
-.wait1:
-		move.w	(a5),d1
-		btst	#1,d1
-		bne.s	.wait1
-
-		move.w	#$8F02,(a5)
 		fillVRAM	0,$FFF,vram_bg ; clear background namespace
-
-.wait2:
-		move.w	(a5),d1
-		btst	#1,d1
-		bne.s	.wait2
-
-		move.w	#$8F02,(a5)
 		clr.l	(v_scrposy_dup).w
 		clr.l	(v_scrposx_dup).w
-
-		lea	(v_spritetablebuffer).w,a1
-		moveq	#0,d0
-		move.w	#($280/4)-1,d1
-
-.clearsprites:
-		move.l	d0,(a1)+
-		dbf	d1,.clearsprites ; clear sprite table (in RAM)
-
-		lea	(v_hscrolltablebuffer).w,a1
-		moveq	#0,d0
-		move.w	#($400/4)-1,d1
-
-.clearhscroll:
-		move.l	d0,(a1)+
-		dbf	d1,.clearhscroll ; clear hscroll table (in RAM)
+		clearRAM v_spritetablebuffer,$280
+		clearRAM v_hscrolltablebuffer,$400
 		rts
 ; End of function ClearScreen
 
@@ -1182,7 +1143,7 @@ NewPLC:
 
 .skip:
 		movem.l	(sp)+,a1-a2
-		rts	
+		rts
 ; End of function NewPLC
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -1232,12 +1193,12 @@ loc_160E:
 		moveq	#$10,d6
 		moveq	#0,d0
 		move.l	a0,(v_plc_buffer).w
-		move.l	a3,(v_plc_buffer_reg0).w
-		move.l	d0,(v_plc_buffer_reg4).w
-		move.l	d0,(v_plc_buffer_reg8).w
-		move.l	d0,(v_plc_buffer_regC).w
-		move.l	d5,(v_plc_buffer_reg10).w
-		move.l	d6,(v_plc_buffer_reg14).w
+		move.l	a3,(v_ptrnemcode).w
+		move.l	d0,($FFFFF6E4).w
+		move.l	d0,($FFFFF6E8).w
+		move.l	d0,($FFFFF6EC).w
+		move.l	d5,($FFFFF6F0).w
+		move.l	d6,($FFFFF6F4).w
 		move.w	d2,(f_plc_execute).w
 
 Rplc_Exit:
@@ -1251,10 +1212,10 @@ Rplc_Exit:
 sub_1642:
 		tst.w	(f_plc_execute).w
 		beq.w	locret_16DA
-		move.w	#9,(v_plc_buffer_reg1A).w
+		move.w	#9,($FFFFF6FA).w
 		moveq	#0,d0
-		move.w	(v_plc_buffer+4).w,d0
-		addi.w	#$120,(v_plc_buffer+4).w
+		move.w	($FFFFF684).w,d0
+		addi.w	#$120,($FFFFF684).w
 		bra.s	loc_1676
 ; End of function sub_1642
 
@@ -1266,10 +1227,10 @@ sub_1642:
 ProcessDPLC2:
 		tst.w	(f_plc_execute).w
 		beq.s	locret_16DA
-		move.w	#3,(v_plc_buffer_reg1A).w
+		move.w	#3,($FFFFF6FA).w
 		moveq	#0,d0
-		move.w	(v_plc_buffer+4).w,d0
-		addi.w	#$60,(v_plc_buffer+4).w
+		move.w	($FFFFF684).w,d0
+		addi.w	#$60,($FFFFF684).w
 
 loc_1676:
 		lea	(vdp_control_port).l,a4
@@ -1280,12 +1241,12 @@ loc_1676:
 		move.l	d0,(a4)
 		subq.w	#4,a4
 		movea.l	(v_plc_buffer).w,a0
-		movea.l	(v_plc_buffer_reg0).w,a3
-		move.l	(v_plc_buffer_reg4).w,d0
-		move.l	(v_plc_buffer_reg8).w,d1
-		move.l	(v_plc_buffer_regC).w,d2
-		move.l	(v_plc_buffer_reg10).w,d5
-		move.l	(v_plc_buffer_reg14).w,d6
+		movea.l	(v_ptrnemcode).w,a3
+		move.l	($FFFFF6E4).w,d0
+		move.l	($FFFFF6E8).w,d1
+		move.l	($FFFFF6EC).w,d2
+		move.l	($FFFFF6F0).w,d5
+		move.l	($FFFFF6F4).w,d6
 		lea	(v_ngfx_buffer).w,a1
 
 loc_16AA:
@@ -1293,15 +1254,15 @@ loc_16AA:
 		bsr.w	NemPCD_NewRow
 		subq.w	#1,(f_plc_execute).w
 		beq.s	loc_16DC
-		subq.w	#1,(v_plc_buffer_reg1A).w
+		subq.w	#1,($FFFFF6FA).w
 		bne.s	loc_16AA
 		move.l	a0,(v_plc_buffer).w
-		move.l	a3,(v_plc_buffer_reg0).w
-		move.l	d0,(v_plc_buffer_reg4).w
-		move.l	d1,(v_plc_buffer_reg8).w
-		move.l	d2,(v_plc_buffer_regC).w
-		move.l	d5,(v_plc_buffer_reg10).w
-		move.l	d6,(v_plc_buffer_reg14).w
+		move.l	a3,(v_ptrnemcode).w
+		move.l	d0,($FFFFF6E4).w
+		move.l	d1,($FFFFF6E8).w
+		move.l	d2,($FFFFF6EC).w
+		move.l	d5,($FFFFF6F0).w
+		move.l	d6,($FFFFF6F4).w
 
 locret_16DA:
 		rts
@@ -1314,7 +1275,7 @@ loc_16DC:
 loc_16E2:
 		move.l	6(a0),(a0)+
 		dbf	d0,loc_16E2
-		rts
+		rts	
 ; End of function ProcessDPLC2
 
 ; ---------------------------------------------------------------------------
@@ -1465,7 +1426,7 @@ FadeIn_AddColour:
 		cmp.w	d2,d1
 		bhi.s	.addred
 		move.w	d1,(a0)+	; update palette
-		rts	
+		rts
 ; ===========================================================================
 
 .addred:
@@ -1560,7 +1521,7 @@ FadeOut_DecColour:
 
 .next:
 		addq.w	#2,a0
-		rts	
+		rts
 ; End of function FadeOut_DecColour
 
 ; ---------------------------------------------------------------------------
@@ -1626,7 +1587,7 @@ WhiteIn_FromWhite:
 		dbf	d0,.decolour2
 
 .exit:
-		rts	
+		rts
 ; End of function WhiteIn_FromWhite
 
 
@@ -1660,12 +1621,12 @@ WhiteIn_DecColour:
 
 .dered:
 		subq.w	#2,(a0)+	; decrease red value
-		rts	
+		rts
 ; ===========================================================================
 
 .next:
 		addq.w	#2,a0
-		rts	
+		rts
 ; End of function WhiteIn_DecColour
 
 ; ---------------------------------------------------------------------------
@@ -1729,7 +1690,7 @@ WhiteOut_AddColour:
 		cmpi.w	#cRed,d1
 		beq.s	.addgreen
 		addq.w	#2,(a0)+	; increase red value
-		rts	
+		rts
 ; ===========================================================================
 
 .addgreen:
@@ -1738,7 +1699,7 @@ WhiteOut_AddColour:
 		cmpi.w	#cGreen,d1
 		beq.s	.addblue
 		addi.w	#$20,(a0)+	; increase green value
-		rts	
+		rts
 ; ===========================================================================
 
 .addblue:
@@ -1849,7 +1810,7 @@ loc_20B2:
 
 loc_20BC:
 		moveq	#1,d0
-		rts
+		rts	
 ; End of function PalCycle_Sega
 
 ; ===========================================================================
@@ -1938,7 +1899,7 @@ PalLoad4_Water:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts
+		rts	
 ; End of function PalLoad4_Water
 
 ; ===========================================================================
@@ -2073,14 +2034,9 @@ GM_Title:
 		move.w	#$8720,(a6)	; set background colour (palette line 2, entry 0)
 		clr.b	(f_wtr_state).w
 		bsr.w	ClearScreen
+		clearRAM v_spritequeue,$400	; fill $AC00-$AFFF with $0
+		clearRAM v_objspace,$2000	; fill object RAM ($B000-$D5FF) with $0
 
-		lea	(v_objspace).w,a1
-		moveq	#0,d0
-		move.w	#$7FF,d1
-
-Tit_ClrObj1:
-		move.l	d0,(a1)+
-		dbf	d1,Tit_ClrObj1	; fill object space ($D000-$EFFF) with 0
 
 		locVRAM	0
 		lea	(Nem_JapNames).l,a0 ; load Japanese credits
@@ -2208,7 +2164,7 @@ Tit_MainLoop:
 		blo.s	Tit_ChkRegion	; if not, branch
 
 		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
-		rts	
+		rts
 ; ===========================================================================
 
 Tit_ChkRegion:
@@ -2434,7 +2390,7 @@ loc_33B6:
 		cmpi.w	#$1C00,d0
 		blo.s	loc_33E4
 		move.b	#id_Sega,(v_gamemode).w
-		rts	
+		rts
 ; ===========================================================================
 
 loc_33E4:
@@ -2616,7 +2572,7 @@ LevSel_ChgSnd:
 LevSel_Numb:
 		add.w	d3,d0
 		move.w	d0,(a6)
-		rts	
+		rts
 ; End of function LevSel_ChgSnd
 
 
@@ -2683,6 +2639,7 @@ Level_NoMusicFade:
 		locVRAM	$B000
 		lea	(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
+;		fillVRAM 0,$FFF,$A000
 		enable_ints
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
@@ -2699,15 +2656,10 @@ loc_37FC:
 		bsr.w	AddPLC		; load standard	patterns
 
 Level_ClrRam:
-		lea	(v_objspace).w,a1
-		moveq	#0,d0
-		move.w	#$7FF,d1
+		clearRAM v_spritequeue,$400	; fill $AC00-$AFFF with $0
+		clearRAM v_objspace,$2000	; fill object RAM ($B000-$D5FF) with $0
 
-Level_ClrObjRam:
-		move.l	d0,(a1)+
-		dbf	d1,Level_ClrObjRam ; clear object RAM
-
-		lea	(MiscLevelVariables).w,a1
+		lea	($FFFFF628).w,a1
 		moveq	#0,d0
 		move.w	#$15,d1
 
@@ -2717,16 +2669,15 @@ Level_ClrVars1:
 
 		lea	(v_screenposx).w,a1
 		moveq	#0,d0
-		move.w	#$1F,d1
+		move.w	#$3F,d1
 
 Level_ClrVars2:
 		move.l	d0,(a1)+
 		dbf	d1,Level_ClrVars2 ; clear misc variables
 
-		clr.w	(v_oscillate).w
 		lea	(v_oscillate+2).w,a1
 		moveq	#0,d0
-		move.w	#$10,d1
+		move.w	#$47,d1
 
 Level_ClrVars3:
 		move.l	d0,(a1)+
@@ -3176,12 +3127,6 @@ GM_Special:
 		bsr.w	ClearScreen
 		enable_ints
 		fillVRAM	0,$6FFF,$5000
-
-SS_WaitForDMA:
-		move.w	(a5),d1		; read control port ($C00004)
-		btst	#1,d1		; is DMA running?
-		bne.s	SS_WaitForDMA	; if yes, branch
-		move.w	#$8F02,(a5)	; set VDP increment to 2 bytes
 		bsr.w	SS_BGLoad
 		moveq	#plcid_SpecialStage,d0
 		bsr.w	QuickPLC	; load special stage patterns
@@ -3195,15 +3140,14 @@ SS_ClrObjRam:
 
 		lea	(v_screenposx).w,a1
 		moveq	#0,d0
-		move.w	#$1F,d1
+		move.w	#$3F,d1
 SS_ClrRam1:
 		move.l	d0,(a1)+
 		dbf	d1,SS_ClrRam1	; clear	variables
 
-		clr.w	(v_oscillate).w
 		lea	(v_oscillate+2).w,a1
 		moveq	#0,d0
-		move.w	#$10,d1
+		move.w	#$27,d1
 SS_ClrRam2:
 		move.l	d0,(a1)+
 		dbf	d1,SS_ClrRam2	; clear	variables
@@ -3350,7 +3294,7 @@ SS_NormalExit:
 		bne.s	SS_NormalExit
 		sfx	sfx_EnterSS,0,1,0 ; play special stage exit sound
 		bsr.w	PaletteWhiteOut
-		rts
+		rts	
 ; ===========================================================================
 
 SS_ToSegaScreen:
@@ -3432,7 +3376,7 @@ loc_491C:
 		moveq	#$3F,d1
 		moveq	#$3F,d2
 		bsr.w	TilemapToVRAM
-		rts
+		rts	
 ; End of function SS_BGLoad
 
 ; ---------------------------------------------------------------------------
@@ -3462,7 +3406,7 @@ loc_4992:
 		move.w	d0,(v_palss_time).w
 		moveq	#0,d0
 		move.b	(a0)+,d0
-		move.w	d0,(v_palss_unknown2).w
+		move.w	d0,($FFFFF7A0).w
 		lea	(byte_4ABC).l,a1
 		lea	(a1,d0.w),a1
 		move.w	#-$7E00,d0
@@ -3489,7 +3433,7 @@ locret_49E6:
 ; ===========================================================================
 
 loc_49E8:
-		move.w	(v_palss_unknown).w,d1
+		move.w	($FFFFF79E).w,d1
 		cmpi.w	#$8A,d0
 		blo.s	loc_49F4
 		addq.w	#1,d1
@@ -3551,7 +3495,7 @@ Pal_SSCyc2:	binclude	"palette/Cycle - Special Stage 2.bin"
 
 
 SS_BGAnimate:
-		move.w	(v_palss_unknown2).w,d0
+		move.w	($FFFFF7A0).w,d0
 		bne.s	loc_4BF6
 		move.w	#0,(v_bgscreenposy).w
 		move.w	(v_bgscreenposy).w,(v_bgscrposy_dup).w
@@ -3727,7 +3671,7 @@ loc_4DF2:
 		tst.w	(v_demolength).w
 		bne.w	Cont_MainLoop
 		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
-		rts
+		rts	
 ; ===========================================================================
 
 Cont_GotoLevel:
@@ -3739,7 +3683,7 @@ Cont_GotoLevel:
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost count
 		subq.b	#1,(v_continues).w ; subtract 1 from continues
-		rts
+		rts	
 ; ===========================================================================
 
 		include	"_incObj/80 Continue Screen Elements.asm"
@@ -3763,7 +3707,7 @@ End_ClrObjRam:
 		move.l	d0,(a1)+
 		dbf	d1,End_ClrObjRam ; clear object	RAM
 
-		lea	(MiscLevelVariables).w,a1
+		lea	($FFFFF628).w,a1
 		moveq	#0,d0
 		move.w	#$15,d1
 End_ClrRam1:
@@ -3772,15 +3716,14 @@ End_ClrRam1:
 
 		lea	(v_screenposx).w,a1
 		moveq	#0,d0
-		move.w	#$1F,d1
+		move.w	#$3F,d1
 End_ClrRam2:
 		move.l	d0,(a1)+
 		dbf	d1,End_ClrRam2	; clear	variables
 
-		clr.w	(v_oscillate).w
 		lea	(v_oscillate+2).w,a1
 		moveq	#0,d0
-		move.w	#$10,d1
+		move.w	#$47,d1
 End_ClrRam3:
 		move.l	d0,(a1)+
 		dbf	d1,End_ClrRam3	; clear	variables
@@ -4946,7 +4889,7 @@ LoadZoneTiles:
 		lea	(a2,d0.w),a2		; Offset LevelHeaders by the zone-offset, and load the resultant address to a2
 		move.l	(a2)+,d0		; Move the first longword of data that a2 points to to d0, this contains the zone's first PLC ID and its art's address.
 						; The auto increment is pointless as a2 is overwritten later, and nothing reads from a2 before then
-		;andi.l	#$FFFFFF,d0    		; Filter out the first byte, which contains the first PLC ID, leaving the address of the zone's art in d0
+		andi.l	#$FFFFFF,d0    		; Filter out the first byte, which contains the first PLC ID, leaving the address of the zone's art in d0
 		movea.l	d0,a0			; Load the address of the zone's art into a0 (source)
 		lea	(v_128x128).l,a1	; Load v_128x128/StartOfRAM (in this context, an art buffer) into a1 (destination)
 		bsr.w	KosDec			; Decompress a0 to a1 (Kosinski compression)
@@ -6690,7 +6633,7 @@ loc_12C7E:
 		bsr.w	Sonic_RecordPosition
 		bsr.w	Sonic_Water
 		move.b	(v_anglebuffer).w,$36(a0)
-		move.b	(v_angledata).w,$37(a0)
+		move.b	($FFFFF76A).w,$37(a0)
 		tst.b	(f_wtunnelmode).w
 		beq.s	loc_12CA6
 		tst.b	obAnim(a0)
@@ -6885,7 +6828,7 @@ Sonic_WalkSpeed:
 		swap	d2
 		swap	d3
 		move.b	d0,(v_anglebuffer).w
-		move.b	d0,(v_angledata).w
+		move.b	d0,($FFFFF76A).w
 		move.b	d0,d1
 		addi.b	#$20,d0
 		bpl.s	loc_14D1A
@@ -6934,7 +6877,7 @@ sub_14D48:
 .first:
 		move.b	(v_lrb_solid_bit).w,d5			; MJ: load L/R/B soldity bit
 		move.b	d0,(v_anglebuffer).w
-		move.b	d0,(v_angledata).w
+		move.b	d0,($FFFFF76A).w
 		addi.b	#$20,d0
 		andi.b	#$C0,d0
 		cmpi.b	#$40,d0
@@ -6983,7 +6926,7 @@ Sonic_HitFloor:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		sub.w	d0,d3
-		lea	(v_angledata).w,a4
+		lea	($FFFFF76A).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindFloor	; MJ: check solidity
@@ -6991,7 +6934,7 @@ Sonic_HitFloor:
 		move.b	#0,d2
 
 loc_14DD0:
-		move.b	(v_angledata).w,d3
+		move.b	($FFFFF76A).w,d3
 		cmp.w	d0,d1
 		ble.s	loc_14DDE
 		move.b	(v_anglebuffer).w,d3
@@ -7055,7 +6998,7 @@ sub_14E50:
 		move.b	obHeight(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	(v_angledata).w,a4
+		lea	($FFFFF76A).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindWall	; MJ: check solidity
@@ -7144,7 +7087,7 @@ Sonic_DontRunOnWalls:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		sub.w	d0,d3
-		lea	(v_angledata).w,a4
+		lea	($FFFFF76A).w,a4
 		movea.w	#-$10,a3
 		move.w	#$800,d6	; MJ: $1000/2
 		bsr.w	FindFloor	; MJ: check solidity
@@ -7218,7 +7161,7 @@ loc_14FD6:
 		ext.w	d0
 		sub.w	d0,d3
 		eori.w	#$F,d3
-		lea	(v_angledata).w,a4
+		lea	($FFFFF76A).w,a4
 		movea.w	#-$10,a3
 		move.w	#$400,d6	; MJ: $800/2
 		bsr.w	FindWall	; MJ: check solidity

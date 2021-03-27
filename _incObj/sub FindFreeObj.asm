@@ -74,3 +74,4 @@ loc_E1BA:				; CODE XREF: sub_E1B4+Ej
 locret_E1C6:				; CODE XREF: sub_E1B4+8j
 		rts
 ; End of function sub_E1B4
+
