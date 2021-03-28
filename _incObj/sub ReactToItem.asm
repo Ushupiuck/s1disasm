@@ -398,5 +398,5 @@ React_Special:
 
 .D7orE1:
 		addq.b	#1,obColProp(a1)
-		rts	
+		rts
 ; End of function React_Special

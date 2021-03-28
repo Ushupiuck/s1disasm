@@ -15,15 +15,15 @@ Sonic_AnglePos:
 		btst	#3,obStatus(a0)
 		beq.s	loc_14602
 		moveq	#0,d0
-		move.b	d0,($FFFFF768).w
-		move.b	d0,($FFFFF76A).w
-		rts	
+		move.b	d0,(v_anglebuffer).w
+		move.b	d0,(v_anglebuffer2).w
+		rts
 ; ===========================================================================
 
 loc_14602:
 		moveq	#3,d0
-		move.b	d0,($FFFFF768).w
-		move.b	d0,($FFFFF76A).w
+		move.b	d0,(v_anglebuffer).w
+		move.b	d0,(v_anglebuffer2).w
 		move.b	obAngle(a0),d0
 		addi.b	#$20,d0
 		bpl.s	loc_14624
@@ -61,7 +61,7 @@ loc_14630:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	($FFFFF768).w,a4
+		lea	(v_anglebuffer).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindFloor	; MJ: check solidity
@@ -76,7 +76,7 @@ loc_14630:
 		ext.w	d0
 		neg.w	d0
 		add.w	d0,d3
-		lea	($FFFFF76A).w,a4
+		lea	(v_anglebuffer2).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindFloor	; MJ: check solidity
@@ -90,7 +90,7 @@ loc_14630:
 		add.w	d1,obY(a0)
 
 locret_146BE:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_146C0:
@@ -99,7 +99,7 @@ loc_146C0:
 
 loc_146C6:
 		add.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_146CC:
@@ -108,55 +108,12 @@ loc_146CC:
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
 		move.b	#1,obNextAni(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 locret_146E6:
-		rts	
+		rts
 ; End of function Sonic_AnglePos
-
-; ===========================================================================
-		move.l	obX(a0),d2
-		move.w	obVelX(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d2
-		move.l	d2,obX(a0)
-		move.w	#$38,d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d3,obY(a0)
-		rts	
-; ===========================================================================
-
-locret_1470A:
-		rts	
-; ===========================================================================
-		move.l	obY(a0),d3
-		move.w	obVelY(a0),d0
-		subi.w	#$38,d0
-		move.w	d0,obVelY(a0)
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d3,obY(a0)
-		rts	
-		rts	
-; ===========================================================================
-		move.l	obX(a0),d2
-		move.l	obY(a0),d3
-		move.w	obVelX(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d2
-		move.w	obVelY(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d2,obX(a0)
-		move.l	d3,obY(a0)
-		rts	
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	change Sonic's angle as he walks along the floor
@@ -166,17 +123,17 @@ locret_1470A:
 
 
 Sonic_Angle:
-		move.b	($FFFFF76A).w,d2
+		move.b	(v_anglebuffer2).w,d2
 		cmp.w	d0,d1
 		ble.s	loc_1475E
-		move.b	($FFFFF768).w,d2
+		move.b	(v_anglebuffer).w,d2
 		move.w	d0,d1
 
 loc_1475E:
 		btst	#0,d2
 		bne.s	loc_1476A
 		move.b	d2,obAngle(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1476A:
@@ -184,7 +141,7 @@ loc_1476A:
 		addi.b	#$20,d2
 		andi.b	#$C0,d2
 		move.b	d2,obAngle(a0)
-		rts	
+		rts
 ; End of function Sonic_Angle
 
 ; ---------------------------------------------------------------------------
@@ -205,7 +162,7 @@ Sonic_WalkVertR:
 		move.b	obHeight(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	($FFFFF768).w,a4
+		lea	(v_anglebuffer).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindWall	; MJ: check solidity
@@ -219,7 +176,7 @@ Sonic_WalkVertR:
 		move.b	obHeight(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	($FFFFF76A).w,a4
+		lea	(v_anglebuffer2).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindWall	; MJ: check solidity
@@ -229,11 +186,11 @@ Sonic_WalkVertR:
 		beq.s	locret_147F0
 		bpl.s	loc_147F2
 		cmpi.w	#-$E,d1
-		blt.w	locret_1470A
+		blt.w	locret_146E6
 		add.w	d1,obX(a0)
 
 locret_147F0:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_147F2:
@@ -242,7 +199,7 @@ loc_147F2:
 
 loc_147F8:
 		add.w	d1,obX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_147FE:
@@ -251,7 +208,7 @@ loc_147FE:
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
 		move.b	#1,obNextAni(a0)
-		rts	
+		rts
 ; End of function Sonic_WalkVertR
 
 ; ---------------------------------------------------------------------------
@@ -272,7 +229,7 @@ Sonic_WalkCeiling:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	($FFFFF768).w,a4
+		lea	(v_anglebuffer).w,a4
 		movea.w	#-$10,a3
 		move.w	#$800,d6	; MJ: $1000/2
 		bsr.w	FindFloor	; MJ: check solidity
@@ -287,7 +244,7 @@ Sonic_WalkCeiling:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		sub.w	d0,d3
-		lea	($FFFFF76A).w,a4
+		lea	(v_anglebuffer2).w,a4
 		movea.w	#-$10,a3
 		move.w	#$800,d6	; MJ: $1000/2
 		bsr.w	FindFloor	; MJ: check solidity
@@ -301,7 +258,7 @@ Sonic_WalkCeiling:
 		sub.w	d1,obY(a0)
 
 locret_14892:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_14894:
@@ -310,7 +267,7 @@ loc_14894:
 
 loc_1489A:
 		sub.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_148A0:
@@ -319,7 +276,7 @@ loc_148A0:
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
 		move.b	#1,obNextAni(a0)
-		rts	
+		rts
 ; End of function Sonic_WalkCeiling
 
 ; ---------------------------------------------------------------------------
@@ -340,7 +297,7 @@ Sonic_WalkVertL:
 		ext.w	d0			; MJ: set left byte pos or neg
 		sub.w	d0,d3			; MJ: subtract from X position
 		eori.w	#$F,d3
-		lea	($FFFFF768).w,a4	; MJ: load address of the angle value set
+		lea	(v_anglebuffer).w,a4	; MJ: load address of the angle value set
 		movea.w	#-$10,a3
 		move.w	#$400,d6		; MJ: $800/2
 		bsr.w	FindWall		; MJ: check solidity
@@ -355,7 +312,7 @@ Sonic_WalkVertL:
 		ext.w	d0
 		sub.w	d0,d3
 		eori.w	#$F,d3
-		lea	($FFFFF76A).w,a4
+		lea	(v_anglebuffer2).w,a4
 		movea.w	#-$10,a3
 		move.w	#$400,d6	; MJ: $800/2
 		bsr.w	FindWall	; MJ: check solidity
@@ -365,11 +322,11 @@ Sonic_WalkVertL:
 		beq.s	locret_14934
 		bpl.s	loc_14936
 		cmpi.w	#-$E,d1
-		blt.w	locret_1470A
+		blt.w	locret_146E6
 		sub.w	d1,obX(a0)
 
 locret_14934:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_14936:
@@ -378,7 +335,7 @@ loc_14936:
 
 loc_1493C:
 		sub.w	d1,obX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_14942:
@@ -387,5 +344,5 @@ loc_14942:
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
 		move.b	#1,obNextAni(a0)
-		rts	
+		rts
 ; End of function Sonic_WalkVertL

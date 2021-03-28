@@ -112,7 +112,8 @@ v_jpadhold2	= ramaddr ( $FFFFF602 )	; joypad input - held, duplicate
 v_jpadpress2	= ramaddr ( $FFFFF603 )	; joypad input - pressed, duplicate
 v_jpadhold1	= ramaddr ( $FFFFF604 )	; joypad input - held
 v_jpadpress1	= ramaddr ( $FFFFF605 )	; joypad input - pressed
-
+;v_jpad2hold1	= ramaddr ( $FFFFF606 )	; joypad input for player 2 - held
+;v_jpad2press1	= ramaddr ( $FFFFF607 )	; joypad input for player 2 - pressed
 v_vdp_buffer1	= ramaddr ( $FFFFF60C )	; VDP instruction buffer (2 bytes)
 
 v_demolength	= ramaddr ( $FFFFF614 )	; the length of a demo in frames (2 bytes)
@@ -148,7 +149,13 @@ f_wtr_state	= ramaddr ( $FFFFF64E )	; water palette state when water is above/be
 v_int_update	= ramaddr ( $FFFFF64F ) ; (1 byte)
 v_pal_buffer	= ramaddr ( $FFFFF650 )	; palette data buffer (used for palette cycling) ($30 bytes)
 v_plc_buffer	= ramaddr ( $FFFFF680 )	; pattern load cues buffer (maximum $10 PLCs) ($60 bytes)
-v_ptrnemcode	= ramaddr ( $FFFFF6E0 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
+v_plc_buffer_reg0	= ramaddr ( $FFFFF6E0 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
+v_plc_buffer_reg4	= ramaddr ( $FFFFF6E4 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
+v_plc_buffer_reg8	= ramaddr ( $FFFFF6E8 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
+v_plc_buffer_regC	= ramaddr ( $FFFFF6EC )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
+v_plc_buffer_reg10	= ramaddr ( $FFFFF6F0 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
+v_plc_buffer_reg14	= ramaddr ( $FFFFF6F4 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
+v_plc_buffer_reg1A	= ramaddr ( $FFFFF6FA )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
 
 f_plc_execute	= ramaddr ( $FFFFF6F8 )	; flag set for pattern load cue execution (2 bytes)
 
@@ -199,7 +206,7 @@ v_sonspeeddec	= ramaddr ( $FFFFF764 )	; Sonic's deceleration (2 bytes)
 v_sonframenum	= ramaddr ( $FFFFF766 )	; frame to display for Sonic
 f_sonframechg	= ramaddr ( $FFFFF767 )	; flag set to update Sonic's sprite frame
 v_anglebuffer	= ramaddr ( $FFFFF768 )	; angle of collision block that Sonic or object is standing on
-
+v_anglebuffer2	= ramaddr ( $FFFFF76A ) ; Same as above
 v_opl_routine	= ramaddr ( $FFFFF76C )	; ObjPosLoad - routine counter
 v_opl_screen	= ramaddr ( $FFFFF76E )	; ObjPosLoad - screen variable
 v_opl_data	= ramaddr ( $FFFFF770 )	; ObjPosLoad - data buffer ($10 bytes)
@@ -212,7 +219,9 @@ v_palchgspeed	= ramaddr ( $FFFFF794 )	; palette fade/transition speed (0 is fast
 v_collindex	= ramaddr ( $FFFFF796 )	; RAM address for collision index of current level (4 bytes)
 v_palss_num	= ramaddr ( $FFFFF79A )	; palette cycling in Special Stage - reference number (2 bytes)
 v_palss_time	= ramaddr ( $FFFFF79C )	; palette cycling in Special Stage - time until next change (2 bytes)
+v_palss_unknown	= ramaddr ( $FFFFF79E )
 
+v_palss_unknown2	= ramaddr ( $FFFFF7A0 )
 v_obj31ypos	= ramaddr ( $FFFFF7A4 )	; y-position of object 31 (MZ stomper) (2 bytes)
 v_bossstatus	= ramaddr ( $FFFFF7A7 )	; status of boss and prison capsule (01 = boss defeated; 02 = prison opened)
 v_trackpos	= ramaddr ( $FFFFF7A8 )	; position tracking reference number (2 bytes)

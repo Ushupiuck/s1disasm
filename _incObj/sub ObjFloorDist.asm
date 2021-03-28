@@ -27,14 +27,13 @@ ObjFloorDist2:
 		add.w	d0,d2
 		moveq	#$C,d5					; MJ: set solid type to check
 		cmpi.b	#id_SonicPlayer,(a0)			; MJ: is the parent object Sonic?
-		bne.s	.notsonic				; MJ: if not, branch and only use first collision set
+		bne.s	.first					; MJ: if not, branch and only use first collision set
 		move.b	(v_top_solid_bit).w,d5			; MJ: load solid type to check
 		move.l	#Primary_Collision,(v_collindex).w	; MJ: load first collision data location
 		cmpi.b	#$C,d5					; MJ: is second collision set to be used?
 		beq.s	.first					; MJ: if not, branch
 		move.l	#Secondary_Collision,(v_collindex).w	; MJ: load second collision data location
-.first:	
-.notsonic:
+.first:
 		lea	(v_anglebuffer).w,a4
 		move.b	#0,(a4)
 		movea.w	#$10,a3		; height of a 16x16 tile
@@ -46,6 +45,6 @@ ObjFloorDist2:
 		move.b	#0,d3
 
 locret_14E4E:
-		rts	
+		rts
 
 ; End of function ObjFloorDist2
