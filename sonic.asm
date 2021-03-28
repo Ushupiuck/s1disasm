@@ -1431,7 +1431,7 @@ FadeIn_AddColour:
 
 .addred:
 		addq.w	#2,(a0)+	; increase red value
-		rts	
+		rts
 ; ===========================================================================
 
 .next:
@@ -1458,7 +1458,7 @@ PaletteFadeOut:
 		bsr.s	FadeOut_ToBlack
 		bsr.w	RunPLC
 		dbf	d4,.mainloop
-		rts	
+		rts
 ; End of function PaletteFadeOut
 
 
@@ -1500,7 +1500,7 @@ FadeOut_DecColour:
 		andi.w	#$E,d1
 		beq.s	.degreen
 		subq.w	#2,(a0)+	; decrease red value
-		rts	
+		rts
 ; ===========================================================================
 
 .degreen:
@@ -1508,7 +1508,7 @@ FadeOut_DecColour:
 		andi.w	#$E0,d1
 		beq.s	.deblue
 		subi.w	#$20,(a0)+	; decrease green value
-		rts	
+		rts
 ; ===========================================================================
 
 .deblue:
@@ -1552,7 +1552,7 @@ PaletteWhiteIn:
 		bsr.s	WhiteIn_FromWhite
 		bsr.w	RunPLC
 		dbf	d4,.mainloop
-		rts	
+		rts
 ; End of function PaletteWhiteIn
 
 
@@ -1606,7 +1606,7 @@ WhiteIn_DecColour:
 		cmp.w	d2,d1
 		blo.s	.degreen
 		move.w	d1,(a0)+
-		rts	
+		rts
 ; ===========================================================================
 
 .degreen:
@@ -1646,7 +1646,7 @@ PaletteWhiteOut:
 		bsr.s	WhiteOut_ToWhite
 		bsr.w	RunPLC
 		dbf	d4,.mainloop
-		rts	
+		rts
 ; End of function PaletteWhiteOut
 
 
@@ -1673,7 +1673,7 @@ WhiteOut_ToWhite:
 .addcolour2:
 		bsr.s	WhiteOut_AddColour
 		dbf	d0,.addcolour2
-		rts	
+		rts
 ; End of function WhiteOut_ToWhite
 
 
@@ -1713,7 +1713,7 @@ WhiteOut_AddColour:
 
 .next:
 		addq.w	#2,a0
-		rts	
+		rts
 ; End of function WhiteOut_AddColour
 
 ; ---------------------------------------------------------------------------
@@ -1770,7 +1770,7 @@ loc_2054:
 loc_2062:
 		move.w	d0,(v_pcyc_num).w
 		moveq	#1,d0
-		rts	
+		rts
 ; ===========================================================================
 
 loc_206A:
@@ -1810,7 +1810,7 @@ loc_20B2:
 
 loc_20BC:
 		moveq	#1,d0
-		rts	
+		rts
 ; End of function PalCycle_Sega
 
 ; ===========================================================================
@@ -1858,7 +1858,7 @@ PalLoad2:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad2
 
 ; ---------------------------------------------------------------------------
@@ -1899,7 +1899,7 @@ PalLoad4_Water:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad4_Water
 
 ; ===========================================================================
@@ -2470,7 +2470,7 @@ LevSel_Down:
 LevSel_Refresh:
 		move.w	d0,(v_levselitem).w ; set new selection
 		bsr.w	LevSelTextLoad	; refresh text
-		rts	
+		rts
 ; ===========================================================================
 
 LevSel_SndTest:
@@ -2499,7 +2499,7 @@ LevSel_Refresh2:
 		bsr.w	LevSelTextLoad	; refresh text
 
 LevSel_NoMove:
-		rts	
+		rts
 ; End of function LevSelControls
 
 ; ---------------------------------------------------------------------------
@@ -2643,7 +2643,12 @@ Level_NoMusicFade:
 		enable_ints
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
-		lsl.w	#4,d0
+	; multiply d0 by 12, the size of a level art load block
+		add.w	d0,d0
+		add.w	d0,d0
+		move.w	d0,d1
+		add.w	d0,d0
+		add.w	d1,d0
 		lea	(LevelHeaders).l,a2
 		lea	(a2,d0.w),a2
 		moveq	#0,d0
