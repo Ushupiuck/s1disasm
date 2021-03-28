@@ -155,9 +155,9 @@ v_plc_buffer_reg8	= ramaddr ( $FFFFF6E8 )	; pointer for nemesis decompression co
 v_plc_buffer_regC	= ramaddr ( $FFFFF6EC )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
 v_plc_buffer_reg10	= ramaddr ( $FFFFF6F0 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
 v_plc_buffer_reg14	= ramaddr ( $FFFFF6F4 )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
-v_plc_buffer_reg1A	= ramaddr ( $FFFFF6FA )	; pointer for nemesis decompression code ($1502 or $150C) (4 bytes)
+v_plc_buffer_reg1A	= ramaddr ( $FFFFF6F8 )	; pointer for nemesis decompression code ($1502 or $150C) (2 bytes)
 
-f_plc_execute	= ramaddr ( $FFFFF6F8 )	; flag set for pattern load cue execution (2 bytes)
+f_plc_execute	= ramaddr ( $FFFFF6FA )	; flag set for pattern load cue execution (2 bytes)
 
 v_screenposx	= ramaddr ( $FFFFF700 )	; screen position x (2 bytes)
 v_screenposy	= ramaddr ( $FFFFF704 )	; screen position y (2 bytes)
