@@ -1259,8 +1259,8 @@ loc_16AA:
 		move.l	a0,(v_plc_buffer).w
 		move.l	a3,(v_plc_buffer_reg0).w
 		move.l	d0,(v_plc_buffer_reg4).w
-		move.l	d0,(v_plc_buffer_reg8).w
-		move.l	d0,(v_plc_buffer_regC).w
+		move.l	d1,(v_plc_buffer_reg8).w
+		move.l	d2,(v_plc_buffer_regC).w
 		move.l	d5,(v_plc_buffer_reg10).w
 		move.l	d6,(v_plc_buffer_reg14).w
 
