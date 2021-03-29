@@ -3299,7 +3299,7 @@ SS_NormalExit:
 		bne.s	SS_NormalExit
 		sfx	sfx_EnterSS,0,1,0 ; play special stage exit sound
 		bsr.w	PaletteWhiteOut
-		rts
+		rts	
 ; ===========================================================================
 
 SS_ToSegaScreen:
@@ -3687,7 +3687,7 @@ Cont_GotoLevel:
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost count
 		subq.b	#1,(v_continues).w ; subtract 1 from continues
-		rts
+		rts	
 ; ===========================================================================
 
 		include	"_incObj/80 Continue Screen Elements.asm"
@@ -3978,12 +3978,7 @@ Cred_ClrPal:
 		bsr.w	EndingDemoLoad
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
-		; multiply d0 by 12, the size of a level art load block
-		add.w	d0,d0
-		add.w	d0,d0
-		move.w	d0,d1
-		add.w	d0,d0
-		add.w	d1,d0
+		lsl.w	#4,d0
 		lea	(LevelHeaders).l,a2
 		lea	(a2,d0.w),a2
 		moveq	#0,d0
@@ -4007,7 +4002,7 @@ Cred_WaitLoop:
 		bne.s	Cred_WaitLoop	; if not, branch
 		cmpi.w	#9,(v_creditsnum).w ; have the credits finished?
 		beq.w	TryAgainEnd	; if yes, branch
-		rts
+		rts	
 
 ; ---------------------------------------------------------------------------
 ; Ending sequence demo loading subroutine
@@ -4044,7 +4039,7 @@ EndDemo_LampLoad:
 		dbf	d0,EndDemo_LampLoad
 
 EndDemo_Exit:
-		rts
+		rts	
 ; End of function EndingDemoLoad
 
 ; ===========================================================================
@@ -4130,7 +4125,7 @@ TryAg_MainLoop:
 
 TryAg_Exit:
 		move.b	#id_Sega,(v_gamemode).w ; goto Sega screen
-		rts
+		rts	
 
 ; ===========================================================================
 
@@ -4255,7 +4250,7 @@ loc_6938:
 		bsr.w	DrawBlocks_TB
 
 locret_6952:
-		rts
+		rts	
 ; End of function LoadTilesAsYouMove
 
 
@@ -4610,7 +4605,7 @@ DrawBlocks_TB_2:
 		movem.l	(sp)+,d4-d5
 		addi.w	#16,d4		; Move X coordinate one block ahead
 		dbf	d6,.loop
-		rts
+		rts	
 ; End of function DrawBlocks_TB_2
 
 
@@ -4653,7 +4648,7 @@ DrawFlipX:
 		eori.l	#$8000800,d4
 		swap	d4
 		move.l	d4,(a6)		; Write bottom two tiles
-		rts
+		rts	
 ; ===========================================================================
 
 DrawFlipY:
@@ -4668,7 +4663,7 @@ DrawFlipY:
 		move.l	d0,(a5)
 		eori.l	#$10001000,d5
 		move.l	d5,(a6)
-		rts
+		rts	
 ; ===========================================================================
 
 DrawFlipXY:
@@ -4899,7 +4894,7 @@ LoadZoneTiles:
 		lea	(a2,d0.w),a2		; Offset LevelHeaders by the zone-offset, and load the resultant address to a2
 		move.l	(a2)+,d0		; Move the first longword of data that a2 points to to d0, this contains the zone's first PLC ID and its art's address.
 						; The auto increment is pointless as a2 is overwritten later, and nothing reads from a2 before then
-;		andi.l	#$FFFFFF,d0    		; Filter out the first byte, which contains the first PLC ID, leaving the address of the zone's art in d0
+		andi.l	#$FFFFFF,d0    		; Filter out the first byte, which contains the first PLC ID, leaving the address of the zone's art in d0
 		movea.l	d0,a0			; Load the address of the zone's art into a0 (source)
 		lea	(v_128x128).l,a1	; Load v_128x128/StartOfRAM (in this context, an art buffer) into a1 (destination)
 		bsr.w	KosDec			; Decompress a0 to a1 (Kosinski compression)
@@ -4959,17 +4954,29 @@ LevelDataLoad:
 		move.w	(a2)+,d0
 		move.w	(a2),d0
 		andi.w	#$FF,d0
-		movea.l	(sp)+,a2	; zone specific pointer in LevelArtPointers
-		addq.w	#4,a2
-		moveq	#0,d0
-		move.b	(a2),d0	; PLC2 ID
-		beq.s	+
-		bsr.w	AddPLC
-+
-		addq.w	#4,a2
-		moveq	#0,d0
-		move.b	(a2),d0	; palette ID
+		cmpi.w	#(id_LZ<<8)+3,(v_zone).w ; is level SBZ3 (LZ4) ?
+		bne.s	.notSBZ3	; if not, branch
+		moveq	#palid_SBZ3,d0	; use SB3 palette
+
+.notSBZ3:
+		cmpi.w	#(id_SBZ<<8)+1,(v_zone).w ; is level SBZ2?
+		beq.s	.isSBZorFZ	; if yes, branch
+		cmpi.w	#(id_SBZ<<8)+2,(v_zone).w ; is level FZ?
+		bne.s	.normalpal	; if not, branch
+
+.isSBZorFZ:
+		moveq	#palid_SBZ2,d0	; use SBZ2/FZ palette
+
+.normalpal:
 		bsr.w	PalLoad1	; load palette (based on d0)
+		movea.l	(sp)+,a2
+		addq.w	#4,a2		; read number for 2nd PLC
+		moveq	#0,d0
+		move.b	(a2),d0
+		beq.s	.skipPLC	; if 2nd PLC is 0 (i.e. the ending sequence), branch
+		bsr.w	AddPLC		; load pattern load cues
+
+.skipPLC:
 		rts
 ; End of function LevelDataLoad
 
