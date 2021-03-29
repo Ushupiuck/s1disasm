@@ -21,6 +21,6 @@ lhead:	macro plc1,lvlgfx,plc2,sixteen,onetwoeight,pal
 	lhead	plcid_SLZ,	Kos_SLZ,	plcid_SLZ2,	Blk16_SLZ,	Blk128_SLZ,	palid_SLZ	; Star Light
 	lhead	plcid_SYZ,	Kos_SYZ,	plcid_SYZ2,	Blk16_SYZ,	Blk128_SYZ,	palid_SYZ	; Spring Yard
 	lhead	plcid_SBZ,	Kos_SBZ,	plcid_SBZ2,	Blk16_SBZ,	Blk128_SBZ,	palid_SBZ1	; Scrap Brain
- 	zonewarning LevelHeaders,$C
+ 	zonewarning LevelHeaders,$10
 	lhead	0,		Kos_GHZ,	0,		Blk16_GHZ,	Blk128_GHZ,	palid_Ending	; Ending
 	even

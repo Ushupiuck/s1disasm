@@ -2643,7 +2643,7 @@ Level_NoMusicFade:
 		enable_ints
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
-		; multiply d0 by 12, the size of a level art load block
+	; multiply d0 by 12, the size of a level art load block
 		add.w	d0,d0
 		add.w	d0,d0
 		move.w	d0,d1
@@ -4884,12 +4884,7 @@ locj_72EE:
 LoadZoneTiles:
 		moveq	#0,d0			; Clear d0
 		move.b	(v_zone).w,d0		; Load number of current zone to d0
-		; multiply d0 by 12, the size of a level art load block
-		add.w	d0,d0
-		add.w	d0,d0
-		move.w	d0,d1
-		add.w	d0,d0
-		add.w	d1,d0
+		lsl.w	#4,d0			; Multiply by $10, converting the zone ID into an offset
 		lea	(LevelHeaders).l,a2	; Load LevelHeaders's address into a2
 		lea	(a2,d0.w),a2		; Offset LevelHeaders by the zone-offset, and load the resultant address to a2
 		move.l	(a2)+,d0		; Move the first longword of data that a2 points to to d0, this contains the zone's first PLC ID and its art's address.
@@ -4933,12 +4928,7 @@ LoadZoneTiles:
 LevelDataLoad:
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
-		; multiply d0 by 12, the size of a level art load block
-		add.w	d0,d0
-		add.w	d0,d0
-		move.w	d0,d1
-		add.w	d0,d0
-		add.w	d1,d0
+		lsl.w	#4,d0
 		lea	(LevelHeaders).l,a2
 		lea	(a2,d0.w),a2
 		move.l	a2,-(sp)
@@ -4977,7 +4967,7 @@ LevelDataLoad:
 		bsr.w	AddPLC		; load pattern load cues
 
 .skipPLC:
-		rts
+		rts	
 ; End of function LevelDataLoad
 
 ; ---------------------------------------------------------------------------
@@ -5083,7 +5073,7 @@ loc_7512:
 		bset	#3,obStatus(a0)
 
 Plat_Exit:
-		rts
+		rts	
 ; End of function PlatformObject
 
 ; ---------------------------------------------------------------------------
