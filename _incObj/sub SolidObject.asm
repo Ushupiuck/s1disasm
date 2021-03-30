@@ -6,6 +6,10 @@
 ;	d2 = height / 2 (when jumping)
 ;	d3 = height / 2 (when walking)
 ;	d4 = x-axis position
+;
+; address registers:
+; a0 = the object to check collision with
+; a1 = sonic or tails (set inside these subroutines)
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
