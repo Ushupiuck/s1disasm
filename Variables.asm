@@ -20,7 +20,15 @@ v_hscrolltablebuffer	= ramaddr ( $FFFFA200 )	; scrolling table data (actually $3
 Primary_Collision	= ramaddr ( $FFFFA600 )
 Secondary_Collision	= ramaddr ( $FFFFA900 )
 ; $2400 bytes of free ram starting at AC00!~
-v_systemstack	= ramaddr ( $FFFFAD00 )
+v_objstate	= ramaddr ( $FFFFAC00 )	; object state list ($200 bytes)
+v_spritetablebuffer	= ramaddr ( $FFFFAE00 ) ; sprite table ($280 bytes, last $80 bytes are overwritten by v_pal_water_dup)
+v_pal_water_dup	= ramaddr ( $FFFFB080 ) ; duplicate underwater palette, used for transitions ($80 bytes)
+v_pal_water	= ramaddr ( $FFFFB100 )	; main underwater palette ($80 bytes)
+v_pal_dry	= ramaddr ( $FFFFB180 )	; main palette ($80 bytes)
+v_pal_dry_dup	= ramaddr ( $FFFFB200 )	; duplicate palette, used for transitions ($80 bytes)
+
+
+v_systemstack	= ramaddr ( $FFFFB300 )
 v_objspace	= ramaddr ( $FFFFD000 )	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player	= v_objspace	; object variable space for Sonic ($40 bytes)
 v_lvlobjspace	= ramaddr ( $FFFFD800 )	; level object variable space ($1800 bytes)
@@ -254,6 +262,8 @@ f_jumponly	= ramaddr ( $FFFFF7CA )	; flag set to lock controls apart from jumpin
 f_lockctrl	= ramaddr ( $FFFFF7CB )	; flag set to lock controls during ending sequence
 f_bigring	= ramaddr ( $FFFFF7CC )	; flag set when Sonic collects the giant ring
 v_syz3door	= ramaddr ( $FFFFF7CD )	; flag to move the blockade at SYZ act 3 (1 byte)
+v_ring1uplimit	= ramaddr ( $FFFFF7CE )	; awards an extra life every 100 rings (2 bytes)
+
 v_itembonus	= ramaddr ( $FFFFF7D0 )	; item bonus from broken enemies, blocks etc. (2 bytes)
 v_timebonus	= ramaddr ( $FFFFF7D2 )	; time bonus at the end of an act (2 bytes)
 v_ringbonus	= ramaddr ( $FFFFF7D4 )	; ring bonus at the end of an act (2 bytes)
@@ -266,13 +276,7 @@ v_scroll_block_2_size	= ramaddr ( $FFFFF7F2 )	; unused (2 bytes)
 v_scroll_block_3_size	= ramaddr ( $FFFFF7F4 )	; unused (2 bytes)
 v_scroll_block_4_size	= ramaddr ( $FFFFF7F6 )	; unused (2 bytes)
 
-v_spritetablebuffer	= ramaddr ( $FFFFF800 ) ; sprite table ($280 bytes, last $80 bytes are overwritten by v_pal_water_dup)
-v_pal_water_dup	= ramaddr ( $FFFFFA80 ) ; duplicate underwater palette, used for transitions ($80 bytes)
-v_pal_water	= ramaddr ( $FFFFFB00 )	; main underwater palette ($80 bytes)
-v_pal_dry	= ramaddr ( $FFFFFB80 )	; main palette ($80 bytes)
-v_pal_dry_dup	= ramaddr ( $FFFFFC00 )	; duplicate palette, used for transitions ($80 bytes)
-v_objstate	= ramaddr ( $FFFFFC80 )	; object state list ($200 bytes)
-
+; $F800 moved to the top
 f_restart	= ramaddr ( $FFFFFE02 )	; restart level flag (2 bytes)
 v_framecount	= ramaddr ( $FFFFFE04 )	; frame counter (adds 1 every frame) (2 bytes)
 v_framebyte	= v_framecount+1; low byte for frame counter

@@ -2303,7 +2303,8 @@ LevSel_Credits:
 
 LevSel_Level_SS:
 		add.w	d0,d0
-		move.w	LevSel_Ptrs(pc,d0.w),d0 ; load level number
+		lea	(LevSel_Ptrs).l,a1 ; load level number
+		move.w	(a1,d0.w),d0
 		bmi.w	LevelSelect
 		cmpi.w	#id_SS*$100,d0	; check	if level is 0700 (Special Stage)
 		bne.s	LevSel_Level	; if not, branch
@@ -2312,6 +2313,7 @@ LevSel_Level_SS:
 		move.b	#3,(v_lives).w	; set lives to 3
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
@@ -2327,6 +2329,7 @@ PlayLevel:
 		move.b	#3,(v_lives).w	; set lives to 3
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastspecial).w ; clear special stage number
@@ -2422,6 +2425,7 @@ Demo_Level:
 		move.b	#3,(v_lives).w	; set lives to 3
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
@@ -2813,6 +2817,7 @@ Level_SkipClr:
 		move.b	d0,(v_shield).w	; clear shield
 		move.b	d0,(v_invinc).w	; clear invincibility
 		move.b	d0,(v_shoes).w	; clear speed shoes
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 		move.w	d0,(v_debuguse).w
 		move.w	d0,(f_restart).w
 		move.w	d0,(v_framecount).w
@@ -3179,6 +3184,7 @@ SS_ClrNemRam:
 		move.b	1(a1),(v_btnpushtime2).w
 		subq.b	#1,(v_btnpushtime2).w
 		clr.w	(v_rings).w
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 		clr.b	(v_lifecount).w
 		move.w	#0,(v_debuguse).w
 		move.w	#1800,(v_demolength).w
@@ -3678,11 +3684,12 @@ Cont_GotoLevel:
 		move.b	#3,(v_lives).w	; set lives to 3
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost count
 		subq.b	#1,(v_continues).w ; subtract 1 from continues
-		rts	
+		rts
 ; ===========================================================================
 
 		include	"_incObj/80 Continue Screen Elements.asm"
@@ -3781,6 +3788,7 @@ End_LoadSonic:
 		jsr	(BuildSprites).l
 		moveq	#0,d0
 		move.w	d0,(v_rings).w
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 		move.l	d0,(v_time).w
 		move.b	d0,(v_lifecount).w
 		move.b	d0,(v_shield).w
@@ -4020,6 +4028,7 @@ EndingDemoLoad:
 		move.b	#3,(v_lives).w	; set lives to 3
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost counter
@@ -5940,10 +5949,10 @@ loc_D672:
 		bclr	#7,obRender(a0)
 		move.b	obRender(a0),d0
 		move.b	d0,d4
-;		btst	#6,d0
-;		bne.w	loc_D126
-		andi.w	#$C,d0
-		beq.s	loc_D6DE
+;		btst	#6,d0	; is the multi-draw flag set?
+;		bne.w	loc_D126	; if it is, branch
+		andi.w	#$C,d0	; is this to be positioned by screen coordinates?
+		beq.s	loc_D6DE	; if it is, branch
 		movea.l	BldSpr_ScrPos(pc,d0.w),a1
 		moveq	#0,d0
 		move.b	obActWid(a0),d0

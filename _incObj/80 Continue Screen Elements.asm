@@ -23,6 +23,7 @@ CSI_Main:	; Routine 0
 		move.w	#$120,obX(a0)
 		move.w	#$C0,obScreenY(a0)
 		move.w	#0,(v_rings).w	; clear rings
+		move.w	#100,(v_ring1uplimit).w	; reset ring 1-up flag
 
 CSI_Display:	; Routine 2
 		jmp	(DisplaySprite).l
@@ -83,8 +84,8 @@ CSI_ChkDel:	; Routine 6
 		andi.b	#1,d0
 		bne.s	CSI_Animate
 		tst.w	(v_player+obVelX).w ; is Sonic running?
-		bne.s	CSI_Delete	; if yes, goto delete
-		rts	
+		jne	(DeleteObject).l	; if yes, delete
+		rts
 
 CSI_Animate:
 		move.b	(v_vbla_byte).w,d0
@@ -94,7 +95,3 @@ CSI_Animate:
 
 CSI_Display2:
 		jmp	(DisplaySprite).l
-; ===========================================================================
-
-CSI_Delete:
-		jmp	(DeleteObject).l

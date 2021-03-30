@@ -121,6 +121,37 @@ bitL:		equ 2
 bitDn:		equ 1
 bitUp:		equ 0
 
+; Sub Sprites
+mainspr_mapframe	= $B
+mainspr_width		= $E
+mainspr_childsprites	= $F	 ; amount of child sprites
+mainspr_height	= $14
+sub2_x_pos	= $10    ;x_vel
+sub2_y_pos	= $12    ;y_vel
+sub2_mapframe	= $15
+sub3_x_pos	= $16    ;y_radius
+sub3_y_pos	= $18    ;priority
+sub3_mapframe	= $1B    ;anim_frame
+sub4_x_pos	= $1C    ;anim
+sub4_y_pos	= $1E    ;anim_frame_duration
+sub4_mapframe	= $21    ;collision_property
+sub5_x_pos	= $22    ;status
+sub5_y_pos	= $24    ;routine
+sub5_mapframe	= $27
+sub6_x_pos	= $28    ;subtype
+sub6_y_pos	= $2A
+sub6_mapframe	= $2D
+sub7_x_pos	= $2E
+sub7_y_pos	= $30
+sub7_mapframe	= $33
+sub8_x_pos	= $34
+sub8_y_pos	= $36
+sub8_mapframe	= $39
+sub9_x_pos	= $3A
+sub9_y_pos	= $3C
+sub9_mapframe	= $3F
+next_subspr	= $6
+
 ; Object variables
 obRender:	equ 1	; bitfield for x/y flip, display mode
 obGfx:		equ 2	; palette line & VRAM setting (2 bytes)
