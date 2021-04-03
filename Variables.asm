@@ -4,9 +4,9 @@ ramaddr function x,(-(x&$80000000)<<1)|x
 
 ; Variables (v) and Flags (f)
 
-v_regbuffer	= ramaddr ( $FFFFFC80 )	; stores registers d0-a7 during an error event ($40 bytes)
-v_spbuffer	= ramaddr ( $FFFFFCC0 )	; stores most recent sp address (4 bytes)
-v_errortype	= ramaddr ( $FFFFFCC4 )	; error type
+v_regbuffer	= ramaddr ( $FFFFAC00 )	; stores registers d0-a7 during an error event ($40 bytes)
+v_spbuffer	= ramaddr ( $FFFFAC40 )	; stores most recent sp address (4 bytes)
+v_errortype	= ramaddr ( $FFFFAC44 )	; error type
 
 v_128x128	= ramaddr ( $FF0000 )	; 128x128 tile mappings ($8000 bytes)
 v_16x16		= ramaddr ( $FFFF8000 )	; 16x16 tile mappings ($1800 bytes)
