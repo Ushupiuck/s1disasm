@@ -1,7 +1,7 @@
 *.asm		text
 *.txt		text
-*.xml		text
-*.cs		text
-*.ini		text
+*.bat		text
+*.lst		text
+*.cpp		text
 *.bin		binary
-
+*.msg		binary

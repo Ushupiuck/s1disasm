@@ -1,0 +1,13 @@
+loadLevelLayout
+MainLevelLoadBlock
+DMA_68KtoVRAM
+DynamicArtCues
+
+j_S1SingleObjectLoad2_0
+j_SpeedToPos ******************
+j_ObjectFall
+j_ModifyA1SpriteAttr_2P_1
+j_AnimateSprite_1
+j_DeleteObject
+j_SingleObjectLoad
+loc_15D90
