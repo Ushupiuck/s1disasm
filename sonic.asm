@@ -8482,7 +8482,8 @@ Art_MzTorch:	binclude	"artunc/MZ Background Torch.bin"
 		even
 Art_SbzSmoke:	binclude	"artunc/SBZ Background Smoke.bin"
 		even
-
+Art_BigRing:	binclude	"artunc/Giant Ring.bin"
+		even
 ; ---------------------------------------------------------------------------
 ; Level	layout index
 ; ---------------------------------------------------------------------------
@@ -8560,10 +8561,6 @@ Level_End:	binclude	"levels/ending.bin"
 		even
 Level_EndGood:	binclude	"levels/ending_good.bin"
 		even
-
-Art_BigRing:	binclude	"artunc/Giant Ring.bin"
-		even
-
 ; ---------------------------------------------------------------------------
 ; Sprite locations index
 ; ---------------------------------------------------------------------------

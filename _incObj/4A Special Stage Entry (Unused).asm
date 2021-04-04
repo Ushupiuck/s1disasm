@@ -17,10 +17,7 @@ van_time = $30		; time for Sonic to disappear
 
 Van_Main:	; Routine 0
 		tst.l	(v_plc_buffer).w ; are pattern load cues empty?
-		beq.s	.isempty	; if yes, branch
-		rts	
-
-.isempty:
+		bne.s	Return_wait	; if not, branch
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Vanish,obMap(a0)
 		move.b	#4,obRender(a0)
@@ -48,9 +45,8 @@ Van_RmvSonic:	; Routine 2
 
 Van_LoadSonic:	; Routine 4
 		subq.w	#1,van_time(a0)	; subtract 1 from time
-		bne.s	.wait		; if time remains, branch
+		bne.s	Return_wait	; if time remains, branch
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
 		jmp	(DeleteObject).l
-
-.wait:
-		rts	
+Return_wait:
+		rts
