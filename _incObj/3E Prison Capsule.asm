@@ -44,13 +44,12 @@ Pri_Main:	; Routine 0
 		move.b	(a1)+,obPriority(a0)
 		move.b	(a1)+,obFrame(a0)
 		cmpi.w	#8,d0		; is object type number	02?
-		bne.s	.not02		; if not, branch
-
+		bne.s	Return_not02	; if not, branch
 		move.b	#6,obColType(a0)
 		move.b	#8,obColProp(a0)
 
-.not02:
-		rts	
+Return_not02:
+		rts
 ; ===========================================================================
 
 Pri_BodyMain:	; Routine 2
@@ -72,7 +71,7 @@ Pri_BodyMain:	; Routine 2
 
 .open:
 		move.b	#2,obFrame(a0)	; use frame number 2 (destroyed	prison)
-		rts	
+		rts
 ; ===========================================================================
 
 Pri_Switched:	; Routine 4
@@ -85,8 +84,7 @@ Pri_Switched:	; Routine 4
 		jsr	(AnimateSprite).l
 		move.w	pri_origY(a0),obY(a0)
 		tst.b	ob2ndRout(a0)	; has prison already been opened?
-		beq.s	.open2		; if yes, branch
-
+		beq.s	Return_not02	; if yes, branch
 		addq.w	#8,obY(a0)
 		move.b	#$A,obRoutine(a0)
 		move.w	#60,obTimeFrame(a0) ; set time between animal spawns
@@ -97,9 +95,7 @@ Pri_Switched:	; Routine 4
 		clr.b	ob2ndRout(a0)
 		bclr	#3,(v_player+obStatus).w
 		bset	#1,(v_player+obStatus).w
-
-.open2:
-		rts	
+		rts
 ; ===========================================================================
 
 Pri_Explosion:	; Routine 6, 8, $A
@@ -124,7 +120,7 @@ Pri_Explosion:	; Routine 6, 8, $A
 .noexplosion:
 		subq.w	#1,obTimeFrame(a0)
 		beq.s	.makeanimal
-		rts	
+		rts
 ; ===========================================================================
 
 .makeanimal:
@@ -139,7 +135,7 @@ Pri_Explosion:	; Routine 6, 8, $A
 
 .loop:
 		jsr	(FindFreeObj).l
-		bne.s	.fail
+		bne.w	Return_not02
 		_move.b	#id_Animals,0(a1) ; load animal object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
@@ -148,9 +144,7 @@ Pri_Explosion:	; Routine 6, 8, $A
 		move.w	d5,$36(a1)
 		subq.w	#8,d5
 		dbf	d6,.loop	; repeat 7 more	times
-
-.fail:
-		rts	
+		rts
 ; ===========================================================================
 
 Pri_Animals:	; Routine $C
@@ -175,12 +169,10 @@ Pri_Animals:	; Routine $C
 
 .noanimal:
 		subq.w	#1,obTimeFrame(a0)
-		bne.s	.wait
+		bne.w	Return_not02
 		addq.b	#2,obRoutine(a0)
 		move.w	#180,obTimeFrame(a0)
-
-.wait:
-		rts	
+		rts
 ; ===========================================================================
 
 Pri_EndAct:	; Routine $E
@@ -191,12 +183,8 @@ Pri_EndAct:	; Routine $E
 
 .findanimal:
 		cmp.b	(a1),d1		; is object $28	(animal) loaded?
-		beq.s	.found		; if yes, branch
+		beq.w	Return_not02	; if yes, branch
 		adda.w	d2,a1		; next object RAM
 		dbf	d0,.findanimal	; repeat $3E times
-
 		jsr	(GotThroughAct).l
 		jmp	(DeleteObject).l
-
-.found:
-		rts	
