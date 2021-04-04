@@ -83,7 +83,9 @@ Pri_Switched:	; Routine 4
 		lea	(Ani_Pri).l,a1
 		jsr	(AnimateSprite).l
 		move.w	pri_origY(a0),obY(a0)
-		tst.b	ob2ndRout(a0)	; has prison already been opened?
+		move.b	obStatus(a0),d0
+		andi.b	#$18,d0		; has prison already been opened?
+;		tst.b	ob2ndRout(a0)	; Same as above but inappropiate
 		beq.s	Return_not02	; if yes, branch
 		addq.w	#8,obY(a0)
 		move.b	#$A,obRoutine(a0)
