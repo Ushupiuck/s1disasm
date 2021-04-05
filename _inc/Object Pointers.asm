@@ -143,7 +143,7 @@ ptr_EndEggman:		dc.l EndEggman
 ptr_TryChaos:		dc.l TryChaos
 
 NullObject:
-		;jmp	(DeleteObject).l	; It would be safer to have this instruction here, but instead it just falls through to ObjectFall
+		jmp	(DeleteObject).l	; It would be safer to have this instruction here, but instead it just falls through to ObjectFall
 
 id_SonicPlayer:		equ ((ptr_SonicPlayer-Obj_Index)/4)+1		; $01
 id_Obj02:		equ ((ptr_Obj02-Obj_Index)/4)+1

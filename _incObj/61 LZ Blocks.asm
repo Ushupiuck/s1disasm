@@ -16,7 +16,7 @@ LBlk_Var:	dc.b $10, $10		; width, height
 		dc.b $10, $10
 		dc.b $10, $10
 
-lblk_height = $16		; block height
+;lblk_height = $16		; block height
 lblk_origX = $34		; original x-axis position
 lblk_origY = $30		; original y-axis position
 lblk_time = $36		; time delay for block movement
