@@ -8022,17 +8022,15 @@ loc_1C962:
 ; ===========================================================================
 
 		include	"_inc/HUD (part 2).asm"
-
-Art_Hud:	binclude	"artunc/HUD Numbers.bin" ; 8x16 pixel numbers on HUD
-		even
-Art_LivesNums:	binclude	"artunc/Lives Counter Numbers.bin" ; 8x8 pixel numbers on lives counter
-		even
-
 		include	"_incObj/DebugMode.asm"
 		include	"_inc/DebugList.asm"
 		include	"_inc/LevelHeaders.asm"
 		include	"_inc/Pattern Load Cues.asm"
 
+Art_Hud:	binclude	"artunc/HUD Numbers.bin" ; 8x16 pixel numbers on HUD
+		even
+Art_LivesNums:	binclude	"artunc/Lives Counter Numbers.bin" ; 8x8 pixel numbers on lives counter
+		even
 Nem_SegaLogo:	binclude	"artnem/Sega Logo (JP1).bin" ; large Sega logo
 		even
 Eni_SegaLogo:	binclude	"tilemaps/Sega Logo (JP1).bin" ; large Sega logo (mappings)
@@ -8049,7 +8047,6 @@ Eni_JapNames:	binclude	"tilemaps/Hidden Japanese Credits.bin" ; Japanese credits
 		even
 Nem_JapNames:	binclude	"artnem/Hidden Japanese Credits.bin"
 		even
-
 
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics	- Sonic
@@ -8451,21 +8448,6 @@ Col_SBZ_1:	binclude	"collide/SBZ1.kos"	; SBZ index 1
 Col_SBZ_2:	binclude	"collide/SBZ2.kos"	; SBZ index 2
 		even
 ; ---------------------------------------------------------------------------
-; Special Stage layouts
-; ---------------------------------------------------------------------------
-SS_1:		binclude	"sslayout/1.bin"
-		even
-SS_2:		binclude	"sslayout/2.bin"
-		even
-SS_3:		binclude	"sslayout/3.bin"
-		even
-SS_4:		binclude	"sslayout/4.bin"
-		even
-SS_5:		binclude	"sslayout/5 (JP1).bin"
-		even
-SS_6:		binclude	"sslayout/6 (JP1).bin"
-		even
-; ---------------------------------------------------------------------------
 ; Animated uncompressed graphics
 ; ---------------------------------------------------------------------------
 Art_GhzWater:	binclude	"artunc/GHZ Waterfall.bin"
@@ -8560,6 +8542,21 @@ Level_SBZ2:	binclude	"levels/sbz2.bin"
 Level_End:	binclude	"levels/ending.bin"
 		even
 Level_EndGood:	binclude	"levels/ending_good.bin"
+		even
+; ---------------------------------------------------------------------------
+; Special Stage layouts
+; ---------------------------------------------------------------------------
+SS_1:		binclude	"sslayout/1.bin"
+		even
+SS_2:		binclude	"sslayout/2.bin"
+		even
+SS_3:		binclude	"sslayout/3.bin"
+		even
+SS_4:		binclude	"sslayout/4.bin"
+		even
+SS_5:		binclude	"sslayout/5 (JP1).bin"
+		even
+SS_6:		binclude	"sslayout/6 (JP1).bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Sprite locations index

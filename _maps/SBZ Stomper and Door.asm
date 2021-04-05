@@ -20,4 +20,3 @@ Map_Stomp_internal:
 		dc.b 0,	$A, $20, $1F, 4
 		dc.b $18, $C, 0, $C, $E4
 		dc.b $18, 8, 0,	$10, 4
-		even

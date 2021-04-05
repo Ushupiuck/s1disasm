@@ -82,4 +82,3 @@ Map_Vanish_internal:
 		dc.b 4,	0, $18,	$26, $50
 		dc.b 4
 .blank:		dc.b 0,	8, $27,	$58, 0
-		even
