@@ -18,5 +18,4 @@ SME_YSh7S_29:	dc.b 4
 		dc.b $F0, $F, 0, 0, $C0	
 		dc.b $F0, $F, 0, 0, $E0	
 		dc.b $F0, $F, 0, 0, 0	
-		dc.b $F0, $F, 0, 0, $20	
-		even
+		dc.b $F0, $F, 0, 0, $20
