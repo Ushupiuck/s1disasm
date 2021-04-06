@@ -106,7 +106,7 @@ PLC_GHZ2end:
 PLC_LZ:		dc.w ((PLC_LZ2-PLC_LZ-2)/6)-1
 ;		plcm	Nem_LZ,0		; LZ main patterns
 		plcm	Nem_LzBlock1, $3C00	; block
-;		plcm	Nem_LzBlock2, $3E00	; large platform from SBZ2
+		plcm	Nem_LzBlock2, $3E00	; block from Hidrocity
 		plcm	Nem_Splash, $4B20	; waterfalls and splash
 		plcm	Nem_Water, $6000	; water	surface
 		plcm	Nem_LzSpikeBall, $6200	; spiked ball

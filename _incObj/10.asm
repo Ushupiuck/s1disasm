@@ -19,10 +19,8 @@ HCBlk_Main:
 		move.b	(a1)+,obActWid(a0)
 		move.w	#$F,obHeight(a0)
 		move.b	(a1)+,obHeight(a0)
-;		move.l	#Map_HCZBlock,obMap(a0)
-		move.l	#Map_LBlock,obMap(a0) ; Temporarily point to LZ's Mappings
-;		move.w	#$43D4,obGfx(a0)
-		move.w	#$43E6,obGfx(a0) ; Temporarily point to LZ's block
+		move.l	#Map_HCZBlock,obMap(a0)
+		move.w	#$41F0,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#5,obPriority(a0) ; Changed From 280 to 5 (Sonic 1/2 Priority manager)
 

@@ -4971,7 +4971,7 @@ LevelDataLoad:
 		bsr.w	AddPLC		; load pattern load cues
 
 .skipPLC:
-		rts	
+		rts
 ; End of function LevelDataLoad
 
 ; ---------------------------------------------------------------------------
@@ -5077,7 +5077,7 @@ loc_7512:
 		bset	#3,obStatus(a0)
 
 Plat_Exit:
-		rts	
+		rts
 ; End of function PlatformObject
 
 ; ---------------------------------------------------------------------------
@@ -5465,7 +5465,7 @@ loc_8B44:
 
 loc_8B48:
 		moveq	#0,d4
-		rts	
+		rts
 ; End of function Obj44_SolidWall2
 
 ; ===========================================================================
@@ -7928,6 +7928,7 @@ Map_SS_Down:	include	"_maps/SS DOWN Block.asm"
 		include	"_incObj/09 Sonic in Special Stage.asm"
 
 		include	"_incObj/10.asm"
+Map_HCZBlock:	include	"_maps/HCZ Block mappings.asm"
 
 		include	"_inc/AnimateLevelGfx.asm"
 
@@ -8164,8 +8165,9 @@ Nem_LzWheel:	binclude	"artnem/LZ Wheel.bin"
 		even
 Nem_Gargoyle:	binclude	"artnem/LZ Gargoyle & Fireball.bin"
 		even
+Nem_LzBlock2:	binclude	"artnem/HCZ Block.bin"
+		even
 ;Nem_LzBlock2:	binclude	"artnem/LZ Blocks.bin"
-;		even
 Nem_LzPlatfm:	binclude	"artnem/LZ Rising Platform.bin"
 		even
 Nem_Cork:	binclude	"artnem/LZ Cork.bin"
