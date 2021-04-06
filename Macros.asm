@@ -251,7 +251,7 @@ out_of_range:	macro exit,pos
 		andi.w	#$FF80,d0	; round down to nearest $80
 		sub.w	(v_screenposx_coarse).w,d0 ; get approximate distance between object and screen
 		cmpi.w	#128+320+192,d0
-		bhi.ATTRIBUTE	exit
+		jhi	exit
 		endm
 
 ; ---------------------------------------------------------------------------
