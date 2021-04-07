@@ -6750,7 +6750,7 @@ loc_12EA6:
 		include	"_incObj/Sonic Loops.asm"
 		include "_incObj/Sonic Drowns.asm"
 		include	"_incObj/Sonic Animate.asm"
-		include	"_anim/Sonic (without frame IDs).asm"
+		include	"_incObj/Sonic AnglePos.asm"
 		include	"_incObj/Sonic LoadGfx.asm"
 		include	"_incObj/0A Drowning Countdown.asm"
 
@@ -6802,8 +6802,6 @@ Map_Shield:	include	"_maps/Shield and Invincibility.asm"
 Map_Vanish:	include	"_maps/Special Stage Entry (Unused).asm"
 		include	"_anim/Water Splash.asm"
 Map_Splash:	include	"_maps/Water Splash.asm"
-
-		include	"_incObj/Sonic AnglePos.asm"
 
 		include	"_incObj/sub FindNearestTile.asm"
 		include	"_incObj/sub FindFloor.asm"
@@ -8056,6 +8054,7 @@ Art_Sonic:	binclude	"artunc/Sonic.bin"	; Sonic
 		even
 Map_Sonic:	include	"_maps/Sonic.asm"
 SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
+		include	"_anim/Sonic (without frame IDs).asm"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - various
 ; ---------------------------------------------------------------------------

@@ -190,7 +190,7 @@ v_limitleft3	= ramaddr ( $FFFFF732 )	; left level boundary, at the end of an act
 v_scrshiftx	= ramaddr ( $FFFFF73A )	; x-screen shift (new - last) * $100
 v_scrshifty	= ramaddr ( $FFFFF73C )	; y-screen shift (new - last) * $100
 
-v_lookshift	= ramaddr ( $FFFFF73E )	; screen shift when Sonic looks up/down (2 bytes)
+v_lookshift	= ramaddr ( $FFFFF73E )	; screen shift when Sonic looks up/down (2 bytes) -- Camera_Y_pos_bias
 v_dle_routine	= ramaddr ( $FFFFF742 )	; dynamic level event - routine counter
 f_nobgscroll	= ramaddr ( $FFFFF744 )	; flag set to cancel background scrolling
 
