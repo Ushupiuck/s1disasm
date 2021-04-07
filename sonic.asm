@@ -8051,10 +8051,18 @@ Nem_JapNames:	binclude	"artnem/Hidden Japanese Credits.bin"
 ; Uncompressed graphics	- Sonic
 ; ---------------------------------------------------------------------------
 Art_Sonic:	binclude	"artunc/Sonic.bin"	; Sonic
-		even
 Map_Sonic:	include	"_maps/Sonic.asm"
 SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
 		include	"_anim/Sonic (without frame IDs).asm"
+		even
+; ---------------------------------------------------------------------------
+; Uncompressed graphics	- Tails
+; ---------------------------------------------------------------------------
+Art_Tails:	binclude	"artunc/Tails.bin"	; Tails
+Map_Tails:	include	"_maps/Tails.asm"
+TailsDynPLC:	include	"_maps/Tails - Dynamic Gfx Script.asm"
+		include	"_anim/Tails.asm"
+		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - various
 ; ---------------------------------------------------------------------------

@@ -136,5 +136,4 @@ SME_X6Z9M_301:	dc.b 3, $73, $94, $33, $9C, $23, $A0
 SME_X6Z9M_308:	dc.b 3, $73, $AC, 3, $B4, $33, $B5	
 SME_X6Z9M_30F:	dc.b 3, $B4, $E1, $14, $ED, $34, $EF	
 SME_X6Z9M_316:	dc.b 3, $54, $F3, $B4, $F9, $10, $6D	
-SME_X6Z9M_31D:	dc.b 2, $F5, 5, $25, $15	
-		even
+SME_X6Z9M_31D:	dc.b 2, $F5, 5, $25, $15

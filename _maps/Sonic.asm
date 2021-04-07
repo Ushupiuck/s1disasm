@@ -31,7 +31,7 @@ SME_OdXIN:
 		dc.w SME_OdXIN_3ED-SME_OdXIN, SME_OdXIN_3F3-SME_OdXIN	
 		dc.w SME_OdXIN_403-SME_OdXIN, SME_OdXIN_40E-SME_OdXIN	
 		dc.w SME_OdXIN_419-SME_OdXIN, SME_OdXIN_424-SME_OdXIN	
-		dc.w SME_OdXIN_42F-SME_OdXIN, SME_OdXIN_43A-SME_OdXIN	
+		dc.w SME_OdXIN_42F-SME_OdXIN, SME_OdXIN_43A-SME_OdXIN
 		dc.w SME_OdXIN_445-SME_OdXIN, SME_OdXIN_45A-SME_OdXIN	
 		dc.w SME_OdXIN_46F-SME_OdXIN, SME_OdXIN_47F-SME_OdXIN	
 		dc.w SME_OdXIN_48F-SME_OdXIN, SME_OdXIN_49F-SME_OdXIN	
@@ -64,7 +64,7 @@ SME_OdXIN_DA:	dc.b 3
 		dc.b $C, 8, 0, $C, $F8	
 SME_OdXIN_EA:	dc.b 3	
 		dc.b $EC, 9, 0, 0, $F0	
-		dc.b $FC, 9, 0, 6, $F0	
+		dc.b $FC, 9, 0, 6, $F0
 		dc.b $C, 8, 0, $C, $F8	
 SME_OdXIN_FA:	dc.b 3	
 		dc.b $EC, $A, 0, 0, $F0	
@@ -97,7 +97,7 @@ SME_OdXIN_165:	dc.b 5
 		dc.b $EB, 9, 0, 0, $EB	
 		dc.b $EB, 6, 0, 6, 3	
 		dc.b $FB, 8, 0, $C, $EB	
-		dc.b 3, 9, 0, $F, $F3	
+		dc.b 3, 9, 0, $F, $F3
 		dc.b $13, 0, 0, $15, $FB	
 SME_OdXIN_17F:	dc.b 6	
 		dc.b $EC, 9, 0, 0, $EC	
@@ -130,7 +130,7 @@ SME_OdXIN_1E2:	dc.b 5
 		dc.b $D, 8, 0, $11, $FD	
 SME_OdXIN_1FC:	dc.b 4	
 		dc.b $F4, 7, 0, 0, $EB	
-		dc.b $EC, 9, 0, 8, $FB	
+		dc.b $EC, 9, 0, 8, $FB
 		dc.b $FC, 4, 0, $E, $FB	
 		dc.b 4, 9, 0, $10, $FB	
 SME_OdXIN_211:	dc.b 2	
@@ -163,7 +163,7 @@ SME_OdXIN_276:	dc.b 6
 		dc.b $E4, 8, 0, 6, $F4	
 		dc.b $EC, 4, 0, 9, $FC	
 		dc.b $F4, 4, 0, $B, $EC	
-		dc.b $F4, $A, 0, $D, $FC	
+		dc.b $F4, $A, 0, $D, $FC
 		dc.b $C, 0, 0, $16, $FC	
 SME_OdXIN_295:	dc.b 4	
 		dc.b $FB, 6, 0, 0, $ED	
@@ -196,7 +196,7 @@ SME_OdXIN_2FE:	dc.b 2
 SME_OdXIN_309:	dc.b 2	
 		dc.b $EE, 9, 0, 0, $F4	
 		dc.b $FE, $E, 0, 6, $EC	
-SME_OdXIN_314:	dc.b 2	
+SME_OdXIN_314:	dc.b 2
 		dc.b $EE, 9, 0, 0, $F4	
 		dc.b $FE, $E, 0, 6, $EC	
 SME_OdXIN_31F:	dc.b 4	
@@ -229,7 +229,7 @@ SME_OdXIN_37F:	dc.b 2
 SME_OdXIN_38A:	dc.b 2	
 		dc.b $F4, 6, 0, 0, $EE	
 		dc.b $F4, $B, 0, 6, $FE	
-SME_OdXIN_395:	dc.b 4	
+SME_OdXIN_395:	dc.b 4
 		dc.b $FA, 6, 0, 0, $EE	
 		dc.b $F2, 4, 0, 6, $EE	
 		dc.b $EA, $B, 0, 8, $FE	
@@ -262,7 +262,7 @@ SME_OdXIN_3F3:	dc.b 3
 SME_OdXIN_403:	dc.b 2	
 		dc.b $F8, $E, 0, 0, $F4	
 		dc.b $10, 8, 0, $C, $F4	
-SME_OdXIN_40E:	dc.b 2	
+SME_OdXIN_40E:	dc.b 2
 		dc.b $F8, $E, 0, 0, $F4	
 		dc.b $10, 8, 0, $C, $F4	
 SME_OdXIN_419:	dc.b 2	
@@ -295,7 +295,7 @@ SME_OdXIN_47F:	dc.b 3
 		dc.b $EC, $E, 8, 0, $E8	
 		dc.b 4, $D, 8, $C, $E0	
 		dc.b $C, 0, $18, $14, 0	
-SME_OdXIN_48F:	dc.b 3	
+SME_OdXIN_48F:	dc.b 3
 		dc.b $F4, $D, 0, 0, $FC	
 		dc.b $FC, 5, 0, 8, $EC	
 		dc.b 4, 8, 0, $C, $FC	
@@ -328,7 +328,7 @@ SME_OdXIN_504:	dc.b 5
 		dc.b $E8, $A, 0, 0, $F4	
 		dc.b $F0, 1, 0, 9, $C	
 		dc.b 0, 9, 0, $B, $F4	
-		dc.b $10, 4, 0, $11, $F4	
+		dc.b $10, 4, 0, $11, $F4
 		dc.b 0, 0, 0, $13, $EC	
 SME_OdXIN_51E:	dc.b 5	
 		dc.b $E8, $A, 0, 0, $F4	
@@ -361,7 +361,7 @@ SME_OdXIN_589:	dc.b 3
 		dc.b $E8, $D, 0, 0, $EC	
 		dc.b $E8, 1, 0, 8, $C	
 		dc.b $F8, $B, 0, $A, $F4	
-SME_OdXIN_599:	dc.b 5	
+SME_OdXIN_599:	dc.b 5
 		dc.b $E8, $D, 0, 0, $EC	
 		dc.b $E8, 1, 0, 8, $C	
 		dc.b $F8, 9, 0, $A, $F4	
@@ -394,7 +394,7 @@ SME_OdXIN_60A:	dc.b 3
 		dc.b $F4, $D, 8, 0, $FC	
 		dc.b $FC, 0, 8, 8, $F4	
 		dc.b 4, $C, 8, 9, $F4	
-SME_OdXIN_61A:	dc.b 3	
+SME_OdXIN_61A:	dc.b 3
 		dc.b $F0, $E, 0, 0, $EC	
 		dc.b $F8, 1, 0, $C, $C	
 		dc.b 8, $C, 0, $E, $F4	
@@ -405,4 +405,3 @@ SME_OdXIN_62A:	dc.b 3
 SME_OdXIN_63A:	dc.b 2	
 		dc.b $F0, $F, 0, 0, $EC	
 		dc.b $F8, 2, 0, $10, $C	
-		even
