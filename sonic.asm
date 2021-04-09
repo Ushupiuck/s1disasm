@@ -8054,6 +8054,7 @@ Art_Sonic:	binclude	"artunc/Sonic.bin"	; Sonic
 Map_Sonic:	include	"_maps/Sonic.asm"
 SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
 		include	"_anim/Sonic (without frame IDs).asm"
+		include "Sonic Animation Script 2.0.asm"
 		even
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics	- Tails
