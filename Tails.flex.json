@@ -1,0 +1,27 @@
+{
+    "Flex": 2,
+    "name": "",
+    "node": "c9bef29e-c92c-439a-8e83-795d6ac81cab",
+    "objects": [
+        {
+            "uuid": "c9bef29e-c92c-439a-8e83-795d6ac81cab",
+            "format": "Sonic 1.js",
+            "name": "Tails",
+            "palettes": [],
+            "art": {
+                "path": "artunc\\Tails.bin",
+                "compression": "Uncompressed",
+                "offset": 0
+            },
+            "mappings": {
+                "path": "_maps\\Tails.asm",
+                "label": ""
+            },
+            "dplcs": {
+                "enabled": true,
+                "path": "_maps\\Tails - Dynamic Gfx Script.asm",
+                "label": ""
+            }
+        }
+    ]
+}

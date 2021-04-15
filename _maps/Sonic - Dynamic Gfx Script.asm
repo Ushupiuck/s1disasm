@@ -1,139 +1,354 @@
-; --------------------------------------------------------------------------------
-; Dynamic Pattern Loading Cues - output from SonMapEd - Sonic 1 format; --------------------------------------------------------------------------------
-
-SME_X6Z9M:	
-		dc.w SME_X6Z9M_B4-SME_X6Z9M, SME_X6Z9M_B5-SME_X6Z9M	
-		dc.w SME_X6Z9M_BE-SME_X6Z9M, SME_X6Z9M_C5-SME_X6Z9M	
-		dc.w SME_X6Z9M_CC-SME_X6Z9M, SME_X6Z9M_D3-SME_X6Z9M	
-		dc.w SME_X6Z9M_DA-SME_X6Z9M, SME_X6Z9M_E3-SME_X6Z9M	
-		dc.w SME_X6Z9M_E8-SME_X6Z9M, SME_X6Z9M_ED-SME_X6Z9M	
-		dc.w SME_X6Z9M_F6-SME_X6Z9M, SME_X6Z9M_FB-SME_X6Z9M	
-		dc.w SME_X6Z9M_102-SME_X6Z9M, SME_X6Z9M_10D-SME_X6Z9M	
-		dc.w SME_X6Z9M_11A-SME_X6Z9M, SME_X6Z9M_123-SME_X6Z9M	
-		dc.w SME_X6Z9M_12E-SME_X6Z9M, SME_X6Z9M_137-SME_X6Z9M	
-		dc.w SME_X6Z9M_142-SME_X6Z9M, SME_X6Z9M_14B-SME_X6Z9M	
-		dc.w SME_X6Z9M_150-SME_X6Z9M, SME_X6Z9M_155-SME_X6Z9M	
-		dc.w SME_X6Z9M_15E-SME_X6Z9M, SME_X6Z9M_163-SME_X6Z9M	
-		dc.w SME_X6Z9M_16A-SME_X6Z9M, SME_X6Z9M_177-SME_X6Z9M	
-		dc.w SME_X6Z9M_184-SME_X6Z9M, SME_X6Z9M_18D-SME_X6Z9M	
-		dc.w SME_X6Z9M_198-SME_X6Z9M, SME_X6Z9M_1A1-SME_X6Z9M	
-		dc.w SME_X6Z9M_1AC-SME_X6Z9M, SME_X6Z9M_1B1-SME_X6Z9M	
-		dc.w SME_X6Z9M_1B6-SME_X6Z9M, SME_X6Z9M_1BB-SME_X6Z9M	
-		dc.w SME_X6Z9M_1C0-SME_X6Z9M, SME_X6Z9M_1C9-SME_X6Z9M	
-		dc.w SME_X6Z9M_1D0-SME_X6Z9M, SME_X6Z9M_1D9-SME_X6Z9M	
-		dc.w SME_X6Z9M_1E0-SME_X6Z9M, SME_X6Z9M_1E5-SME_X6Z9M	
-		dc.w SME_X6Z9M_1EA-SME_X6Z9M, SME_X6Z9M_1EF-SME_X6Z9M	
-		dc.w SME_X6Z9M_1F4-SME_X6Z9M, SME_X6Z9M_1FD-SME_X6Z9M	
-		dc.w SME_X6Z9M_202-SME_X6Z9M, SME_X6Z9M_20B-SME_X6Z9M	
-		dc.w SME_X6Z9M_210-SME_X6Z9M, SME_X6Z9M_213-SME_X6Z9M	
-		dc.w SME_X6Z9M_216-SME_X6Z9M, SME_X6Z9M_219-SME_X6Z9M	
-		dc.w SME_X6Z9M_21C-SME_X6Z9M, SME_X6Z9M_21F-SME_X6Z9M	
-		dc.w SME_X6Z9M_226-SME_X6Z9M, SME_X6Z9M_22B-SME_X6Z9M	
-		dc.w SME_X6Z9M_230-SME_X6Z9M, SME_X6Z9M_235-SME_X6Z9M	
-		dc.w SME_X6Z9M_23A-SME_X6Z9M, SME_X6Z9M_23F-SME_X6Z9M	
-		dc.w SME_X6Z9M_244-SME_X6Z9M, SME_X6Z9M_24D-SME_X6Z9M	
-		dc.w SME_X6Z9M_256-SME_X6Z9M, SME_X6Z9M_25D-SME_X6Z9M	
-		dc.w SME_X6Z9M_264-SME_X6Z9M, SME_X6Z9M_26B-SME_X6Z9M	
-		dc.w SME_X6Z9M_26E-SME_X6Z9M, SME_X6Z9M_275-SME_X6Z9M	
-		dc.w SME_X6Z9M_27C-SME_X6Z9M, SME_X6Z9M_283-SME_X6Z9M	
-		dc.w SME_X6Z9M_28C-SME_X6Z9M, SME_X6Z9M_295-SME_X6Z9M	
-		dc.w SME_X6Z9M_2A0-SME_X6Z9M, SME_X6Z9M_2AB-SME_X6Z9M	
-		dc.w SME_X6Z9M_2B0-SME_X6Z9M, SME_X6Z9M_2B7-SME_X6Z9M	
-		dc.w SME_X6Z9M_2BC-SME_X6Z9M, SME_X6Z9M_2C3-SME_X6Z9M	
-		dc.w SME_X6Z9M_2C8-SME_X6Z9M, SME_X6Z9M_2CF-SME_X6Z9M	
-		dc.w SME_X6Z9M_2D6-SME_X6Z9M, SME_X6Z9M_2E1-SME_X6Z9M	
-		dc.w SME_X6Z9M_2EC-SME_X6Z9M, SME_X6Z9M_2F1-SME_X6Z9M	
-		dc.w SME_X6Z9M_2F8-SME_X6Z9M, SME_X6Z9M_2FB-SME_X6Z9M	
-		dc.w SME_X6Z9M_2FE-SME_X6Z9M, SME_X6Z9M_301-SME_X6Z9M	
-		dc.w SME_X6Z9M_308-SME_X6Z9M, SME_X6Z9M_30F-SME_X6Z9M	
-		dc.w SME_X6Z9M_316-SME_X6Z9M, SME_X6Z9M_31D-SME_X6Z9M	
-SME_X6Z9M_B4:	dc.b 0	
-SME_X6Z9M_B5:	dc.b 4, $20, 0, $70, 3, $20, $B, $20, $E	
-SME_X6Z9M_BE:	dc.b 3, $50, $11, $50, $17, $20, $1D	
-SME_X6Z9M_C5:	dc.b 3, $50, $20, $50, $17, $20, $1D	
-SME_X6Z9M_CC:	dc.b 3, $50, $20, $50, $17, $20, $26	
-SME_X6Z9M_D3:	dc.b 3, $80, $29, $20, $B, $20, $E	
-SME_X6Z9M_DA:	dc.b 4, $70, $32, $50, $3A, $50, $40, $10, $46	
-SME_X6Z9M_E3:	dc.b 2, $70, $32, $B0, $48	
-SME_X6Z9M_E8:	dc.b 2, $50, $54, $80, $5A	
-SME_X6Z9M_ED:	dc.b 4, $50, $54, $50, $63, $50, $69, $10, $6F	
-SME_X6Z9M_F6:	dc.b 2, $50, $54, $B0, $71	
-SME_X6Z9M_FB:	dc.b 3, $70, $32, $30, $7D, $50, $81	
-SME_X6Z9M_102:	dc.b 5, $50, $87, $50, $8D, $20, $93, $50, $96, 0, $9C	
-SME_X6Z9M_10D:	dc.b 6, $50, $87, $10, $9D, $30, $9F, $50, $A3, $30, $A9, 0, $AD	
-SME_X6Z9M_11A:	dc.b 4, $50, $AE, $10, $B4, $70, $B6, $20, $BE	
-SME_X6Z9M_123:	dc.b 5, $50, $C1, $30, $C7, $70, $CB, $20, $D3, $10, $D6	
-SME_X6Z9M_12E:	dc.b 4, $50, $C1, $10, $D8, $70, $DA, $20, $E2	
-SME_X6Z9M_137:	dc.b 5, $50, $87, $10, $9D, 0, $93, $70, $E5, $20, $ED	
-SME_X6Z9M_142:	dc.b 4, $70, $F0, $50, $F8, $10, $FE, $51, 0	
-SME_X6Z9M_14B:	dc.b 2, $70, $F0, $B1, 6	
-SME_X6Z9M_150:	dc.b 2, $51, $12, $81, $18	
-SME_X6Z9M_155:	dc.b 4, $51, $12, $51, $21, $11, $27, $51, $29	
-SME_X6Z9M_15E:	dc.b 2, $51, $12, $B1, $2F	
-SME_X6Z9M_163:	dc.b 3, $70, $F0, 1, 6, $81, $3B	
-SME_X6Z9M_16A:	dc.b 6, $51, $44, $11, $4A, $11, $4C, $81, $4E, 1, $57, 1, $58	
-SME_X6Z9M_177:	dc.b 6, $51, $44, $21, $59, $11, $5C, $11, $5E, $81, $60, 1, $57	
-SME_X6Z9M_184:	dc.b 4, $51, $69, $11, $6F, $81, $71, $11, $7A	
-SME_X6Z9M_18D:	dc.b 5, $51, $7C, $21, $82, $11, $85, $71, $87, $21, $8F	
-SME_X6Z9M_198:	dc.b 4, $51, $7C, $11, $92, $81, $94, $11, $9D	
-SME_X6Z9M_1A1:	dc.b 5, $51, $44, $81, $9F, $11, $5E, $11, $A8, 1, $57	
-SME_X6Z9M_1AC:	dc.b 2, $51, $AA, $B1, $B0	
-SME_X6Z9M_1B1:	dc.b 2, $50, $54, $B1, $BC	
-SME_X6Z9M_1B6:	dc.b 2, $51, $AA, $B1, $C8	
-SME_X6Z9M_1BB:	dc.b 2, $50, $54, $B1, $D4	
-SME_X6Z9M_1C0:	dc.b 4, $51, $E0, $11, $E6, $B1, $E8, 1, $F4	
-SME_X6Z9M_1C9:	dc.b 3, $51, $F5, $11, $FB, $B1, $FD	
-SME_X6Z9M_1D0:	dc.b 4, $51, $E0, $12, 9, $B2, $B, 1, $F4	
-SME_X6Z9M_1D9:	dc.b 3, $51, $F5, $11, $FB, $B2, $17	
-SME_X6Z9M_1E0:	dc.b 2, $52, $23, $B2, $29	
-SME_X6Z9M_1E5:	dc.b 2, $51, $12, $B2, $35	
-SME_X6Z9M_1EA:	dc.b 2, $52, $23, $B2, $41	
-SME_X6Z9M_1EF:	dc.b 2, $51, $12, $B2, $4D	
-SME_X6Z9M_1F4:	dc.b 4, $52, $59, $12, $5F, $B2, $61, 2, $6D	
-SME_X6Z9M_1FD:	dc.b 2, $72, $6E, $B2, $76	
-SME_X6Z9M_202:	dc.b 4, $52, $59, $12, $82, $B2, $84, 2, $6D	
-SME_X6Z9M_20B:	dc.b 2, $72, $6E, $B2, $90	
-SME_X6Z9M_210:	dc.b 1, $F2, $9C	
-SME_X6Z9M_213:	dc.b 1, $F2, $AC	
-SME_X6Z9M_216:	dc.b 1, $F2, $BC	
-SME_X6Z9M_219:	dc.b 1, $F2, $CC	
-SME_X6Z9M_21C:	dc.b 1, $F2, $DC	
-SME_X6Z9M_21F:	dc.b 3, $22, $EC, $72, $EF, $22, $F7	
-SME_X6Z9M_226:	dc.b 2, $B2, $FA, $23, 6	
-SME_X6Z9M_22B:	dc.b 2, $B3, 9, $23, 6	
-SME_X6Z9M_230:	dc.b 2, $B3, $15, $23, 6	
-SME_X6Z9M_235:	dc.b 2, $B3, $21, $23, 6	
-SME_X6Z9M_23A:	dc.b 2, $B3, $2D, $23, 6	
-SME_X6Z9M_23F:	dc.b 2, $53, $39, $B3, $3F	
-SME_X6Z9M_244:	dc.b 4, $53, $4B, $73, $51, $13, $59, 3, $5B	
-SME_X6Z9M_24D:	dc.b 4, $13, $5C, $73, $5E, $23, $66, 3, $69	
-SME_X6Z9M_256:	dc.b 3, $23, $6A, $23, $6D, $F3, $70	
-SME_X6Z9M_25D:	dc.b 3, $B3, $80, $73, $8C, 0, $71	
-SME_X6Z9M_264:	dc.b 3, $73, $94, $33, $9C, $23, $A0	
-SME_X6Z9M_26B:	dc.b 1, $83, $A3	
-SME_X6Z9M_26E:	dc.b 3, $73, $AC, 3, $B4, $33, $B5	
-SME_X6Z9M_275:	dc.b 3, $73, $B9, $33, $C1, $23, $C5	
-SME_X6Z9M_27C:	dc.b 3, $B3, $C8, $13, $D4, 3, $D6	
-SME_X6Z9M_283:	dc.b 4, $B3, $D7, $33, $E3, 3, $E7, 3, $E8	
-SME_X6Z9M_28C:	dc.b 4, $B3, $E9, $33, $F5, 3, $F9, 3, $FA	
-SME_X6Z9M_295:	dc.b 5, $83, $FB, $14, 4, $54, 6, $14, $C, 4, $E	
-SME_X6Z9M_2A0:	dc.b 5, $84, $F, $14, $18, $54, 6, $14, $C, 4, $E	
-SME_X6Z9M_2AB:	dc.b 2, $84, $1A, $74, $23	
-SME_X6Z9M_2B0:	dc.b 3, $84, $2B, $24, $34, $14, $37	
-SME_X6Z9M_2B7:	dc.b 2, $84, $39, $74, $42	
-SME_X6Z9M_2BC:	dc.b 3, $84, $2B, $24, $4A, $14, $4D	
-SME_X6Z9M_2C3:	dc.b 2, $54, $4F, $B4, $55	
-SME_X6Z9M_2C8:	dc.b 3, $84, $61, $34, $6A, 4, $6E	
-SME_X6Z9M_2CF:	dc.b 3, $74, $6F, $14, $77, $B4, $79	
-SME_X6Z9M_2D6:	dc.b 5, $74, $85, $14, $8D, $54, $8F, $34, $95, 4, $99	
-SME_X6Z9M_2E1:	dc.b 5, $74, $9A, $14, $8D, $54, $A2, $34, $95, 4, $99	
-SME_X6Z9M_2EC:	dc.b 2, $24, $A8, $F4, $AB	
-SME_X6Z9M_2F1:	dc.b 3, $24, $BB, $B4, $BE, $24, $CA	
-SME_X6Z9M_2F8:	dc.b 1, $B4, $CD	
-SME_X6Z9M_2FB:	dc.b 1, $54, $D9	
-SME_X6Z9M_2FE:	dc.b 1, $14, $DF	
-SME_X6Z9M_301:	dc.b 3, $73, $94, $33, $9C, $23, $A0	
-SME_X6Z9M_308:	dc.b 3, $73, $AC, 3, $B4, $33, $B5	
-SME_X6Z9M_30F:	dc.b 3, $B4, $E1, $14, $ED, $34, $EF	
-SME_X6Z9M_316:	dc.b 3, $54, $F3, $B4, $F9, $10, $6D	
-SME_X6Z9M_31D:	dc.b 2, $F5, 5, $25, $15
+Sonic_DPLCS:
+Sonic_DPLCS_0: 	dc.w Sonic_DPLCS_B4-Sonic_DPLCS
+Sonic_DPLCS_2: 	dc.w Sonic_DPLCS_B5-Sonic_DPLCS
+Sonic_DPLCS_4: 	dc.w Sonic_DPLCS_BE-Sonic_DPLCS
+Sonic_DPLCS_6: 	dc.w Sonic_DPLCS_C1-Sonic_DPLCS
+Sonic_DPLCS_8: 	dc.w Sonic_DPLCS_C6-Sonic_DPLCS
+Sonic_DPLCS_A: 	dc.w Sonic_DPLCS_CD-Sonic_DPLCS
+Sonic_DPLCS_C: 	dc.w Sonic_DPLCS_D2-Sonic_DPLCS
+Sonic_DPLCS_E: 	dc.w Sonic_DPLCS_D7-Sonic_DPLCS
+Sonic_DPLCS_10: 	dc.w Sonic_DPLCS_DC-Sonic_DPLCS
+Sonic_DPLCS_12: 	dc.w Sonic_DPLCS_DF-Sonic_DPLCS
+Sonic_DPLCS_14: 	dc.w Sonic_DPLCS_E4-Sonic_DPLCS
+Sonic_DPLCS_16: 	dc.w Sonic_DPLCS_E9-Sonic_DPLCS
+Sonic_DPLCS_18: 	dc.w Sonic_DPLCS_EE-Sonic_DPLCS
+Sonic_DPLCS_1A: 	dc.w Sonic_DPLCS_F3-Sonic_DPLCS
+Sonic_DPLCS_1C: 	dc.w Sonic_DPLCS_FA-Sonic_DPLCS
+Sonic_DPLCS_1E: 	dc.w Sonic_DPLCS_FF-Sonic_DPLCS
+Sonic_DPLCS_20: 	dc.w Sonic_DPLCS_104-Sonic_DPLCS
+Sonic_DPLCS_22: 	dc.w Sonic_DPLCS_109-Sonic_DPLCS
+Sonic_DPLCS_24: 	dc.w Sonic_DPLCS_112-Sonic_DPLCS
+Sonic_DPLCS_26: 	dc.w Sonic_DPLCS_117-Sonic_DPLCS
+Sonic_DPLCS_28: 	dc.w Sonic_DPLCS_11C-Sonic_DPLCS
+Sonic_DPLCS_2A: 	dc.w Sonic_DPLCS_11F-Sonic_DPLCS
+Sonic_DPLCS_2C: 	dc.w Sonic_DPLCS_124-Sonic_DPLCS
+Sonic_DPLCS_2E: 	dc.w Sonic_DPLCS_129-Sonic_DPLCS
+Sonic_DPLCS_30: 	dc.w Sonic_DPLCS_130-Sonic_DPLCS
+Sonic_DPLCS_32: 	dc.w Sonic_DPLCS_135-Sonic_DPLCS
+Sonic_DPLCS_34: 	dc.w Sonic_DPLCS_13C-Sonic_DPLCS
+Sonic_DPLCS_36: 	dc.w Sonic_DPLCS_141-Sonic_DPLCS
+Sonic_DPLCS_38: 	dc.w Sonic_DPLCS_146-Sonic_DPLCS
+Sonic_DPLCS_3A: 	dc.w Sonic_DPLCS_14B-Sonic_DPLCS
+Sonic_DPLCS_3C: 	dc.w Sonic_DPLCS_156-Sonic_DPLCS
+Sonic_DPLCS_3E: 	dc.w Sonic_DPLCS_15B-Sonic_DPLCS
+Sonic_DPLCS_40: 	dc.w Sonic_DPLCS_160-Sonic_DPLCS
+Sonic_DPLCS_42: 	dc.w Sonic_DPLCS_165-Sonic_DPLCS
+Sonic_DPLCS_44: 	dc.w Sonic_DPLCS_16A-Sonic_DPLCS
+Sonic_DPLCS_46: 	dc.w Sonic_DPLCS_16F-Sonic_DPLCS
+Sonic_DPLCS_48: 	dc.w Sonic_DPLCS_174-Sonic_DPLCS
+Sonic_DPLCS_4A: 	dc.w Sonic_DPLCS_17B-Sonic_DPLCS
+Sonic_DPLCS_4C: 	dc.w Sonic_DPLCS_180-Sonic_DPLCS
+Sonic_DPLCS_4E: 	dc.w Sonic_DPLCS_185-Sonic_DPLCS
+Sonic_DPLCS_50: 	dc.w Sonic_DPLCS_18A-Sonic_DPLCS
+Sonic_DPLCS_52: 	dc.w Sonic_DPLCS_18F-Sonic_DPLCS
+Sonic_DPLCS_54: 	dc.w Sonic_DPLCS_194-Sonic_DPLCS
+Sonic_DPLCS_56: 	dc.w Sonic_DPLCS_199-Sonic_DPLCS
+Sonic_DPLCS_58: 	dc.w Sonic_DPLCS_19E-Sonic_DPLCS
+Sonic_DPLCS_5A: 	dc.w Sonic_DPLCS_1A5-Sonic_DPLCS
+Sonic_DPLCS_5C: 	dc.w Sonic_DPLCS_1AA-Sonic_DPLCS
+Sonic_DPLCS_5E: 	dc.w Sonic_DPLCS_1AD-Sonic_DPLCS
+Sonic_DPLCS_60: 	dc.w Sonic_DPLCS_1B0-Sonic_DPLCS
+Sonic_DPLCS_62: 	dc.w Sonic_DPLCS_1B3-Sonic_DPLCS
+Sonic_DPLCS_64: 	dc.w Sonic_DPLCS_1B6-Sonic_DPLCS
+Sonic_DPLCS_66: 	dc.w Sonic_DPLCS_1B9-Sonic_DPLCS
+Sonic_DPLCS_68: 	dc.w Sonic_DPLCS_1BC-Sonic_DPLCS
+Sonic_DPLCS_6A: 	dc.w Sonic_DPLCS_1BF-Sonic_DPLCS
+Sonic_DPLCS_6C: 	dc.w Sonic_DPLCS_1C4-Sonic_DPLCS
+Sonic_DPLCS_6E: 	dc.w Sonic_DPLCS_1C9-Sonic_DPLCS
+Sonic_DPLCS_70: 	dc.w Sonic_DPLCS_1CE-Sonic_DPLCS
+Sonic_DPLCS_72: 	dc.w Sonic_DPLCS_1D3-Sonic_DPLCS
+Sonic_DPLCS_74: 	dc.w Sonic_DPLCS_1D8-Sonic_DPLCS
+Sonic_DPLCS_76: 	dc.w Sonic_DPLCS_1DD-Sonic_DPLCS
+Sonic_DPLCS_78: 	dc.w Sonic_DPLCS_1E0-Sonic_DPLCS
+Sonic_DPLCS_7A: 	dc.w Sonic_DPLCS_1E5-Sonic_DPLCS
+Sonic_DPLCS_7C: 	dc.w Sonic_DPLCS_1EC-Sonic_DPLCS
+Sonic_DPLCS_7E: 	dc.w Sonic_DPLCS_1EF-Sonic_DPLCS
+Sonic_DPLCS_80: 	dc.w Sonic_DPLCS_1F2-Sonic_DPLCS
+Sonic_DPLCS_82: 	dc.w Sonic_DPLCS_1F5-Sonic_DPLCS
+Sonic_DPLCS_84: 	dc.w Sonic_DPLCS_1F8-Sonic_DPLCS
+Sonic_DPLCS_86: 	dc.w Sonic_DPLCS_1FB-Sonic_DPLCS
+Sonic_DPLCS_88: 	dc.w Sonic_DPLCS_200-Sonic_DPLCS
+Sonic_DPLCS_8A: 	dc.w Sonic_DPLCS_205-Sonic_DPLCS
+Sonic_DPLCS_8C: 	dc.w Sonic_DPLCS_20A-Sonic_DPLCS
+Sonic_DPLCS_8E: 	dc.w Sonic_DPLCS_20F-Sonic_DPLCS
+Sonic_DPLCS_90: 	dc.w Sonic_DPLCS_214-Sonic_DPLCS
+Sonic_DPLCS_92: 	dc.w Sonic_DPLCS_217-Sonic_DPLCS
+Sonic_DPLCS_94: 	dc.w Sonic_DPLCS_21C-Sonic_DPLCS
+Sonic_DPLCS_96: 	dc.w Sonic_DPLCS_221-Sonic_DPLCS
+Sonic_DPLCS_98: 	dc.w Sonic_DPLCS_226-Sonic_DPLCS
+Sonic_DPLCS_9A: 	dc.w Sonic_DPLCS_229-Sonic_DPLCS
+Sonic_DPLCS_9C: 	dc.w Sonic_DPLCS_22E-Sonic_DPLCS
+Sonic_DPLCS_9E: 	dc.w Sonic_DPLCS_233-Sonic_DPLCS
+Sonic_DPLCS_A0: 	dc.w Sonic_DPLCS_23C-Sonic_DPLCS
+Sonic_DPLCS_A2: 	dc.w Sonic_DPLCS_241-Sonic_DPLCS
+Sonic_DPLCS_A4: 	dc.w Sonic_DPLCS_246-Sonic_DPLCS
+Sonic_DPLCS_A6: 	dc.w Sonic_DPLCS_249-Sonic_DPLCS
+Sonic_DPLCS_A8: 	dc.w Sonic_DPLCS_24C-Sonic_DPLCS
+Sonic_DPLCS_AA: 	dc.w Sonic_DPLCS_24F-Sonic_DPLCS
+Sonic_DPLCS_AC: 	dc.w Sonic_DPLCS_252-Sonic_DPLCS
+Sonic_DPLCS_AE: 	dc.w Sonic_DPLCS_255-Sonic_DPLCS
+Sonic_DPLCS_B0: 	dc.w Sonic_DPLCS_25A-Sonic_DPLCS
+Sonic_DPLCS_B2: 	dc.w Sonic_DPLCS_261-Sonic_DPLCS
+Sonic_DPLCS_B4: 	dc.b $0
+Sonic_DPLCS_B5: 	dc.b $4
+	dc.b $20, $0
+	dc.b $70, $3
+	dc.b $20, $B
+	dc.b $20, $E
+Sonic_DPLCS_BE: 	dc.b $1
+	dc.b $E0, $11
+Sonic_DPLCS_C1: 	dc.b $2
+	dc.b $50, $20
+	dc.b $80, $17
+Sonic_DPLCS_C6: 	dc.b $3
+	dc.b $50, $20
+	dc.b $50, $17
+	dc.b $20, $26
+Sonic_DPLCS_CD: 	dc.b $2
+	dc.b $80, $29
+	dc.b $50, $B
+Sonic_DPLCS_D2: 	dc.b $2
+	dc.b $F0, $32
+	dc.b $50, $42
+Sonic_DPLCS_D7: 	dc.b $2
+	dc.b $70, $32
+	dc.b $B0, $48
+Sonic_DPLCS_DC: 	dc.b $1
+	dc.b $E0, $54
+Sonic_DPLCS_DF: 	dc.b $2
+	dc.b $50, $54
+	dc.b $D0, $63
+Sonic_DPLCS_E4: 	dc.b $2
+	dc.b $50, $54
+	dc.b $B0, $71
+Sonic_DPLCS_E9: 	dc.b $2
+	dc.b $70, $32
+	dc.b $90, $7D
+Sonic_DPLCS_EE: 	dc.b $2
+	dc.b $F0, $87
+	dc.b $50, $97
+Sonic_DPLCS_F3: 	dc.b $3
+	dc.b $50, $87
+	dc.b $F0, $9D
+	dc.b $0, $AD
+Sonic_DPLCS_FA: 	dc.b $2
+	dc.b $F0, $AE
+	dc.b $20, $BE
+Sonic_DPLCS_FF: 	dc.b $2
+	dc.b $F0, $C1
+	dc.b $60, $D1
+Sonic_DPLCS_104: 	dc.b $2
+	dc.b $50, $C1
+	dc.b $C0, $D8
+Sonic_DPLCS_109: 	dc.b $4
+	dc.b $50, $87
+	dc.b $10, $9D
+	dc.b $0, $93
+	dc.b $A0, $E5
+Sonic_DPLCS_112: 	dc.b $2
+	dc.b $F0, $F0
+	dc.b $51, $0
+Sonic_DPLCS_117: 	dc.b $2
+	dc.b $70, $F0
+	dc.b $B1, $6
+Sonic_DPLCS_11C: 	dc.b $1
+	dc.b $E1, $12
+Sonic_DPLCS_11F: 	dc.b $2
+	dc.b $51, $12
+	dc.b $D1, $21
+Sonic_DPLCS_124: 	dc.b $2
+	dc.b $51, $12
+	dc.b $B1, $2F
+Sonic_DPLCS_129: 	dc.b $3
+	dc.b $70, $F0
+	dc.b $1, $6
+	dc.b $81, $3B
+Sonic_DPLCS_130: 	dc.b $2
+	dc.b $F1, $44
+	dc.b $41, $54
+Sonic_DPLCS_135: 	dc.b $3
+	dc.b $51, $44
+	dc.b $F1, $59
+	dc.b $1, $57
+Sonic_DPLCS_13C: 	dc.b $2
+	dc.b $F1, $69
+	dc.b $21, $79
+Sonic_DPLCS_141: 	dc.b $2
+	dc.b $F1, $7C
+	dc.b $51, $8C
+Sonic_DPLCS_146: 	dc.b $2
+	dc.b $51, $7C
+	dc.b $C1, $92
+Sonic_DPLCS_14B: 	dc.b $5
+	dc.b $51, $44
+	dc.b $81, $9F
+	dc.b $11, $5E
+	dc.b $11, $A8
+	dc.b $1, $57
+Sonic_DPLCS_156: 	dc.b $2
+	dc.b $F1, $AA
+	dc.b $11, $BA
+Sonic_DPLCS_15B: 	dc.b $2
+	dc.b $50, $54
+	dc.b $B1, $BC
+Sonic_DPLCS_160: 	dc.b $2
+	dc.b $51, $AA
+	dc.b $B1, $C8
+Sonic_DPLCS_165: 	dc.b $2
+	dc.b $50, $54
+	dc.b $B1, $D4
+Sonic_DPLCS_16A: 	dc.b $2
+	dc.b $F1, $E0
+	dc.b $41, $F0
+Sonic_DPLCS_16F: 	dc.b $2
+	dc.b $F1, $F5
+	dc.b $32, $5
+Sonic_DPLCS_174: 	dc.b $3
+	dc.b $51, $E0
+	dc.b $D2, $9
+	dc.b $1, $F4
+Sonic_DPLCS_17B: 	dc.b $2
+	dc.b $71, $F5
+	dc.b $B2, $17
+Sonic_DPLCS_180: 	dc.b $2
+	dc.b $F2, $23
+	dc.b $12, $33
+Sonic_DPLCS_185: 	dc.b $2
+	dc.b $51, $12
+	dc.b $B2, $35
+Sonic_DPLCS_18A: 	dc.b $2
+	dc.b $52, $23
+	dc.b $B2, $41
+Sonic_DPLCS_18F: 	dc.b $2
+	dc.b $51, $12
+	dc.b $B2, $4D
+Sonic_DPLCS_194: 	dc.b $2
+	dc.b $F2, $59
+	dc.b $42, $69
+Sonic_DPLCS_199: 	dc.b $2
+	dc.b $F2, $6E
+	dc.b $32, $7E
+Sonic_DPLCS_19E: 	dc.b $3
+	dc.b $52, $59
+	dc.b $D2, $82
+	dc.b $2, $6D
+Sonic_DPLCS_1A5: 	dc.b $2
+	dc.b $72, $6E
+	dc.b $B2, $90
+Sonic_DPLCS_1AA: 	dc.b $1
+	dc.b $F2, $9C
+Sonic_DPLCS_1AD: 	dc.b $1
+	dc.b $F2, $AC
+Sonic_DPLCS_1B0: 	dc.b $1
+	dc.b $F2, $BC
+Sonic_DPLCS_1B3: 	dc.b $1
+	dc.b $F2, $CC
+Sonic_DPLCS_1B6: 	dc.b $1
+	dc.b $F2, $DC
+Sonic_DPLCS_1B9: 	dc.b $1
+	dc.b $D2, $EC
+Sonic_DPLCS_1BC: 	dc.b $1
+	dc.b $E2, $FA
+Sonic_DPLCS_1BF: 	dc.b $2
+	dc.b $B3, $9
+	dc.b $23, $6
+Sonic_DPLCS_1C4: 	dc.b $2
+	dc.b $B3, $15
+	dc.b $23, $6
+Sonic_DPLCS_1C9: 	dc.b $2
+	dc.b $B3, $21
+	dc.b $23, $6
+Sonic_DPLCS_1CE: 	dc.b $2
+	dc.b $B3, $2D
+	dc.b $23, $6
+Sonic_DPLCS_1D3: 	dc.b $2
+	dc.b $F3, $39
+	dc.b $13, $49
+Sonic_DPLCS_1D8: 	dc.b $2
+	dc.b $F3, $4B
+	dc.b $3, $5B
+Sonic_DPLCS_1DD: 	dc.b $1
+	dc.b $D3, $5C
+Sonic_DPLCS_1E0: 	dc.b $2
+	dc.b $F3, $6A
+	dc.b $53, $7A
+Sonic_DPLCS_1E5: 	dc.b $3
+	dc.b $F3, $80
+	dc.b $33, $90
+	dc.b $0, $71
+Sonic_DPLCS_1EC: 	dc.b $1
+	dc.b $E3, $94
+Sonic_DPLCS_1EF: 	dc.b $1
+	dc.b $83, $A3
+Sonic_DPLCS_1F2: 	dc.b $1
+	dc.b $C3, $AC
+Sonic_DPLCS_1F5: 	dc.b $1
+	dc.b $E3, $B9
+Sonic_DPLCS_1F8: 	dc.b $1
+	dc.b $E3, $C8
+Sonic_DPLCS_1FB: 	dc.b $2
+	dc.b $F3, $D7
+	dc.b $13, $E7
+Sonic_DPLCS_200: 	dc.b $2
+	dc.b $F3, $E9
+	dc.b $13, $F9
+Sonic_DPLCS_205: 	dc.b $2
+	dc.b $F3, $FB
+	dc.b $34, $B
+Sonic_DPLCS_20A: 	dc.b $2
+	dc.b $A4, $F
+	dc.b $84, $6
+Sonic_DPLCS_20F: 	dc.b $2
+	dc.b $F4, $1A
+	dc.b $4, $2A
+Sonic_DPLCS_214: 	dc.b $1
+	dc.b $D4, $2B
+Sonic_DPLCS_217: 	dc.b $2
+	dc.b $F4, $39
+	dc.b $4, $49
+Sonic_DPLCS_21C: 	dc.b $2
+	dc.b $84, $2B
+	dc.b $44, $4A
+Sonic_DPLCS_221: 	dc.b $2
+	dc.b $F4, $4F
+	dc.b $14, $5F
+Sonic_DPLCS_226: 	dc.b $1
+	dc.b $D4, $61
+Sonic_DPLCS_229: 	dc.b $2
+	dc.b $F4, $6F
+	dc.b $54, $7F
+Sonic_DPLCS_22E: 	dc.b $2
+	dc.b $F4, $85
+	dc.b $44, $95
+Sonic_DPLCS_233: 	dc.b $4
+	dc.b $74, $9A
+	dc.b $14, $8D
+	dc.b $54, $A2
+	dc.b $44, $95
+Sonic_DPLCS_23C: 	dc.b $2
+	dc.b $F4, $A8
+	dc.b $24, $B8
+Sonic_DPLCS_241: 	dc.b $2
+	dc.b $F4, $BB
+	dc.b $14, $CB
+Sonic_DPLCS_246: 	dc.b $1
+	dc.b $B4, $CD
+Sonic_DPLCS_249: 	dc.b $1
+	dc.b $54, $D9
+Sonic_DPLCS_24C: 	dc.b $1
+	dc.b $14, $DF
+Sonic_DPLCS_24F: 	dc.b $1
+	dc.b $E3, $94
+Sonic_DPLCS_252: 	dc.b $1
+	dc.b $C3, $AC
+Sonic_DPLCS_255: 	dc.b $2
+	dc.b $F4, $E1
+	dc.b $14, $F1
+Sonic_DPLCS_25A: 	dc.b $3
+	dc.b $F4, $F3
+	dc.b $15, $3
+	dc.b $10, $6D
+Sonic_DPLCS_261: 	dc.b $2
+	dc.b $F5, $5
+	dc.b $25, $15
+	even

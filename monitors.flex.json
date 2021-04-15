@@ -1,0 +1,36 @@
+{
+    "Flex": 2,
+    "name": "",
+    "node": "be69c9be-f29e-492c-939a-ce83795d6ac8",
+    "objects": [
+        {
+            "uuid": "be69c9be-f29e-492c-939a-ce83795d6ac8",
+            "format": "Sonic 1.js",
+            "name": "Monitors",
+            "palettes": [
+                {
+                    "path": "palette\\Sonic.bin",
+                    "length": 1
+                },
+                {
+                    "path": "palette\\Green Hill Zone.bin",
+                    "length": 3
+                }
+            ],
+            "art": {
+                "path": "artnem\\Monitors.bin",
+                "compression": "Nemesis",
+                "offset": 0
+            },
+            "mappings": {
+                "path": "_maps\\Monitor.asm",
+                "label": ""
+            },
+            "dplcs": {
+                "enabled": false,
+                "path": "",
+                "label": ""
+            }
+        }
+    ]
+}

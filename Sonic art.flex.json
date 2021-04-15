@@ -1,0 +1,27 @@
+{
+    "Flex": 2,
+    "name": "",
+    "node": "69c9bef2-9ec9-4c53-9ace-83795d6ac81c",
+    "objects": [
+        {
+            "uuid": "69c9bef2-9ec9-4c53-9ace-83795d6ac81c",
+            "format": "Sonic 1.js",
+            "name": "object",
+            "palettes": [],
+            "art": {
+                "path": "artunc\\Sonic.bin",
+                "compression": "Uncompressed",
+                "offset": 0
+            },
+            "mappings": {
+                "path": "_maps\\Sonic.asm",
+                "label": ""
+            },
+            "dplcs": {
+                "enabled": true,
+                "path": "_maps\\Sonic - Dynamic Gfx Script.asm",
+                "label": ""
+            }
+        }
+    ]
+}
