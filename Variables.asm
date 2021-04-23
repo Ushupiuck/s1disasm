@@ -192,7 +192,7 @@ v_scrshifty	= ramaddr ( $FFFFF73C )	; y-screen shift (new - last) * $100
 
 v_lookshift	= ramaddr ( $FFFFF73E )	; screen shift when Sonic looks up/down (2 bytes) -- Camera_Y_pos_bias
 v_dle_routine	= ramaddr ( $FFFFF742 )	; dynamic level event - routine counter
-f_nobgscroll	= ramaddr ( $FFFFF744 )	; flag set to cancel background scrolling
+f_nobgscroll	= ramaddr ( $FFFFF744 )	; flag set to cancel background scrolling (v_scroll_lock in Sonic CD)
 
 v_fg_xblock	= ramaddr ( $FFFFF74A )	; foreground x-block parity (for redraw)
 v_fg_yblock	= ramaddr ( $FFFFF74B )	; foreground y-block parity (for redraw)

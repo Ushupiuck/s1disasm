@@ -644,7 +644,7 @@ VBla_14:
 VBla_04:
 		bsr.w	sub_106E
 		bsr.w	LoadTilesAsYouMove_BGOnly
-		bsr.w	sub_1642
+		bsr.w	ProcessPLCDec
 		tst.w	(v_demolength).w
 		beq.w	.end
 		subq.w	#1,(v_demolength).w
@@ -654,8 +654,7 @@ VBla_04:
 ; ===========================================================================
 
 VBla_06:
-		bsr.w	sub_106E
-		rts
+		bra.w	sub_106E
 ; ===========================================================================
 
 VBla_10:
@@ -704,8 +703,8 @@ VBla_08:
 Demo_Time:
 		bsr.w	LoadTilesAsYouMove
 		jsr	(AnimateLevelGfx).l
-		jsr	(HUD_Update).l
 		bsr.w	ProcessDPLC2
+		jsr	(HUD_Update).l
 		tst.w	(v_demolength).w ; is there time left on the demo?
 		beq.w	.end		; if not, branch
 		subq.w	#1,(v_demolength).w ; subtract 1 from time left
@@ -764,8 +763,7 @@ VBla_0C:
 		bsr.w	LoadTilesAsYouMove
 		jsr	(AnimateLevelGfx).l
 		jsr	(HUD_Update).l
-		bsr.w	sub_1642
-		rts
+		bra.w	ProcessPLCDec
 ; ===========================================================================
 
 VBla_0E:
@@ -778,7 +776,7 @@ VBla_0E:
 VBla_12:
 		bsr.w	sub_106E
 		move.w	(v_hbla_hreg).w,(a5)
-		bra.w	sub_1642
+		bra.w	ProcessPLCDec
 ; ===========================================================================
 
 VBla_16:
@@ -1020,17 +1018,13 @@ ClearScreen:
 
 
 SoundDriverLoad:
-		nop
 		stopZ80
 		resetZ80
 		lea	(Kos_Z80).l,a0	; load sound driver
 		lea	(z80_ram).l,a1	; target Z80 RAM
 		bsr.w	KosDec		; decompress
 		resetZ80a
-		nop
-		nop
-		nop
-		nop
+		ror.b	#8,d0
 		resetZ80
 		startZ80
 		rts
@@ -1108,7 +1102,7 @@ AddPLC:
 
 .skip:
 		movem.l	(sp)+,a1-a2 ; a1=object
-		rts	
+		rts
 ; End of function AddPLC
 
 
@@ -1182,7 +1176,7 @@ RunPLC:
 		lea	(v_ngfx_buffer).w,a1
 		move.w	(a0)+,d2
 		bpl.s	loc_160E
-		adda.w	#$A,a3
+		adda.w	#NemPCD_WriteRowToVDP_XOR-NemPCD_WriteRowToVDP,a3
 
 loc_160E:
 		andi.w	#$7FFF,d2
@@ -1209,15 +1203,16 @@ Rplc_Exit:
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-sub_1642:
+ProcessPLCDec:
 		tst.w	(f_plc_execute).w
-		beq.w	locret_16DA
+		beq.w	ProcessPLCDec_Done
+ProcessPLCDec_Large:
 		move.w	#9,(v_plc_buffer_reg1A).w
 		moveq	#0,d0
 		move.w	(v_plc_buffer+4).w,d0
-		addi.w	#$120,(v_plc_buffer+4).w
-		bra.s	loc_1676
-; End of function sub_1642
+		addi.w	#9*$20,(v_plc_buffer+4).w
+		bra.s	ProcessPLCDec_Main
+; End of function ProcessPLCDec
 
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -1226,13 +1221,15 @@ sub_1642:
 ; sub_165E:
 ProcessDPLC2:
 		tst.w	(f_plc_execute).w
-		beq.s	locret_16DA
+		beq.s	ProcessPLCDec_Done
+		tst.b	(f_nobgscroll).w			; Is scrolling locked?
+		bne.s	ProcessPLCDec_Large			; If so, go with the large batch instead
 		move.w	#3,(v_plc_buffer_reg1A).w
 		moveq	#0,d0
 		move.w	(v_plc_buffer+4).w,d0
 		addi.w	#$60,(v_plc_buffer+4).w
 
-loc_1676:
+ProcessPLCDec_Main:
 		lea	(vdp_control_port).l,a4
 		lsl.l	#2,d0
 		lsr.w	#2,d0
@@ -1253,7 +1250,7 @@ loc_16AA:
 		movea.w	#8,a5
 		bsr.w	NemPCD_NewRow
 		subq.w	#1,(f_plc_execute).w
-		beq.s	loc_16DC
+		beq.s	ProcessPLCDec_Pop
 		subq.w	#1,(v_plc_buffer_reg1A).w
 		bne.s	loc_16AA
 		move.l	a0,(v_plc_buffer).w
@@ -1264,17 +1261,21 @@ loc_16AA:
 		move.l	d5,(v_plc_buffer_reg10).w
 		move.l	d6,(v_plc_buffer_reg14).w
 
-locret_16DA:
+ProcessPLCDec_Done:
 		rts
 ; ===========================================================================
 
-loc_16DC:
+ProcessPLCDec_Pop:
 		lea	(v_plc_buffer).w,a0
-		moveq	#$15,d0
+		lea	6(a0),a1
+		moveq	#$E,d0		; do $F cues
 
-loc_16E2:
-		move.l	6(a0),(a0)+
-		dbf	d0,loc_16E2
+-		move.l	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		dbf	d0,-
+		moveq	#0,d0
+		move.l	d0,(a0)+	; clear the last cue to avoid overcopying it
+		move.w	d0,(a0)+	;
 		rts
 ; End of function ProcessDPLC2
 
@@ -2903,8 +2904,8 @@ Level_MainLoop:
 		bsr.w	MoveSonicInDemo
 		bsr.w	LZWaterFeatures
 		jsr	(ExecuteObjects).l
-		tst.w   (f_restart).w
-		bne     GM_Level
+		tst.w	(f_restart).w	; is the level set to restart?
+		bne.w	GM_Level		; if yes, branch
 		tst.w	(v_debuguse).w	; is debug mode being used?
 		bne.s	Level_DoScroll	; if yes, branch
 		cmpi.b	#6,(v_player+obRoutine).w ; has Sonic just died?
@@ -6213,7 +6214,7 @@ locret_D87C:
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
-
+; LevelObjManager:
 ObjPosLoad:
 		moveq	#0,d0
 		move.b	(v_opl_routine).w,d0
