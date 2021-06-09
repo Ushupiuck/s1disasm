@@ -6,11 +6,11 @@
 ;
 
 	save
-	!org	0							; z80 Align, handled by the build process
+	!org	0					; z80 Align, handled by the build process
 	CPU Z80
 	listing purecode
 
-zSEGA_Pitch:	equ	0Bh					; The pitch of the SEGA sound
+zSEGA_Pitch:	equ	0Bh				; The pitch of the SEGA sound
 
 
 z80_stack:		equ 1FFCh
