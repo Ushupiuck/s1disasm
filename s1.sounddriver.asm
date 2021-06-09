@@ -1628,21 +1628,25 @@ WriteFMIorII:
 
 ; sub_7272E:
 WriteFMI:
-		move.b	(ym2612_a0).l,d2
-		btst	#7,d2		; Is FM busy?
-		bne.s	WriteFMI	; Loop if so
-		move.b	d0,(ym2612_a0).l
-		nop	
-		nop	
-		nop	
+		lea	ym2612_a0,a0
+WriteFMI_loop:
+		btst	#7,(a0)		; Is FM busy?
+		bne.s	WriteFMI_loop	; Loop if so
+		move.b	d0,(a0)
+;		move.b	(ym2612_a0).l,d2
+;		btst	#7,d2		; Is FM busy?
+;		bne.s	WriteFMI	; Loop if so
+;		move.b	d0,(ym2612_a0).l
 ; loc_72746:
 .waitloop:
-		move.b	(ym2612_a0).l,d2
-		btst	#7,d2		; Is FM busy?
+		btst	#7,(a0)		; Is FM busy?
 		bne.s	.waitloop	; Loop if so
-
-		move.b	d1,(ym2612_d0).l
-		rts	
+		move.b	d1,TrackVoiceControl(a0)
+;		move.b	(ym2612_a0).l,d2
+;		btst	#7,d2		; Is FM busy?
+;		bne.s	.waitloop	; Loop if so
+;		move.b	d1,(ym2612_d0).l
+		rts
 ; End of function WriteFMI
 
 ; ===========================================================================
@@ -1656,21 +1660,25 @@ WriteFMIIPart:
 
 ; sub_72764:
 WriteFMII:
-		move.b	(ym2612_a0).l,d2
-		btst	#7,d2		; Is FM busy?
-		bne.s	WriteFMII	; Loop if so
-		move.b	d0,(ym2612_a1).l
-		nop	
-		nop	
-		nop	
+		lea	ym2612_a0,a0
+WriteFMII_loop:
+		btst	#7,(a0)		; Is FM busy?
+		bne.s	WriteFMII_loop	; Loop if so
+		move.b	d0,TrackTempoDivider(a0)
+;		move.b	(ym2612_a0).l,d2
+;		btst	#7,d2		; Is FM busy?
+;		bne.s	WriteFMII	; Loop if so
+;		move.b	d0,(ym2612_a1).l
 ; loc_7277C:
 .waitloop:
-		move.b	(ym2612_a0).l,d2
-		btst	#7,d2		; Is FM busy?
+		btst	#7,(a0)		; Is FM busy?
 		bne.s	.waitloop	; Loop if so
-
-		move.b	d1,(ym2612_d1).l
-		rts	
+		move.b	d1,$3(a0)
+;		move.b	(ym2612_a0).l,d2
+;		btst	#7,d2		; Is FM busy?
+;		bne.s	.waitloop	; Loop if so
+;		move.b	d1,(ym2612_d1).l
+		rts
 ; End of function WriteFMII
 
 ; ===========================================================================
