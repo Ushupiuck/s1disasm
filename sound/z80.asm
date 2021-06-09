@@ -46,7 +46,7 @@ endpad := $
 	di						; Disable interrupts. Interrupts will never be reenabled
 	di						; for the z80, so that no code will be executed on V-Int.
 	di						; This means that the sample loop is all the z80 does.
-	ld	sp,z80_stack				; Initialize the stack pointer (unused throughout the driver)
+;	ld	sp,z80_stack				; Initialize the stack pointer (unused throughout the driver)
 	ld	ix,zYM2612_A0				; ix = Pointer to memory-mapped communication register with YM2612
 	xor	a					; a=0
 	ld	(zDAC_Status),a				; Disable DAC
