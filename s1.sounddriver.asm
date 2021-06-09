@@ -500,7 +500,7 @@ FMUpdateFreq:
 		jsr	WriteFMIorII(pc)
 		move.b	d6,d1
 		move.b	#$A0,d0			; Register for lower 8 bits of frequency
-		jsr	WriteFMIorII(pc)	; (It would be better if this were a jmp)
+		jmp	WriteFMIorII(pc)	; (It would be better if this were a jmp)
 ; locret_71E48:
 locret_71E48:
 		rts	
@@ -1712,8 +1712,7 @@ PSGUpdateTrack:
 		jsr	NoteTimeoutUpdate(pc)
 		jsr	PSGUpdateVolFX(pc)
 		jsr	DoModulation(pc)
-		jsr	PSGUpdateFreq(pc)	; It would be better if this were a jmp and the rts was removed
-		rts
+		jmp	PSGUpdateFreq(pc)	; It would be better if this were a jmp and the rts was removed
 ; End of function PSGUpdateTrack
 
 
@@ -2225,7 +2224,7 @@ SetVoice:
 		
 		move.b	#$B4,d0			; Register for AMS/FMS/Panning
 		move.b	TrackAMSFMSPan(a5),d1	; Value to send
-		jsr	WriteFMIorII(pc) 	; (It would be better if this were a jmp)
+		jmp	WriteFMIorII(pc) 	; (It would be better if this were a jmp)
 
 locret_72CAA:
 		rts	
