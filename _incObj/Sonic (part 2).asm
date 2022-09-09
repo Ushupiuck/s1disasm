@@ -74,7 +74,7 @@ GameOver:
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$100,d0
 		cmp.w	obY(a0),d0
-		bhs.w	locret_13900
+		bcc.w	locret_13914
 		move.w	#-$38,obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 		clr.b	(f_timecount).w	; stop time counter
@@ -97,7 +97,7 @@ loc_138C2:
 loc_138D4:
 		move.w	#60,objoff_3A(a0)	; set time delay to 1 second
 		tst.b	(f_timeover).w	; is TIME OVER tag set?
-		beq.s	locret_13900	; if not, branch
+		beq.s	locret_13914	; if not, branch
 		move.w	#0,objoff_3A(a0)
 		move.b	#id_GameOverCard,(v_gameovertext1).w ; load TIME object
 		move.b	#id_GameOverCard,(v_gameovertext2).w ; load OVER object
@@ -105,10 +105,6 @@ loc_138D4:
 		move.b	#3,(v_gameovertext2+obFrame).w
 		bra.s	loc_138C2
 ; ===========================================================================
-
-locret_13900:
-		rts	
-; End of function GameOver
 
 ; ---------------------------------------------------------------------------
 ; Sonic	when the level is restarted
@@ -122,4 +118,4 @@ Sonic_ResetLevel:; Routine 8
 		move.w	#1,(f_restart).w ; restart the level
 
 locret_13914:
-		rts	
+		rts

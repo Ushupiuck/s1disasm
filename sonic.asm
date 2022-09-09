@@ -16,7 +16,7 @@ AddressSRAM	  = 3	; 0 = odd+even; 2 = even only; 3 = odd only
 ; Change to 0 to build the original version of the game, dubbed REV00
 ; Change to 1 to build the later vesion, dubbed REV01, which includes various bugfixes and enhancements
 ; Change to 2 to build the version from Sonic Mega Collection, dubbed REVXB, which fixes the infamous "spike bug"
-Revision	  = 1
+Revision	  = 0
 
 ZoneCount	  = 6	; discrete zones are: GHZ, MZ, SYZ, LZ, SLZ, and SBZ
 
@@ -88,7 +88,6 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
-	if Revision<>2
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
@@ -97,20 +96,7 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
-	else
-loc_E0:
-		; Relocated code from Spik_Hurt. REVXB was a nasty hex-edit.
-		move.l	obY(a0),d3
-		move.w	obVelY(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		jmp	(loc_D5A2).l
 
-		dc.w ErrorTrap
-		dc.l ErrorTrap
-		dc.l ErrorTrap
-		dc.l ErrorTrap
-	endif
 		dc.b "SEGA MEGA DRIVE " ; Hardware system ID (Console name)
 		dc.b "(C)SEGA 1991.APR" ; Copyright holder and release date (generally year)
 		dc.b "SONIC THE               HEDGEHOG                " ; Domestic name
@@ -1092,13 +1078,13 @@ DACDriverLoad:
 		lea	(z80_ram).l,a1		; target Z80 RAM
 		bsr.w	KosDec			; decompress
 		resetZ80a
-		nop	
-		nop	
-		nop	
-		nop	
+		nop
+		nop
+		nop
+		nop
 		resetZ80
 		startZ80
-		rts	
+		rts
 ; End of function DACDriverLoad
 
 		include	"_incObj/sub PlaySound.asm"
@@ -1389,7 +1375,7 @@ Qplc_Loop:
 
 		include	"_inc/Enigma Decompression.asm"
 		include	"_inc/Kosinski Decompression.asm"
-
+		include	"_inc/Twizzler Decompression.asm"
 		include	"_inc/PaletteCycle.asm"
 
 Pal_TitleCyc:	binclude	"palette/Cycle - Title Screen Water.bin"
@@ -2030,10 +2016,6 @@ WaitForVBla:
 
 		include	"_incObj/sub RandomNumber.asm"
 		include	"_incObj/sub CalcSine.asm"
-		if Revision=0
-		include	"_incObj/sub CalcSqrt.asm"
-		else
-		endif
 		include	"_incObj/sub CalcAngle.asm"
 
 ; ---------------------------------------------------------------------------
@@ -2188,7 +2170,7 @@ Tit_LoadText:
 		bsr.w	EniDec
 		lea	(Blk256_GHZ).l,a0 ; load GHZ 256x256 mappings
 		lea	(v_256x256&$FFFFFF).l,a1
-		bsr.w	KosDec
+		bsr.w	KosPlusDec
 		bsr.w	LevelLayoutLoad
 		bsr.w	PaletteFadeOut
 		disable_ints
@@ -2215,7 +2197,7 @@ Tit_LoadText:
 		bsr.w	PlaySound_Special	; play title screen music
 		move.b	#0,(f_debugmode).w ; disable debug mode
 		move.w	#$178,(v_demolength).w ; run title screen for $178 frames
-		
+
 	if FixBugs
 		clearRAM v_sonicteam,v_sonicteam+object_size
 	else
@@ -2889,7 +2871,6 @@ Level_SkipTtlCard:
 		bset	#2,(v_fg_scroll_flags).w
 		bsr.w	LevelDataLoad ; load block mappings and palettes
 		bsr.w	LoadTilesFromStart
-		jsr	(ConvertCollisionArray).l
 		bsr.w	ColIndexLoad
 		bsr.w	LZWaterFeatures
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
@@ -3016,10 +2997,8 @@ Level_MainLoop:
 		bsr.w	MoveSonicInDemo
 		bsr.w	LZWaterFeatures
 		jsr	(ExecuteObjects).l
-		if Revision<>0
-			tst.w   (f_restart).w
-			bne     GM_Level
-		endif
+		tst.w   (f_restart).w
+		bne     GM_Level
 		tst.w	(v_debuguse).w	; is debug mode being used?
 		bne.s	Level_DoScroll	; if yes, branch
 		cmpi.b	#6,(v_player+obRoutine).w ; has Sonic just died?
@@ -3039,13 +3018,9 @@ Level_SkipScroll:
 
 		cmpi.b	#id_Demo,(v_gamemode).w
 		beq.s	Level_ChkDemo	; if mode is 8 (demo), branch
-		if Revision=0
-		tst.w	(f_restart).w	; is the level set to restart?
-		bne.w	GM_Level	; if yes, branch
-		endif
 		cmpi.b	#id_Level,(v_gamemode).w
 		beq.w	Level_MainLoop	; if mode is $C (level), branch
-		rts	
+		rts
 ; ===========================================================================
 
 Level_ChkDemo:
@@ -3056,7 +3031,7 @@ Level_ChkDemo:
 		cmpi.b	#id_Demo,(v_gamemode).w
 		beq.w	Level_MainLoop	; if mode is 8 (demo), branch
 		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
-		rts	
+		rts
 ; ===========================================================================
 
 Level_EndDemo:
@@ -3307,11 +3282,7 @@ SS_ChkEnd:
 		beq.w	SS_MainLoop	; if yes, branch
 
 		tst.w	(f_demo).w	; is demo mode on?
-		if Revision=0
-		bne.w	SS_ToSegaScreen	; if yes, branch
-		else
-		bne.w	SS_ToLevel
-		endif
+		bne.w	SS_ToLevel	; if yes, branch
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
 		cmpi.w	#(id_SBZ<<8)+3,(v_zone).w ; is level number higher than FZ?
 		blo.s	SS_Finish	; if not, branch
@@ -3382,19 +3353,16 @@ SS_NormalExit:
 		bne.s	SS_NormalExit
 		move.w	#sfx_EnterSS,d0
 		bsr.w	PlaySound_Special ; play special stage exit sound
-		bsr.w	PaletteWhiteOut
-		rts	
+		bra.w	PaletteWhiteOut
 ; ===========================================================================
 
 SS_ToSegaScreen:
 		move.b	#id_Sega,(v_gamemode).w ; goto Sega screen
 		rts
 
-		if Revision<>0
 SS_ToLevel:	cmpi.b	#id_Level,(v_gamemode).w
 		beq.s	SS_ToSegaScreen
 		rts
-		endif
 
 ; ---------------------------------------------------------------------------
 ; Special stage	background loading subroutine
@@ -3819,7 +3787,7 @@ End_LoadData:
 		enable_ints
 		lea	(Kos_EndFlowers).l,a0 ;	load extra flower patterns
 		lea	(v_256x256_end-$1000).w,a1 ; RAM address to buffer the patterns
-		bsr.w	KosDec
+		bsr.w	KosPlusDec
 		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad1	; load Sonic's palette
 		move.w	#bgm_Ending,d0
@@ -4491,7 +4459,7 @@ loc_6A3E:
 		bsr.w	DrawBlocks_TB_2
 
 locret_6A80:
-		rts	
+		rts
 ; End of function DrawBGScrollBlock2
 
 ; ===========================================================================
@@ -4509,7 +4477,7 @@ locret_6A80:
 		sub.w	d1,d4
 		move.w	d4,-(sp)
 		moveq	#-16,d5
-		bsr.w	Calc_VRAM_Pos_Unknown
+;		bsr.w	Calc_VRAM_Pos_Unknown
 		move.w	(sp)+,d4
 		moveq	#-16,d5
 		moveq	#3-1,d6	; Draw only three rows
@@ -4525,7 +4493,7 @@ loc_6AAC:
 		sub.w	d1,d4
 		move.w	d4,-(sp)
 		move.w	#320,d5
-		bsr.w	Calc_VRAM_Pos_Unknown
+;		bsr.w	Calc_VRAM_Pos_Unknown
 		move.w	(sp)+,d4
 		move.w	#320,d5
 		moveq	#3-1,d6
@@ -4567,7 +4535,7 @@ locj_6DF2:
 locj_6DF4:
 			dc.b $00,$00,$00,$00,$00,$06,$06,$06,$06,$06,$06,$06,$06,$06,$06,$04
 			dc.b $04,$04,$04,$04,$04,$04,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02
-			dc.b $02,$00						
+			dc.b $02,$00
 ;===============================================================================
 Draw_SBz:
 			moveq	#-16,d4
@@ -4887,31 +4855,6 @@ DrawFlipXY:
 ; End of function DrawBlocks
 
 ; ===========================================================================
-; unused garbage
-		if Revision=0
-; This is interesting. It draws a block, but not before
-; incrementing its palette lines by 1. This may have been
-; a debug function to discolour mirrored tiles, to test
-; if they're loading properly.
-		rts	
-		move.l	d0,(a5)
-		move.w	#$2000,d5
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		add.l	d7,d0
-		move.l	d0,(a5)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		rts
-		endif
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -5004,29 +4947,6 @@ Calc_VRAM_Pos_2:
 		rts	
 ; End of function Calc_VRAM_Pos
 
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-; not used
-
-; This is just like Calc_VRAM_Pos, but seemingly for an earlier
-; VRAM layout: the only difference is the high bits of the
-; plane's VRAM address, which are 10 instead of 11.
-; Both the foreground and background are at $C000 and $E000
-; respectively, so this one starting at $8000 makes no sense.
-; sub_6C3C:
-Calc_VRAM_Pos_Unknown:
-		add.w	4(a3),d4
-		add.w	(a3),d5
-		andi.w	#$F0,d4
-		andi.w	#$1F0,d5
-		lsl.w	#4,d4
-		lsr.w	#2,d5
-		add.w	d5,d4
-		moveq	#2,d0
-		swap	d0
-		move.w	d4,d0
-		rts	
-; End of function Calc_VRAM_Pos_Unknown
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	load tiles as soon as the level	appears
@@ -5173,7 +5093,7 @@ LevelDataLoad:
 		bsr.w	EniDec
 		movea.l	(a2)+,a0
 		lea	(v_256x256&$FFFFFF).l,a1 ; RAM address for 256x256 mappings
-		bsr.w	KosDec
+		bsr.w	KosPlusDec
 		bsr.w	LevelLayoutLoad
 		move.w	(a2)+,d0
 		move.w	(a2),d0
@@ -5198,7 +5118,7 @@ LevelDataLoad:
 		moveq	#0,d0
 		move.b	(a2),d0
 		beq.s	.skipPLC	; if 2nd PLC is 0 (i.e. the ending sequence), branch
-		bsr.w	AddPLC		; load pattern load cues
+		bra.w	AddPLC		; load pattern load cues
 
 .skipPLC:
 		rts	
@@ -5676,7 +5596,7 @@ loc_8AC4:
 		move.w	#0,obVelY(a1)
 
 locret_8AD8:
-		rts	
+		rts
 ; End of function Obj44_SolidWall
 
 
@@ -6184,6 +6104,7 @@ Obj_Index:
 
 		include	"_incObj/sub ObjectFall.asm"
 		include	"_incObj/sub SpeedToPos.asm"
+		include	"_incObj/sub RememberState.asm"
 		include	"_incObj/sub DisplaySprite.asm"
 		include	"_incObj/sub DeleteObject.asm"
 
@@ -6297,7 +6218,7 @@ BuildSprites:
 		cmpi.b	#$50,d5
 		beq.s	.spriteLimit
 		move.l	#0,(a2)
-		rts	
+		rts
 ; ===========================================================================
 
 	.spriteLimit:
@@ -6755,7 +6676,7 @@ Map_LTag:	include	"_maps/Lava Tag.asm"
 Map_Geyser:	include	"_maps/Lava Geyser.asm"
 Map_LWall:	include	"_maps/Wall of Lava.asm"
 
-		include	"_incObj/40 Moto Bug.asm" ; includes "_incObj/sub RememberState.asm"
+		include	"_incObj/40 Moto Bug.asm"
 		include	"_anim/Moto Bug.asm"
 Map_Moto:	include	"_maps/Moto Bug.asm"
 		include	"_incObj/4F.asm"
@@ -6878,7 +6799,7 @@ Sonic_Control:	; Routine 2
 		beq.s	loc_12C58	; if not, branch
 		move.w	#1,(v_debuguse).w ; change Sonic into a ring/item
 		clr.b	(f_lockctrl).w
-		rts	
+		rts
 ; ===========================================================================
 
 loc_12C58:
@@ -6915,8 +6836,7 @@ loc_12CA6:
 
 loc_12CB6:
 		bsr.w	Sonic_Loops
-		bsr.w	Sonic_LoadGfx
-		rts	
+		bra.w	Sonic_LoadGfx
 ; ===========================================================================
 Sonic_Modes:	dc.w Sonic_MdNormal-Sonic_Modes
 		dc.w Sonic_MdJump-Sonic_Modes
@@ -6953,8 +6873,7 @@ Sonic_MdNormal:
 		bsr.w	Sonic_LevelBound
 		jsr	(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
-		bsr.w	Sonic_SlopeRepel
-		rts	
+		bra.w	Sonic_SlopeRepel
 ; ===========================================================================
 
 Sonic_MdJump:
@@ -6968,8 +6887,7 @@ Sonic_MdJump:
 
 loc_12E5C:
 		bsr.w	Sonic_JumpAngle
-		bsr.w	Sonic_Floor
-		rts	
+		bra.w	Sonic_Floor
 ; ===========================================================================
 
 Sonic_MdRoll:
@@ -6979,8 +6897,7 @@ Sonic_MdRoll:
 		bsr.w	Sonic_LevelBound
 		jsr	(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
-		bsr.w	Sonic_SlopeRepel
-		rts	
+		bra.w	Sonic_SlopeRepel
 ; ===========================================================================
 
 Sonic_MdJump2:
@@ -6994,32 +6911,11 @@ Sonic_MdJump2:
 
 loc_12EA6:
 		bsr.w	Sonic_JumpAngle
-		bsr.w	Sonic_Floor
-		rts	
+		bra.w	Sonic_Floor
 
 		include	"_incObj/Sonic Move.asm"
 		include	"_incObj/Sonic RollSpeed.asm"
 		include	"_incObj/Sonic JumpDirection.asm"
-
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Unused subroutine to squash Sonic
-; ---------------------------------------------------------------------------
-		move.b	obAngle(a0),d0
-		addi.b	#$20,d0
-		andi.b	#$C0,d0
-		bne.s	locret_13302
-		bsr.w	Sonic_DontRunOnWalls
-		tst.w	d1
-		bpl.s	locret_13302
-		move.w	#0,obInertia(a0) ; stop Sonic moving
-		move.w	#0,obVelX(a0)
-		move.w	#0,obVelY(a0)
-		move.b	#id_Warp3,obAnim(a0) ; use "warping" animation
-
-locret_13302:
-		rts	
-
 		include	"_incObj/Sonic LevelBound.asm"
 		include	"_incObj/Sonic Roll.asm"
 		include	"_incObj/Sonic Jump.asm"
@@ -7033,7 +6929,7 @@ locret_13302:
 		include	"_incObj/Sonic (part 2).asm"
 		include	"_incObj/Sonic Loops.asm"
 		include	"_incObj/Sonic Animate.asm"
-		include	"_anim/Sonic.asm"
+		include	"_anim/Sonic (without frame IDs).asm"
 		include	"_incObj/Sonic LoadGfx.asm"
 
 		include	"_incObj/0A Drowning Countdown.asm"
@@ -7055,17 +6951,14 @@ ResumeMusic:
 		move.w	#bgm_SBZ,d0	; play SBZ music
 
 .notsbz:
-		if Revision<>0
-			tst.b	(v_invinc).w ; is Sonic invincible?
-			beq.s	.notinvinc ; if not, branch
-			move.w	#bgm_Invincible,d0
+		tst.b	(v_invinc).w ; is Sonic invincible?
+		beq.s	.notinvinc ; if not, branch
+		move.w	#bgm_Invincible,d0
 .notinvinc:
-			tst.b	(f_lockscreen).w ; is Sonic at a boss?
-			beq.s	.playselected ; if not, branch
-			move.w	#bgm_Boss,d0
+		tst.b	(f_lockscreen).w ; is Sonic at a boss?
+		beq.s	.playselected ; if not, branch
+		move.w	#bgm_Boss,d0
 .playselected:
-		endif
-
 		jsr	(PlaySound).l
 
 .over12:
@@ -7090,121 +6983,9 @@ Map_Vanish:	include	"_maps/Special Stage Entry (Unused).asm"
 Map_Splash:	include	"_maps/Water Splash.asm"
 
 		include	"_incObj/Sonic AnglePos.asm"
-
 		include	"_incObj/sub FindNearestTile.asm"
 		include	"_incObj/sub FindFloor.asm"
 		include	"_incObj/sub FindWall.asm"
-
-; ---------------------------------------------------------------------------
-; This subroutine takes 'raw' bitmap-like collision block data as input and
-; converts it into the proper collision arrays (ColArray and ColArray2).
-; Pointers to said raw data are dummied out.
-; Curiously, an example of the original 'raw' data that this was intended
-; to process can be found in the J2ME version, in a file called 'blkcol.bct'.
-; ---------------------------------------------------------------------------
-
-RawColBlocks		equ CollArray1
-ConvRowColBlocks	equ CollArray1
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-ConvertCollisionArray:
-		rts	
-; ---------------------------------------------------------------------------
-		; The raw format stores the collision data column by column for the normal collision array.
-		; This makes a copy of the data, but stored row by row, for the rotated collision array.
-		lea	(RawColBlocks).l,a1	; Source location of raw collision block data
-		lea	(ConvRowColBlocks).l,a2	; Destinatation location for row-converted collision block data
-
-		move.w	#$100-1,d3		; Number of blocks in collision data
-
-.blockLoop:
-		moveq	#16,d5			; Start on the 16th bit (the leftmost pixel)
-
-		move.w	#16-1,d2		; Width of a block in pixels
-
-.columnLoop:
-		moveq	#0,d4
-
-		move.w	#16-1,d1		; Height of a block in pixels
-
-.rowLoop:
-		move.w	(a1)+,d0		; Get row of collision bits
-		lsr.l	d5,d0			; Push the selected bit of this row into the 'eXtend' flag
-		addx.w	d4,d4			; Shift d4 to the left, and insert the selected bit into bit 0
-		dbf	d1,.rowLoop		; Loop for each row of pixels in a block
-
-		move.w	d4,(a2)+		; Store column of collision bits
-		suba.w	#2*16,a1		; Back to the start of the block
-		subq.w	#1,d5			; Get next bit in the row
-		dbf	d2,.columnLoop		; Loop for each column of pixels in a block
-
-		adda.w	#2*16,a1		; Next block
-		dbf	d3,.blockLoop		; Loop for each block in the raw collision block data
-
-		; This then converts the collision data into the final collision arrays
-		lea	(ConvRowColBlocks).l,a1
-		lea	(CollArray2).l,a2	; Convert the row-converted collision block data into final rotated collision array
-		bsr.s	.convertArray
-		lea	(RawColBlocks).l,a1
-		lea	(CollArray1).l,a2	; Convert the raw collision block data into final normal collision array
-
-
-.convertArray:
-		move.w	#$1000-1,d3		; Size of the collision array
-
-.processLoop:
-		moveq	#0,d2
-		move.w	#$F,d1
-		move.w	(a1)+,d0		; Get current column of collision pixels
-		beq.s	.noCollision		; Branch if there's no collision in this column
-		bmi.s	.topPixelSolid		; Branch if top pixel of collision is solid
-
-	; Here we count, starting from the bottom, how many pixels tall
-	; the collision in this column is.
-.processColumnLoop1:
-		lsr.w	#1,d0
-		bhs.s	.pixelNotSolid1
-		addq.b	#1,d2
-
-.pixelNotSolid1:
-		dbf	d1,.processColumnLoop1
-
-		bra.s	.columnProcessed
-; ===========================================================================
-
-.topPixelSolid:
-		cmpi.w	#$FFFF,d0		; Is entire column solid?
-		beq.s	.entireColumnSolid	; Branch if so
-
-	; Here we count, starting from the top, how many pixels tall
-	; the collision in this column is (the resulting number is negative).
-.processColumnLoop2:
-		lsl.w	#1,d0
-		bhs.s	.pixelNotSolid2
-		subq.b	#1,d2
-
-.pixelNotSolid2:
-		dbf	d1,.processColumnLoop2
-
-		bra.s	.columnProcessed
-; ===========================================================================
-
-.entireColumnSolid:
-		move.w	#$10,d0
-
-.noCollision:
-		move.w	d0,d2
-
-.columnProcessed:
-		move.b	d2,(a2)+		; Store column collision height
-		dbf	d3,.processLoop
-
-		rts	
-
-; End of function ConvertCollisionArray
-
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -8191,7 +7972,7 @@ SS_AniEmeraldSparks:
 		clr.l	4(a0)
 		move.b	#4,(v_player+obRoutine).w
 		move.w	#sfx_SSGoal,d0
-		jsr	(PlaySound_Special).l	; play special stage GOAL sound
+		jmp	(PlaySound_Special).l	; play special stage GOAL sound
 
 locret_1B60C:
 		rts	
@@ -8280,8 +8061,7 @@ SS_LoadData:
 		movea.l	SS_LayoutIndex(pc,d0.w),a0
 		lea	(v_ssbuffer2&$FFFFFF).l,a1
 		move.w	#0,d0
-		jsr	(EniDec).l
-
+		jsr	(TwizDec).l
 		; Clear everything from v_ssbuffer1 to v_ssbuffer2
 		lea	(v_ssbuffer1&$FFFFFF).l,a1
 		move.w	#(v_ssbuffer2-v_ssbuffer1)/4-1,d0
@@ -8325,7 +8105,7 @@ loc_1B730:
 		clr.l	(a1)+
 		dbf	d1,loc_1B730
 
-		rts	
+		rts
 ; End of function SS_Load
 
 ; ===========================================================================
@@ -8469,21 +8249,10 @@ Art_LivesNums:	binclude	"artunc/Lives Counter Numbers.bin" ; 8x8 pixel numbers o
 		include	"_inc/LevelHeaders.asm"
 		include	"_inc/Pattern Load Cues.asm"
 
-		align	$200
-		if Revision=0
-Nem_SegaLogo:	binclude	"artnem/Sega Logo.nem"	; large Sega logo
-		even
-Eni_SegaLogo:	binclude	"tilemaps/Sega Logo.eni" ; large Sega logo (mappings)
-		even
-		else
-		rept $300
-			dc.b	$FF
-		endm
 Nem_SegaLogo:	binclude	"artnem/Sega Logo (JP1).nem" ; large Sega logo
-			even
+		even
 Eni_SegaLogo:	binclude	"tilemaps/Sega Logo (JP1).eni" ; large Sega logo (mappings)
-			even
-		endif
+		even
 Eni_Title:	binclude	"tilemaps/Title Screen.eni" ; title screen foreground (mappings)
 		even
 Nem_TitleFg:	binclude	"artnem/Title Screen Foreground.nem"
@@ -8496,46 +8265,19 @@ Eni_JapNames:	binclude	"tilemaps/Hidden Japanese Credits.eni" ; Japanese credits
 		even
 Nem_JapNames:	binclude	"artnem/Hidden Japanese Credits.nem"
 		even
-
-Map_Sonic:	include	"_maps/Sonic.asm"
-SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
-
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics	- Sonic
 ; ---------------------------------------------------------------------------
 Art_Sonic:	binclude	"artunc/Sonic.bin"	; Sonic
 		even
-; ---------------------------------------------------------------------------
-; Compressed graphics - various
-; ---------------------------------------------------------------------------
-		if Revision=0
-Nem_Smoke:	binclude	"artnem/Unused - Smoke.nem"
-		even
-Nem_SyzSparkle:	binclude	"artnem/Unused - SYZ Sparkles.nem"
-		even
-		endif
-Nem_Shield:	binclude	"artnem/Shield.nem"
-		even
-Nem_Stars:	binclude	"artnem/Invincibility Stars.nem"
-		even
-		if Revision=0
-Nem_LzSonic:	binclude	"artnem/Unused - LZ Sonic.nem" ; Sonic holding his breath
-		even
-Nem_UnkFire:	binclude	"artnem/Unused - Fireball.nem" ; unused fireball
-		even
-Nem_Warp:	binclude	"artnem/Unused - SStage Flash.nem" ; entry to special stage flash
-		even
-Nem_Goggle:	binclude	"artnem/Unused - Goggles.nem" ; unused goggles
-		even
-		endif
-
-Map_SSWalls:	include	"_maps/SS Walls.asm"
-
+Map_Sonic:	include	"_maps/Sonic.asm"
+SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - special stage
 ; ---------------------------------------------------------------------------
 Nem_SSWalls:	binclude	"artnem/Special Walls.nem" ; special stage walls
 		even
+Map_SSWalls:	include	"_maps/SS Walls.asm"
 Eni_SSBg1:	binclude	"tilemaps/SS Background 1.eni" ; special stage background (mappings)
 		even
 Nem_SSBgFish:	binclude	"artnem/Special Birds & Fish.nem" ; special stage birds and fish background
@@ -8587,13 +8329,9 @@ Nem_Swing:	binclude	"artnem/GHZ Swinging Platform.nem"
 		even
 Nem_Bridge:	binclude	"artnem/GHZ Bridge.nem"
 		even
-Nem_GhzUnkBlock:binclude	"artnem/Unused - GHZ Block.nem"
-		even
 Nem_Ball:	binclude	"artnem/GHZ Giant Ball.nem"
 		even
 Nem_Spikes:	binclude	"artnem/Spikes.nem"
-		even
-Nem_GhzLog:	binclude	"artnem/Unused - GHZ Log.nem"
 		even
 Nem_SpikePole:	binclude	"artnem/GHZ Spiked Log.nem"
 		even
@@ -8647,15 +8385,11 @@ Nem_MzSwitch:	binclude	"artnem/MZ Switch.nem"
 		even
 Nem_MzGlass:	binclude	"artnem/MZ Green Glass Block.nem"
 		even
-Nem_UnkGrass:	binclude	"artnem/Unused - Grass.nem"
-		even
 Nem_MzFire:	binclude	"artnem/Fireballs.nem"
 		even
 Nem_Lava:	binclude	"artnem/MZ Lava.nem"
 		even
 Nem_MzBlock:	binclude	"artnem/MZ Green Pushable Block.nem"
-		even
-Nem_MzUnkBlock:	binclude	"artnem/Unused - MZ Background.nem"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - SLZ stuff
@@ -8727,8 +8461,6 @@ Nem_Crabmeat:	binclude	"artnem/Enemy Crabmeat.nem"
 		even
 Nem_Buzz:	binclude	"artnem/Enemy Buzz Bomber.nem"
 		even
-Nem_UnkExplode:	binclude	"artnem/Unused - Explosion.nem"
-		even
 Nem_Burrobot:	binclude	"artnem/Enemy Burrobot.nem"
 		even
 Nem_Chopper:	binclude	"artnem/Enemy Chopper.nem"
@@ -8768,6 +8500,10 @@ Nem_Monitors:	binclude	"artnem/Monitors.nem"
 		even
 Nem_Explode:	binclude	"artnem/Explosion.nem"
 		even
+Nem_Shield:	binclude	"artnem/Shield.nem"
+		even
+Nem_Stars:	binclude	"artnem/Invincibility Stars.nem"
+		even
 Nem_Points:	binclude	"artnem/Points.nem"	; points from destroyed enemy or object
 		even
 Nem_GameOver:	binclude	"artnem/Game Over.nem"	; game over / time over
@@ -8783,6 +8519,10 @@ Nem_Lamp:	binclude	"artnem/Lamppost.nem"
 Nem_BigFlash:	binclude	"artnem/Giant Ring Flash.nem"
 		even
 Nem_Bonus:	binclude	"artnem/Hidden Bonuses.nem" ; hidden bonuses at end of a level
+		even
+Nem_UnkExplode:	binclude	"artnem/Unused - Explosion.nem"
+		even
+Nem_Warp:	binclude	"artnem/Unused - SStage Flash.nem" ; entry to special stage flash
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - continue screen
@@ -8811,51 +8551,43 @@ Nem_Squirrel:	binclude	"artnem/Animal Squirrel.nem"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - primary patterns and block mappings
 ; ---------------------------------------------------------------------------
-Blk16_GHZ:	binclude	"map16/GHZ.eni"
-		even
 Nem_GHZ_1st:	binclude	"artnem/8x8 - GHZ1.nem"	; GHZ primary patterns
 		even
 Nem_GHZ_2nd:	binclude	"artnem/8x8 - GHZ2.nem"	; GHZ secondary patterns
 		even
-Blk256_GHZ:	binclude	"map256/GHZ.kos"
+Blk16_GHZ:	binclude	"map16/GHZ.eni"
 		even
-Blk16_LZ:	binclude	"map16/LZ.eni"
-		even
-Nem_LZ:		binclude	"artnem/8x8 - LZ.nem"	; LZ primary patterns
-		even
-Blk256_LZ:	binclude	"map256/LZ.kos"
-		even
-Blk16_MZ:	binclude	"map16/MZ.eni"
+Blk256_GHZ:	binclude	"map256/GHZ.kosp"
 		even
 Nem_MZ:		binclude	"artnem/8x8 - MZ.nem"	; MZ primary patterns
 		even
-Blk256_MZ:	if Revision=0
-		binclude	"map256/MZ.kos"
-		else
-		binclude	"map256/MZ (JP1).kos"
-		endif
+Blk16_MZ:	binclude	"map16/MZ.eni"
 		even
-Blk16_SLZ:	binclude	"map16/SLZ.eni"
-		even
-Nem_SLZ:	binclude	"artnem/8x8 - SLZ.nem"	; SLZ primary patterns
-		even
-Blk256_SLZ:	binclude	"map256/SLZ.kos"
-		even
-Blk16_SYZ:	binclude	"map16/SYZ.eni"
+Blk256_MZ:	binclude	"map256/MZ (JP1).kosp"
 		even
 Nem_SYZ:	binclude	"artnem/8x8 - SYZ.nem"	; SYZ primary patterns
 		even
-Blk256_SYZ:	binclude	"map256/SYZ.kos"
+Blk16_SYZ:	binclude	"map16/SYZ.eni"
 		even
-Blk16_SBZ:	binclude	"map16/SBZ.eni"
+Blk256_SYZ:	binclude	"map256/SYZ.kosp"
+		even
+Nem_LZ:		binclude	"artnem/8x8 - LZ.nem"	; LZ primary patterns
+		even
+Blk16_LZ:	binclude	"map16/LZ.eni"
+		even
+Blk256_LZ:	binclude	"map256/LZ.kosp"
+		even
+Nem_SLZ:	binclude	"artnem/8x8 - SLZ.nem"	; SLZ primary patterns
+		even
+Blk16_SLZ:	binclude	"map16/SLZ.eni"
+		even
+Blk256_SLZ:	binclude	"map256/SLZ.kosp"
 		even
 Nem_SBZ:	binclude	"artnem/8x8 - SBZ.nem"	; SBZ primary patterns
 		even
-Blk256_SBZ:	if Revision=0
-		binclude	"map256/SBZ.kos"
-		else
-		binclude	"map256/SBZ (JP1).kos"
-		endif
+Blk16_SBZ:	binclude	"map16/SBZ.eni"
+		even
+Blk256_SBZ:	binclude	"map256/SBZ (JP1).kosp"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - bosses and ending sequence
@@ -8880,11 +8612,7 @@ Nem_EndSonic:	binclude	"artnem/Ending - Sonic.nem"
 		even
 Nem_TryAgain:	binclude	"artnem/Ending - Try Again.nem"
 		even
-Nem_EndEggman:	if Revision=0
-		binclude	"artnem/Unused - Eggman Ending.nem"
-		endif
-		even
-Kos_EndFlowers:	binclude	"artkos/Flowers at Ending.kos" ; ending sequence animated flowers
+Kos_EndFlowers:	binclude	"artkos/Flowers at Ending.kosp" ; ending sequence animated flowers
 		even
 Nem_EndFlower:	binclude	"artnem/Ending - Flowers.nem"
 		even
@@ -8893,15 +8621,6 @@ Nem_CreditText:	binclude	"artnem/Ending - Credits.nem"
 Nem_EndStH:	binclude	"artnem/Ending - StH Logo.nem"
 		even
 
-		if Revision=0
-		rept $104
-		dc.b $FF			; why?
-		endm
-		else
-		rept $40
-		dc.b $FF
-		endm
-		endif
 ; ---------------------------------------------------------------------------
 ; Collision data
 ; ---------------------------------------------------------------------------
@@ -8926,23 +8645,17 @@ Col_SBZ:	binclude	"collide/SBZ.bin"	; SBZ index
 ; ---------------------------------------------------------------------------
 ; Special Stage layouts
 ; ---------------------------------------------------------------------------
-SS_1:		binclude	"sslayout/1.eni"
+SS_1:		binclude	"sslayout/1.twiz"
 		even
-SS_2:		binclude	"sslayout/2.eni"
+SS_2:		binclude	"sslayout/2.twiz"
 		even
-SS_3:		binclude	"sslayout/3.eni"
+SS_3:		binclude	"sslayout/3.twiz"
 		even
-SS_4:		binclude	"sslayout/4.eni"
+SS_4:		binclude	"sslayout/4.twiz"
 		even
-		if Revision=0
-SS_5:		binclude	"sslayout/5.eni"
+SS_5:		binclude	"sslayout/5.twiz"
 		even
-SS_6:		binclude	"sslayout/6.eni"
-		else
-SS_5:		binclude	"sslayout/5 (JP1).eni"
-			even
-SS_6:		binclude	"sslayout/6 (JP1).eni"
-		endif
+SS_6:		binclude	"sslayout/6.twiz"
 		even
 ; ---------------------------------------------------------------------------
 ; Animated uncompressed graphics
@@ -8961,7 +8674,8 @@ Art_MzTorch:	binclude	"artunc/MZ Background Torch.bin"
 		even
 Art_SbzSmoke:	binclude	"artunc/SBZ Background Smoke.bin"
 		even
-
+Art_BigRing:	binclude	"artunc/Giant Ring.bin"
+		even
 ; ---------------------------------------------------------------------------
 ; Level	layout index
 ; ---------------------------------------------------------------------------
@@ -9088,12 +8802,6 @@ Level_End:	binclude	"levels/ending.bin"
 		even
 byte_6A320:	dc.b 0,	0, 0, 0
 
-
-Art_BigRing:	binclude	"artunc/Giant Ring.bin"
-		even
-
-		align	$100
-
 ; ---------------------------------------------------------------------------
 ; Sprite locations index
 ; ---------------------------------------------------------------------------
@@ -9150,25 +8858,13 @@ ObjPos_GHZ1:	binclude	"objpos/ghz1.bin"
 		even
 ObjPos_GHZ2:	binclude	"objpos/ghz2.bin"
 		even
-ObjPos_GHZ3:	if Revision=0
-		binclude	"objpos/ghz3.bin"
-		else
-		binclude	"objpos/ghz3 (JP1).bin"
-		endif
+ObjPos_GHZ3:	binclude	"objpos/ghz3 (JP1).bin"
 		even
-ObjPos_LZ1:	if Revision=0
-		binclude	"objpos/lz1.bin"
-		else
-		binclude	"objpos/lz1 (JP1).bin"
-		endif
+ObjPos_LZ1:	binclude	"objpos/lz1 (JP1).bin"
 		even
 ObjPos_LZ2:	binclude	"objpos/lz2.bin"
 		even
-ObjPos_LZ3:	if Revision=0
-		binclude	"objpos/lz3.bin"
-		else
-		binclude	"objpos/lz3 (JP1).bin"
-		endif
+ObjPos_LZ3:	binclude	"objpos/lz3 (JP1).bin"
 		even
 ObjPos_SBZ3:	binclude	"objpos/sbz3.bin"
 		even
@@ -9184,11 +8880,7 @@ ObjPos_LZ3pf1:	binclude	"objpos/lz3pf1.bin"
 		even
 ObjPos_LZ3pf2:	binclude	"objpos/lz3pf2.bin"
 		even
-ObjPos_MZ1:	if Revision=0
-		binclude	"objpos/mz1.bin"
-		else
-		binclude	"objpos/mz1 (JP1).bin"
-		endif
+ObjPos_MZ1:	binclude	"objpos/mz1 (JP1).bin"
 		even
 ObjPos_MZ2:	binclude	"objpos/mz2.bin"
 		even
@@ -9204,17 +8896,9 @@ ObjPos_SYZ1:	binclude	"objpos/syz1.bin"
 		even
 ObjPos_SYZ2:	binclude	"objpos/syz2.bin"
 		even
-ObjPos_SYZ3:	if Revision=0
-		binclude	"objpos/syz3.bin"
-		else
-		binclude	"objpos/syz3 (JP1).bin"
-		endif
+ObjPos_SYZ3:	binclude	"objpos/syz3 (JP1).bin"
 		even
-ObjPos_SBZ1:	if Revision=0
-		binclude	"objpos/sbz1.bin"
-		else
-		binclude	"objpos/sbz1 (JP1).bin"
-		endif
+ObjPos_SBZ1:	binclude	"objpos/sbz1 (JP1).bin"
 		even
 ObjPos_SBZ2:	binclude	"objpos/sbz2.bin"
 		even
@@ -9235,16 +8919,6 @@ ObjPos_SBZ1pf6:	binclude	"objpos/sbz1pf6.bin"
 ObjPos_End:	binclude	"objpos/ending.bin"
 		even
 ObjPos_Null:	dc.b $FF, $FF, 0, 0, 0,	0
-
-		if Revision=0
-		rept $62A
-		dc.b $FF
-		endm
-		else
-		rept $63C
-		dc.b $FF
-		endm
-		endif
 
 SoundDriver:	include "s1.sounddriver.asm"
 

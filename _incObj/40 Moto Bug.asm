@@ -50,9 +50,7 @@ Moto_Action:	; Routine 2
 		jsr	Moto_ActIndex(pc,d1.w)
 		lea	(Ani_Moto).l,a1
 		bsr.w	AnimateSprite
-
-		include	"_incObj/sub RememberState.asm" ; Moto_Action terminates in this file
-
+		bra.w	RememberState
 ; ===========================================================================
 Moto_ActIndex:	dc.w .move-Moto_ActIndex
 		dc.w .findfloor-Moto_ActIndex

@@ -2,12 +2,12 @@
 ; Object pointers
 ; ---------------------------------------------------------------------------
 ptr_SonicPlayer:	dc.l SonicPlayer	; $01
-ptr_Obj02:		dc.l NullObject
-ptr_Obj03:		dc.l NullObject
-ptr_Obj04:		dc.l NullObject
-ptr_Obj05:		dc.l NullObject
-ptr_Obj06:		dc.l NullObject
-ptr_Obj07:		dc.l NullObject
+ptr_Obj02:		dc.l DeleteObject
+ptr_Obj03:		dc.l DeleteObject
+ptr_Obj04:		dc.l DeleteObject
+ptr_Obj05:		dc.l DeleteObject
+ptr_Obj06:		dc.l DeleteObject
+ptr_Obj07:		dc.l DeleteObject
 ptr_Splash:		dc.l Splash		; $08
 ptr_SonicSpecial:	dc.l SonicSpecial
 ptr_DrownCount:		dc.l DrownCount
@@ -16,7 +16,7 @@ ptr_FlapDoor:		dc.l FlapDoor
 ptr_Signpost:		dc.l Signpost
 ptr_TitleSonic:		dc.l TitleSonic
 ptr_PSBTM:		dc.l PSBTM
-ptr_Obj10:		dc.l Obj10		; $10
+ptr_Obj10:		dc.l DeleteObject	; $10
 ptr_Bridge:		dc.l Bridge
 ptr_SpinningLight:	dc.l SpinningLight
 ptr_LavaMaker:		dc.l LavaMaker
@@ -25,7 +25,7 @@ ptr_SwingingPlatform:	dc.l SwingingPlatform
 ptr_Harpoon:		dc.l Harpoon
 ptr_Helix:		dc.l Helix
 ptr_BasicPlatform:	dc.l BasicPlatform	; $18
-ptr_Obj19:		dc.l Obj19
+ptr_Obj19:		dc.l DeleteObject
 ptr_CollapseLedge:	dc.l CollapseLedge
 ptr_WaterSurface:	dc.l WaterSurface
 ptr_Scenery:		dc.l Scenery
@@ -79,7 +79,7 @@ ptr_GiantRing:		dc.l GiantRing
 ptr_GeyserMaker:	dc.l GeyserMaker
 ptr_LavaGeyser:		dc.l LavaGeyser
 ptr_LavaWall:		dc.l LavaWall
-ptr_Obj4F:		dc.l Obj4F
+ptr_Obj4F:		dc.l DeleteObject
 ptr_Yadrin:		dc.l Yadrin		; $50
 ptr_SmashBlock:		dc.l SmashBlock
 ptr_MovingBlock:	dc.l MovingBlock

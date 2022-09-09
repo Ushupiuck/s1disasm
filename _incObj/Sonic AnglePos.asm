@@ -82,11 +82,11 @@ loc_14630:
 		beq.s	locret_146BE
 		bpl.s	loc_146C0
 		cmpi.w	#-$E,d1
-		blt.s	locret_146E6
+		blt.s	locret_146BE
 		add.w	d1,obY(a0)
 
 locret_146BE:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_146C0:
@@ -95,7 +95,7 @@ loc_146C0:
 
 loc_146C6:
 		add.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_146CC:
@@ -104,55 +104,12 @@ loc_146CC:
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
-		rts	
+		rts
 ; ===========================================================================
 
 locret_146E6:
-		rts	
+		rts
 ; End of function Sonic_AnglePos
-
-; ===========================================================================
-		move.l	obX(a0),d2
-		move.w	obVelX(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d2
-		move.l	d2,obX(a0)
-		move.w	#$38,d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d3,obY(a0)
-		rts	
-; ===========================================================================
-
-locret_1470A:
-		rts	
-; ===========================================================================
-		move.l	obY(a0),d3
-		move.w	obVelY(a0),d0
-		subi.w	#$38,d0
-		move.w	d0,obVelY(a0)
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d3,obY(a0)
-		rts	
-		rts	
-; ===========================================================================
-		move.l	obX(a0),d2
-		move.l	obY(a0),d3
-		move.w	obVelX(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d2
-		move.w	obVelY(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d2,obX(a0)
-		move.l	d3,obY(a0)
-		rts	
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	change Sonic's angle as he walks along the floor
@@ -172,7 +129,7 @@ loc_1475E:
 		btst	#0,d2
 		bne.s	loc_1476A
 		move.b	d2,obAngle(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1476A:
@@ -227,7 +184,7 @@ Sonic_WalkVertR:
 		beq.s	locret_147F0
 		bpl.s	loc_147F2
 		cmpi.w	#-$E,d1
-		blt.w	locret_1470A
+		blt.s	locret_147F0
 		add.w	d1,obX(a0)
 
 locret_147F0:
@@ -297,7 +254,7 @@ Sonic_WalkCeiling:
 		beq.s	locret_14892
 		bpl.s	loc_14894
 		cmpi.w	#-$E,d1
-		blt.w	locret_146E6
+		blt.w	locret_14892
 		sub.w	d1,obY(a0)
 
 locret_14892:
@@ -367,7 +324,7 @@ Sonic_WalkVertL:
 		beq.s	locret_14934
 		bpl.s	loc_14936
 		cmpi.w	#-$E,d1
-		blt.w	locret_1470A
+		blt.w	locret_14934
 		sub.w	d1,obX(a0)
 
 locret_14934:

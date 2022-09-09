@@ -85,19 +85,13 @@ Spik_Hurt:
 		movea.l	a0,a2
 		lea	(v_player).w,a0
 		cmpi.b	#4,obRoutine(a0)
-		bhs.s	loc_CF20
-	if Revision<>2
+		bcc.s	loc_CF20
+		tst.w	flashtime(a0)	; Is Sonic flashing after being hurt?
+		bne.s	loc_CF20	; If so, skip getting hurt
 		move.l	obY(a0),d3
 		move.w	obVelY(a0),d0
 		ext.l	d0
 		asl.l	#8,d0
-	else
-		; This fixes the infamous "spike bug"
-		tst.w	flashtime(a0)	; Is Sonic flashing after being hurt?
-		bne.s	loc_CF20	; If so, skip getting hurt
-		jmp	(loc_E0).l	; This is a copy of the above code that was pushed aside for this
-loc_D5A2:
-	endif
 		sub.l	d0,d3
 		move.l	d3,obY(a0)
 		jsr	(HurtSonic).l
@@ -106,9 +100,8 @@ loc_CF20:
 		movea.l	(sp)+,a0
 
 Spik_Display:
-		bsr.w	DisplaySprite
 		out_of_range.w	DeleteObject,spik_origX(a0)
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 Spik_Type0x:
@@ -142,7 +135,7 @@ Spik_Type02:
 		move.b	objoff_34(a0),d0
 		add.w	spik_origX(a0),d0
 		move.w	d0,obX(a0)	; move the object horizontally
-		rts	
+		rts
 ; ===========================================================================
 
 Spik_Wait:
@@ -177,4 +170,4 @@ loc_CFC6:
 		move.w	#60,objoff_38(a0)	; set time delay to 1 second
 
 locret_CFE6:
-		rts	
+		rts
