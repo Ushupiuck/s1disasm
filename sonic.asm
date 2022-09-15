@@ -484,7 +484,7 @@ ShowErrorMessage:
 		addi.w	#$790,d0
 		move.w	d0,(a6)
 		dbf	d1,.showchars	; repeat for number of characters
-		rts	
+		rts
 ; End of function ShowErrorMessage
 
 ; ===========================================================================
@@ -1060,7 +1060,7 @@ ClearScreen:
 		clearRAM v_hscrolltablebuffer,v_hscrolltablebuffer_end_padded+4 ; Clears too much RAM, clearing the first 4 bytes of v_objspace.
 	endif
 
-		rts	
+		rts
 ; End of function ClearScreen
 
 ; ---------------------------------------------------------------------------
@@ -1071,7 +1071,7 @@ ClearScreen:
 
 ; SoundDriverLoad:
 DACDriverLoad:
-		nop	
+		nop
 		stopZ80
 		resetZ80
 		lea	(DACDriver).l,a0	; load DAC driver
@@ -1116,7 +1116,7 @@ Tilemap_Cell:
 		dbf	d3,Tilemap_Cell	; next tile
 		add.l	d4,d0		; goto next line
 		dbf	d2,Tilemap_Line	; next line
-		rts	
+		rts
 ; End of function TilemapToVRAM
 
 		include	"_inc/Nemesis Decompression.asm"
@@ -1878,7 +1878,7 @@ loc_20B2:
 
 loc_20BC:
 		moveq	#1,d0
-		rts	
+		rts
 ; End of function PalCycle_Sega
 
 ; ===========================================================================
@@ -2714,7 +2714,7 @@ LevSel_CharOk:
 		add.w	d3,d0		; combine char with VRAM setting
 		move.w	d0,(a6)		; send to VRAM
 		dbf	d2,LevSel_LineLoop
-		rts	
+		rts
 ; End of function LevSel_ChgLine
 
 ; ===========================================================================
@@ -3427,7 +3427,7 @@ loc_491C:
 		bsr.w	EniDec
 		copyTilemap	v_ssbuffer1&$FFFFFF,$C000,$3F,$1F
 		copyTilemap	v_ssbuffer1&$FFFFFF,$D000,$3F,$3F
-		rts	
+		rts
 ; End of function SS_BGLoad
 
 ; ---------------------------------------------------------------------------
@@ -3718,7 +3718,7 @@ loc_4DF2:
 		tst.w	(v_demolength).w
 		bne.w	Cont_MainLoop
 		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
-		rts	
+		rts
 ; ===========================================================================
 
 Cont_GotoLevel:
@@ -4016,7 +4016,7 @@ Cred_WaitLoop:
 		bne.s	Cred_WaitLoop	; if not, branch
 		cmpi.w	#9,(v_creditsnum).w ; have the credits finished?
 		beq.w	TryAgainEnd	; if yes, branch
-		rts	
+		rts
 
 ; ---------------------------------------------------------------------------
 ; Ending sequence demo loading subroutine
@@ -4053,7 +4053,7 @@ EndDemo_LampLoad:
 		dbf	d0,EndDemo_LampLoad
 
 EndDemo_Exit:
-		rts	
+		rts
 ; End of function EndingDemoLoad
 
 ; ===========================================================================
@@ -4129,7 +4129,7 @@ TryAg_MainLoop:
 
 TryAg_Exit:
 		move.b	#id_Sega,(v_gamemode).w ; goto Sega screen
-		rts	
+		rts
 
 ; ===========================================================================
 
@@ -4912,7 +4912,7 @@ GetBlockData_2:
 		adda.w	d3,a1
 
 locret_6C1E:
-		rts	
+		rts
 ; End of function GetBlockData
 
 
@@ -4944,7 +4944,7 @@ Calc_VRAM_Pos_2:
 		moveq	#3,d0	; Highest bits of plane VRAM address
 		swap	d0
 		move.w	d4,d0
-		rts	
+		rts
 ; End of function Calc_VRAM_Pos
 
 
@@ -4996,14 +4996,14 @@ DrawChunks:
 		movem.l	(sp)+,d4-d6
 		addi.w	#16,d4
 		dbf	d6,.loop
-		rts	
+		rts
 ; End of function DrawChunks
 
 		if Revision>=1
 Draw_GHz_Bg:
 			moveq	#0,d4
 			moveq	#((224+16+16)/16)-1,d6
-locj_7224:			
+locj_7224:
 			movem.l	d4-d6,-(sp)
 			lea	(locj_724a).l,a0
 			move.w	(v_bgscreenposy).w,d0
@@ -5020,7 +5020,7 @@ locj_724a:
 Draw_Mz_Bg:;locj_725a:
 			moveq	#-16,d4
 			moveq	#((224+16+16)/16)-1,d6
-locj_725E:			
+locj_725E:
 			movem.l	d4-d6,-(sp)
 			lea	(locj_6EF2+1).l,a0
 			move.w	(v_bgscreenposy).w,d0
@@ -5036,7 +5036,7 @@ locj_725E:
 Draw_SBz_Bg:;locj_7288:
 			moveq	#-16,d4
 			moveq	#((224+16+16)/16)-1,d6
-locj_728C:			
+locj_728C:
 			movem.l	d4-d6,-(sp)
 			lea	(locj_6DF4+1).l,a0
 			move.w	(v_bgscreenposy).w,d0
@@ -5067,7 +5067,7 @@ locj_72da:
 			bsr.w	Calc_VRAM_Pos_2
 			movem.l	(sp)+,d4/d5
 			moveq	#(512/16)-1,d6
-			bsr.w	DrawBlocks_LR_3
+			bra.w	DrawBlocks_LR_3
 locj_72EE:
 			rts
 		endif
@@ -5089,7 +5089,7 @@ LevelDataLoad:
 		addq.l	#4,a2
 		movea.l	(a2)+,a0
 		lea	(v_16x16).w,a1	; RAM address for 16x16 mappings
-		move.w	#0,d0
+		clr.w	d0
 		bsr.w	EniDec
 		movea.l	(a2)+,a0
 		lea	(v_256x256&$FFFFFF).l,a1 ; RAM address for 256x256 mappings
@@ -5121,7 +5121,7 @@ LevelDataLoad:
 		bra.w	AddPLC		; load pattern load cues
 
 .skipPLC:
-		rts	
+		rts
 ; End of function LevelDataLoad
 
 ; ---------------------------------------------------------------------------
@@ -5184,7 +5184,7 @@ LevLoad_Row:
 		dbf	d0,LevLoad_Row	; load 1 row
 		lea	$80(a3),a3	; do next row
 		dbf	d2,LevLoad_NumRows ; repeat for	number of rows
-		rts	
+		rts
 ; End of function LevelLayoutLoad2
 
 		include	"_inc/DynamicLevelEvents.asm"
@@ -7385,7 +7385,7 @@ ObjHitWallLeft:
 		; Engine bug: colliding with left walls is erratic with this function.
 		; The cause is this: a missing instruction to flip collision on the found
 		; 16x16 block; this one:
-		;eori.w	#$F,d3
+		eori.w	#$F,d3
 		lea	(v_anglebuffer).w,a4
 		move.b	#0,(a4)
 		movea.w	#-$10,a3
