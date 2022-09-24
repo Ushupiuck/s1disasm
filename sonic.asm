@@ -2116,18 +2116,9 @@ GM_Title:
 
 		clearRAM v_objspace,v_objend
 
-		locVRAM	0
-		lea	(Nem_JapNames).l,a0 ; load Japanese credits
-		bsr.w	NemDec
-		locVRAM	ArtTile_Sonic_Team_Font*$20
+		locVRAM	$0020
 		lea	(Nem_CreditText).l,a0 ;	load alphabet
 		bsr.w	NemDec
-		lea	(v_256x256&$FFFFFF).l,a1
-		lea	(Eni_JapNames).l,a0 ; load mappings for	Japanese credits
-		move.w	#0,d0
-		bsr.w	EniDec
-
-		copyTilemap	v_256x256&$FFFFFF,$C000,$27,$1B
 
 		clearRAM v_pal_dry_dup,v_pal_dry_dup+16*4*2
 
@@ -2348,8 +2339,6 @@ LevelSelect:
 		bne.s	LevSel_Level_SS	; if not, go to	Level/SS subroutine
 		move.w	(v_levselsound).w,d0
 		addi.w	#$80,d0
-		tst.b	(f_creditscheat).w ; is Japanese Credits cheat on?
-		beq.s	LevSel_NoCheat	; if not, branch
 		cmpi.w	#$9F,d0		; is sound $9F being played?
 		beq.s	LevSel_Ending	; if yes, branch
 		cmpi.w	#$9E,d0		; is sound $9E being played?
@@ -8260,10 +8249,6 @@ Nem_TitleFg:	binclude	"artnem/Title Screen Foreground.nem"
 Nem_TitleSonic:	binclude	"artnem/Title Screen Sonic.nem"
 		even
 Nem_TitleTM:	binclude	"artnem/Title Screen TM.nem"
-		even
-Eni_JapNames:	binclude	"tilemaps/Hidden Japanese Credits.eni" ; Japanese credits (mappings)
-		even
-Nem_JapNames:	binclude	"artnem/Hidden Japanese Credits.nem"
 		even
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics	- Sonic
