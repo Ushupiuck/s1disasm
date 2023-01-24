@@ -16,7 +16,7 @@ AddressSRAM	  = 3	; 0 = odd+even; 2 = even only; 3 = odd only
 ; Change to 0 to build the original version of the game, dubbed REV00
 ; Change to 1 to build the later vesion, dubbed REV01, which includes various bugfixes and enhancements
 ; Change to 2 to build the version from Sonic Mega Collection, dubbed REVXB, which fixes the infamous "spike bug"
-Revision	  = 0
+Revision	  = 2
 
 ZoneCount	  = 6	; discrete zones are: GHZ, MZ, SYZ, LZ, SLZ, and SBZ
 
@@ -101,17 +101,9 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.b "(C)SEGA 1991.APR" ; Copyright holder and release date (generally year)
 		dc.b "SONIC THE               HEDGEHOG                " ; Domestic name
 		dc.b "SONIC THE               HEDGEHOG                " ; International name
-		if Revision=0
-		dc.b "GM 00001009-00"   ; Serial/version number (Rev 0)
-		else
-			dc.b "GM 00004049-01" ; Serial/version number (Rev non-0)
-		endif
+		dc.b "GM 00004049-03" ; Serial/version number (Rev non-0)
 Checksum:
-		if Revision=0
-		dc.w $264A	; Hardcoded to make it easier to check for ROM correctness
-		else
-		dc.w $AFC7
-		endif
+		dc.w $AFC7	; Hardcoded to make it easier to check for ROM correctness
 		dc.b "J               " ; I/O support
 		dc.l StartOfRom		; Start address of ROM
 RomEndLoc:	dc.l EndOfRom-1		; End address of ROM
@@ -209,7 +201,7 @@ PSGInitLoop:
 		disable_ints
 
 SkipSetup:
-		bra.s	GameProgram	; begin game
+		bra.s	GameInit	; begin game
 
 ; ===========================================================================
 SetupValues:	dc.w $8000		; VDP register start number
@@ -292,40 +284,6 @@ zStartupCodeEndLoc:
 
 		dc.b $9F, $BF, $DF, $FF	; values for PSG channel volumes
 ; ===========================================================================
-
-GameProgram:
-		tst.w	(vdp_control_port).l
-		btst	#6,(z80_expansion_control+1).l
-		beq.s	CheckSumCheck
-		cmpi.l	#'init',(v_init).w ; has checksum routine already run?
-		beq.w	GameInit	; if yes, branch
-
-CheckSumCheck:
-		movea.l	#EndOfHeader,a0	; start	checking bytes after the header	($200)
-		movea.l	#RomEndLoc,a1	; stop at end of ROM
-		move.l	(a1),d0
-		moveq	#0,d1
-
-.loop:
-		add.w	(a0)+,d1
-		cmp.l	a0,d0
-		bhs.s	.loop
-		movea.l	#Checksum,a1	; read the checksum
-		cmp.w	(a1),d1		; compare checksum in header to ROM
-		bne.w	CheckSumError	; if they don't match, branch
-
-CheckSumOk:
-		lea	(v_crossresetram).w,a6
-		moveq	#0,d7
-		move.w	#(v_ram_end-v_crossresetram)/4-1,d6
-.clearRAM:
-		move.l	d7,(a6)+
-		dbf	d6,.clearRAM	; clear RAM ($FE00-$FFFF)
-
-		move.b	(z80_version).l,d0
-		andi.b	#$C0,d0
-		move.b	d0,(v_megadrive).w ; get region setting
-		move.l	#'init',(v_init).w ; set flag so checksum won't run again
 
 GameInit:
 		lea	(v_ram_start&$FFFFFF).l,a6
@@ -2089,7 +2047,7 @@ Sega_WaitEnd:
 
 Sega_GotoTitle:
 		move.b	#id_Title,(v_gamemode).w ; go to title screen
-		rts	
+		rts
 ; ===========================================================================
 
 ; ---------------------------------------------------------------------------
@@ -2236,23 +2194,14 @@ Tit_MainLoop:
 		addq.w	#2,d0
 		move.w	d0,(v_player+obX).w ; move Sonic to the right
 		cmpi.w	#$1C00,d0	; has Sonic object passed $1C00 on x-axis?
-		blo.s	Tit_ChkRegion	; if not, branch
+		blo.s	Tit_EnterCheat	; if not, branch
 
 		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
-		rts	
+		rts
 ; ===========================================================================
 
-Tit_ChkRegion:
-		tst.b	(v_megadrive).w	; check	if the machine is US or	Japanese
-		bpl.s	Tit_RegionJap	; if Japanese, branch
-
-		lea	(LevSelCode_US).l,a0 ; load US code
-		bra.s	Tit_EnterCheat
-
-Tit_RegionJap:
-		lea	(LevSelCode_J).l,a0 ; load J code
-
 Tit_EnterCheat:
+		lea	(LevSelCode).l,a0 ; load code
 		move.w	(v_title_dcount).w,d0
 		adda.w	d0,a0
 		move.b	(v_jpadpress1).w,d0 ; get button press
@@ -2465,14 +2414,7 @@ LevSel_Ptrs:	if Revision=0
 ; ---------------------------------------------------------------------------
 ; Level	select codes
 ; ---------------------------------------------------------------------------
-LevSelCode_J:	if Revision=0
-		dc.b btnUp,btnDn,btnL,btnR,0,$FF
-		else
-		dc.b btnUp,btnDn,btnDn,btnDn,btnL,btnR,0,$FF
-		endif
-		even
-
-LevSelCode_US:	dc.b btnUp,btnDn,btnL,btnR,0,$FF
+LevSelCode:	dc.b btnUp,btnDn,btnL,btnR,0,$FF
 		even
 ; ===========================================================================
 
@@ -3114,16 +3056,16 @@ Sync2:
 
 ; Used for nothing
 Sync3:
-		subq.b	#1,(v_ani2_time).w
-		bpl.s	Sync4
-		move.b	#7,(v_ani2_time).w
-		addq.b	#1,(v_ani2_frame).w
-		cmpi.b	#6,(v_ani2_frame).w
-		blo.s	Sync4
-		move.b	#0,(v_ani2_frame).w
+;		subq.b	#1,(v_ani2_time).w
+;		bpl.s	Sync4
+;		move.b	#7,(v_ani2_time).w
+;		addq.b	#1,(v_ani2_frame).w
+;		cmpi.b	#6,(v_ani2_frame).w
+;		blo.s	Sync4
+;		move.b	#0,(v_ani2_frame).w
 
 ; Used for bouncing rings
-Sync4:
+;Sync4:
 		tst.b	(v_ani3_time).w
 		beq.s	SyncEnd
 		moveq	#0,d0
@@ -3136,7 +3078,7 @@ Sync4:
 		subq.b	#1,(v_ani3_time).w
 
 SyncEnd:
-		rts	
+		rts
 ; End of function SynchroAnimate
 
 ; ---------------------------------------------------------------------------
@@ -3166,7 +3108,7 @@ SignpostArtLoad:
 		bra.w	NewPLC		; load signpost	patterns
 
 .exit:
-		rts	
+		rts
 ; End of function SignpostArtLoad
 
 ; ===========================================================================
@@ -3469,7 +3411,7 @@ loc_4992:
 		move.l	(a1)+,(a2)+
 
 locret_49E6:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_49E8:
@@ -3505,7 +3447,7 @@ loc_4A2E:
 		adda.w	d0,a1
 		move.l	(a1)+,(a2)+
 		move.w	(a1)+,(a2)+
-		rts	
+		rts
 ; End of function PalCycle_SS
 
 ; ===========================================================================
@@ -3619,7 +3561,7 @@ loc_4CA4:
 		andi.w	#$3FC,d2
 		dbf	d1,loc_4CA4
 		dbf	d3,loc_4C9A
-		rts	
+		rts
 ; End of function SS_BGAnimate
 
 ; ===========================================================================
@@ -3719,7 +3661,7 @@ Cont_GotoLevel:
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost count
 		subq.b	#1,(v_continues).w ; subtract 1 from continues
-		rts	
+		rts
 ; ===========================================================================
 
 		include	"_incObj/80 Continue Screen Elements.asm"
@@ -3840,10 +3782,9 @@ End_MainLoop:
 		beq.s	End_ChkEmerald	; if yes, branch
 
 		move.b	#id_Credits,(v_gamemode).w ; goto credits
-		move.b	#bgm_Credits,d0
-		bsr.w	PlaySound_Special ; play credits music
 		move.w	#0,(v_creditsnum).w ; set credits index number to 0
-		rts	
+		move.b	#bgm_Credits,d0
+		jmp	(PlaySound_Special).l ; play credits music
 ; ===========================================================================
 
 End_ChkEmerald:
@@ -4250,7 +4191,7 @@ loc_6938:
 		bsr.w	DrawBlocks_TB
 
 locret_6952:
-		rts	
+		rts
 ; End of function LoadTilesAsYouMove
 
 
@@ -4385,7 +4326,7 @@ locj_6D88:
 		endif
 
 locret_69F2:
-		rts	
+		rts
 ; End of function DrawBGScrollBlock1
 
 
@@ -4489,7 +4430,7 @@ loc_6AAC:
 		bsr.w	DrawBlocks_TB_2
 
 locret_6AD6:
-		rts	
+		rts
 
 		else
 
@@ -4517,7 +4458,7 @@ locj_6DD2:
 			move.w	#224/2,d4
 			move.w	#320,d5
 			moveq	#3-1,d6
-			bsr.w	DrawBlocks_TB_2
+			bra.w	DrawBlocks_TB_2
 locj_6DF2:
 			rts
 ;===============================================================================
@@ -5396,7 +5337,7 @@ MvSonic2:
 		sub.w	d2,obX(a1)
 
 locret_7B62:
-		rts	
+		rts
 ; End of function MvSonicOnPtfm2
 
 		include	"_incObj/15 Swinging Platforms (part 2).asm"

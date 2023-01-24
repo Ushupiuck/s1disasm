@@ -10,7 +10,7 @@
 
 PlaySound:
 		move.b	d0,(v_snddriver_ram+v_soundqueue0).w
-		rts	
+		rts
 ; End of function PlaySound
 
 ; ---------------------------------------------------------------------------
@@ -22,7 +22,7 @@ PlaySound:
 
 PlaySound_Special:
 		move.b	d0,(v_snddriver_ram+v_soundqueue1).w
-		rts	
+		rts
 ; End of function PlaySound_Special
 
 ; ===========================================================================
@@ -32,4 +32,4 @@ PlaySound_Special:
 
 PlaySound_Unused:
 		move.b	d0,(v_snddriver_ram+v_soundqueue2).w
-		rts	
+		rts

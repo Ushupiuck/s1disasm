@@ -34,15 +34,17 @@ Jun_Main:	; Routine 0
 		move.w	obY(a0),obY(a1)
 		move.b	#3,obPriority(a1)
 		move.b	#$10,obFrame(a1) ; use large circular sprite
-
-.makeitem:
 		move.l	#Map_Jun,obMap(a1)
 		move.w	#make_art_tile(ArtTile_SBZ_Junction,2,0),obGfx(a1)
 		ori.b	#4,obRender(a1)
 		move.b	#$38,obActWid(a1)
+		bsr.w	FindFreeObj
+		bne.s	.fail
+		_move.b	#id_Junction,0(a1)
+		addq.b	#4,obRoutine(a1) ; goto Jun_Display next
 
 .fail:
-		dbf	d1,.repeat
+		dbf	d1,-
 
 		move.b	#$30,obActWid(a0)
 		move.b	#4,obPriority(a0)
@@ -68,7 +70,7 @@ Jun_Action:	; Routine 2
 		move.w	obX(a1),d0
 		cmp.w	obX(a0),d0	; is Sonic to the left of the disc?
 		blo.s	.isleft		; if yes, branch
-		moveq	#7,d1		
+		moveq	#7,d1
 
 .isleft:
 		cmp.b	obFrame(a0),d1	; is the gap next to Sonic?
@@ -154,7 +156,7 @@ Jun_ChkSwitch:
 		move.b	d0,obFrame(a0)	; update frame
 
 .nochange:
-		rts	
+		rts
 ; End of function Jun_ChkSwitch
 
 
@@ -175,7 +177,7 @@ Jun_ChgPos:
 		ext.w	d0
 		add.w	obY(a0),d0
 		move.w	d0,obY(a1)
-		rts	
+		rts
 
 
 .data:		dc.b -$20,    0, -$1E,   $E ; disc x-pos, Sonic x-pos, disc y-pos, Sonic y-pos
