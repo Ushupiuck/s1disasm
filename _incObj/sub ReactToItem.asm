@@ -38,7 +38,7 @@ ReactToItem:
 		moveq	#0,d0
 		rts	
 ; ===========================================================================
-.sizes:		;   width, height
+.sizes:		dc.b    4,   4;   width, height
 		dc.b  $14, $14		; $01
 		dc.b   $C, $14		; $02
 		dc.b  $14,  $C		; $03
@@ -80,7 +80,7 @@ ReactToItem:
 .proximity:
 		andi.w	#$3F,d0
 		add.w	d0,d0
-		lea	.sizes-2(pc,d0.w),a2
+		lea	.sizes(pc,d0.w),a2
 		moveq	#0,d1
 		move.b	(a2)+,d1
 		move.w	obX(a1),d0

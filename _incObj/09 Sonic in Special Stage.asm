@@ -223,7 +223,7 @@ Obj09_Jump:
 		move.w	d0,obVelY(a0)
 		bset	#1,obStatus(a0)
 		move.w	#sfx_Jump,d0
-		jsr	(PlaySound_Special).l	; play jumping sound
+		jmp	(PlaySound_Special).l	; play jumping sound
 
 Obj09_NoJump:
 		rts	
@@ -341,6 +341,7 @@ Obj09_Fall:
 		moveq	#0,d0
 		move.w	d0,obVelX(a0)
 		bclr	#1,obStatus(a0)
+;		move.b	#4,$36(a0)
 		add.l	d1,d2
 		bsr.w	sub_1BCE8
 		beq.s	loc_1BCC6
@@ -358,6 +359,7 @@ loc_1BCB0:
 		moveq	#0,d1
 		move.w	d1,obVelY(a0)
 		bclr	#1,obStatus(a0)
+;		move.b	#4,$36(a0)
 
 loc_1BCC6:
 		asr.l	#8,d0
@@ -372,8 +374,15 @@ loc_1BCD4:
 		asr.l	#8,d1
 		move.w	d0,obVelX(a0)
 		move.w	d1,obVelY(a0)
+;		tst.b	$36(a0)
+;		bne.s	.loc_4BD54
 		bset	#1,obStatus(a0)
-		rts	
+		rts
+; ---------------------------------------------------------------------------
+
+;.loc_4BD54:
+;		subq.b	#1,$36(a0)
+;		rts
 ; End of function Obj09_Fall
 
 
@@ -415,13 +424,14 @@ sub_1BCE8:
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
+
 sub_1BD30:
+		beq.s	locret_1BD44	; branch if 0
+		cmpi.b	#$28,d4		; is the item an extra life?
 		beq.s	locret_1BD44
-		cmpi.b	#$28,d4
-		beq.s	locret_1BD44
-		cmpi.b	#$3A,d4
+		cmpi.b	#$3A,d4		; is the item an emerald or ghost block ($3B+)?
 		blo.s	loc_1BD46
-		cmpi.b	#$4B,d4
+		cmpi.b	#$4B,d4		; is the item a flashing glass block ($4B+)?
 		bhs.s	loc_1BD46
 
 locret_1BD44:
@@ -631,8 +641,7 @@ Obj09_GOAL:
 		bne.s	Obj09_UPblock
 		addq.b	#2,obRoutine(a0) ; run routine "Obj09_ExitStage"
 		move.w	#sfx_SSGoal,d0
-		jsr	(PlaySound_Special).l	; play "GOAL" sound
-		rts	
+		jmp	(PlaySound_Special).l	; play "GOAL" sound
 ; ===========================================================================
 
 Obj09_UPblock:
@@ -712,6 +721,7 @@ Obj09_Glass:
 		cmpi.b	#$30,d0
 		bls.s	Obj09_GlassUpdate ; if glass is	still there, branch
 		clr.b	d0		; remove the glass block when it's destroyed
+;		move.b	#$27,d0		; change to a GOAL block
 
 Obj09_GlassUpdate:
 		move.b	d0,4(a2)	; update the stage layout

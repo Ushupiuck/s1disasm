@@ -29,16 +29,16 @@ Msl_Main:	; Routine 0
 		andi.b	#3,obStatus(a0)
 		tst.b	obSubtype(a0)	; was object created by	a Newtron?
 		beq.s	Msl_Animate	; if not, branch
-
 		move.b	#8,obRoutine(a0) ; run "Msl_FromNewt" routine
 		move.b	#$87,obColType(a0)
 		move.b	#1,obAnim(a0)
-		bra.s	Msl_Animate2
+		lea	(Ani_Missile).l,a1
+		bsr.w	AnimateSprite
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 Msl_Animate:	; Routine 2
 		bsr.s	Msl_ChkCancel
-	if FixBugs
 		; Msl_ChkCancel can call DeleteObject, so we shouldn't queue
 		; this object for display or update the animation state.
 		; Failing to account for this results in a null pointer
@@ -47,7 +47,6 @@ Msl_Animate:	; Routine 2
 		; code in its BuildSprites function for detecting this type
 		; of bug.
 		beq.s	Msl_ChkCancel.return
-	endif
 		lea	(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
@@ -56,13 +55,10 @@ Msl_Animate:	; Routine 2
 ; Subroutine to	check if the Buzz Bomber which fired the missile has been
 ; destroyed, and if it has, then cancel	the missile
 ; ---------------------------------------------------------------------------
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
-
-Msl_ChkCancel:
+Msl_ChkCancel:	; Routine 2
 		movea.l	msl_parent(a0),a1
 		_cmpi.b	#id_ExplosionItem,obID(a1) ; has Buzz Bomber been destroyed?
-	if FixBugs
 		; This adds a return value so that we know if the object has
 		; been freed.
 		bne.s	.return
@@ -70,10 +66,7 @@ Msl_ChkCancel:
 		moveq	#0,d0
 
 .return:
-	else
-		beq.s	Msl_Delete	; if yes, branch
-	endif
-		rts	
+		rts
 ; End of function Msl_ChkCancel
 
 ; ===========================================================================
@@ -84,27 +77,14 @@ Msl_FromBuzz:	; Routine 4
 		move.b	#$87,obColType(a0)
 		move.b	#1,obAnim(a0)
 		bsr.w	SpeedToPos
-
-	if ~~FixBugs
-		; Object should not call DisplaySprite and DeleteObject on
-		; the same frame, or else cause a null-pointer dereference.
-		lea	(Ani_Missile).l,a1
-		bsr.w	AnimateSprite
-		bsr.w	DisplaySprite
-	endif
-
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has object moved below the level boundary?
 		blo.s	Msl_Delete	; if yes, branch
 
-	if FixBugs
 		lea	(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
-	else
-		rts	
-	endif
 ; ===========================================================================
 
 .explode:
@@ -114,17 +94,13 @@ Msl_FromBuzz:	; Routine 4
 ; ===========================================================================
 
 Msl_Delete:	; Routine 6
-		bsr.w	DeleteObject
-		rts	
+		bra.w	DeleteObject
 ; ===========================================================================
 
 Msl_FromNewt:	; Routine 8
 		tst.b	obRender(a0)
 		bpl.s	Msl_Delete
 		bsr.w	SpeedToPos
-
-Msl_Animate2:
 		lea	(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
-		bsr.w	DisplaySprite
-		rts	
+		bra.w	DisplaySprite

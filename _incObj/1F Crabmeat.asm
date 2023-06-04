@@ -78,7 +78,6 @@ Crab_Action:	; Routine 2
 		bchg	#0,obStatus(a0)
 		bne.s	.noflip
 		neg.w	obVelX(a0)	; change direction
-
 .dontmove:
 .noflip:
 		rts	
@@ -148,6 +147,7 @@ loc_966E:
 		bsr.w	Crab_SetAni
 		move.b	d0,obAnim(a0)
 		rts	
+
 ; ---------------------------------------------------------------------------
 ; Subroutine to	set the	correct	animation for a	Crabmeat
 ; ---------------------------------------------------------------------------
@@ -185,8 +185,7 @@ locret_96B6:
 ; ===========================================================================
 
 Crab_Delete:	; Routine 4
-		bsr.w	DeleteObject
-		rts	
+		bra.w	DeleteObject
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Sub-object - missile that the	Crabmeat throws
@@ -207,21 +206,8 @@ Crab_BallMove:	; Routine 8
 		lea	(Ani_Crab).l,a1
 		bsr.w	AnimateSprite
 		bsr.w	ObjectFall
-	if ~~FixBugs
-		; Another bug where an object is queued for display and then
-		; deleted, causing a null-pointer dereference.
-		bsr.w	DisplaySprite
-	endif
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has object moved below the level boundary?
-	if FixBugs
-		blo.s	Crab_Delete
+		blo.w	DeleteObject	; if so, branch
 		bra.w	DisplaySprite
-	else
-		blo.s	.delete		; if yes, branch
-		rts	
-
-.delete:
-		bra.w	DeleteObject
-	endif

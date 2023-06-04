@@ -125,5 +125,4 @@ Buzz_Action:	; Routine 2
 ; ===========================================================================
 
 Buzz_Delete:	; Routine 4
-		bsr.w	DeleteObject
-		rts	
+		bra.w	DeleteObject

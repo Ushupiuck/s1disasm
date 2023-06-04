@@ -53,21 +53,19 @@ FBlock_Main:	; Routine 0
 		move.b	(a2),d0
 		add.w	d0,d0
 		move.w	d0,fb_height(a0)
-		if Revision<>0
-			cmpi.b	#$37,obSubtype(a0)
-			bne.s	.dontdelete
-			cmpi.w	#$1BB8,obX(a0)
-			bne.s	.notatpos
-			tst.b	(f_obj56).w
-			beq.s	.dontdelete
-			jmp	(DeleteObject).l
+		cmpi.b	#$37,obSubtype(a0)
+		bne.s	.dontdelete
+		cmpi.w	#$1BB8,obX(a0)
+		bne.s	.notatpos
+		tst.b	(f_obj56).w
+		beq.s	.dontdelete
+		jmp	(DeleteObject).l
 .notatpos:
-			clr.b	obSubtype(a0)
-			tst.b	(f_obj56).w
-			bne.s	.dontdelete
-			jmp	(DeleteObject).l
+		clr.b	obSubtype(a0)
+		tst.b	(f_obj56).w
+		bne.s	.dontdelete
+		jmp	(DeleteObject).l
 .dontdelete:
-		endif
 		moveq	#0,d0
 		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ
 		beq.s	.stillnotLZ
@@ -98,8 +96,10 @@ FBlock_Main:	; Routine 0
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		beq.s	FBlock_Action
-		bclr	#7,2(a2,d0.w)
-		btst	#0,2(a2,d0.w)
+;		bclr	#7,2(a2,d0.w)
+;		btst	#0,2(a2,d0.w)
+		bclr	#7,obGfx(a2,d0.w)
+		btst	#0,obGfx(a2,d0.w)
 		beq.s	FBlock_Action
 		addq.b	#1,obSubtype(a0)
 		clr.w	fb_height(a0)
@@ -125,21 +125,15 @@ FBlock_Action:	; Routine 2
 		bsr.w	SolidObject
 
 .chkdel:
-		if Revision=0
-		out_of_range.w	DeleteObject,fb_origX(a0)
+		out_of_range.s	.chkdel2,fb_origX(a0)
 		bra.w	DisplaySprite
-		else
-			out_of_range.s	.chkdel2,fb_origX(a0)
-.display:
-			bra.w	DisplaySprite
 .chkdel2:
-			cmpi.b	#$37,obSubtype(a0)
-			bne.s	.delete
-			tst.b	objoff_38(a0)
-			bne.s	.display
+		cmpi.b	#$37,obSubtype(a0)
+		bne.s	.delete
+		tst.b	objoff_38(a0)
+		bne.s	.display
 .delete:
-			jmp	(DeleteObject).l
-		endif
+		jmp	(DeleteObject).l
 ; ===========================================================================
 .index:		dc.w .type00-.index, .type01-.index
 		dc.w .type02-.index, .type03-.index
@@ -152,7 +146,7 @@ FBlock_Action:	; Routine 2
 
 .type00:
 ; doesn't move
-		rts	
+		rts
 ; ===========================================================================
 
 .type01:
@@ -179,7 +173,7 @@ FBlock_Action:	; Routine 2
 		move.w	fb_origX(a0),d1
 		sub.w	d0,d1
 		move.w	d1,obX(a0)	; move object horizontally
-		rts	
+		rts
 ; ===========================================================================
 
 .type03:
@@ -206,7 +200,7 @@ FBlock_Action:	; Routine 2
 		move.w	fb_origY(a0),d1
 		sub.w	d0,d1
 		move.w	d1,obY(a0)	; move object vertically
-		rts	
+		rts
 ; ===========================================================================
 
 .type05:
@@ -253,7 +247,7 @@ FBlock_Action:	; Routine 2
 		move.w	fb_origY(a0),d1
 		add.w	d0,d1
 		move.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .loc_104C8:
@@ -263,7 +257,8 @@ FBlock_Action:	; Routine 2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		beq.s	.loc_104AE
-		bset	#0,2(a2,d0.w)
+;		bset	#0,2(a2,d0.w)
+		bset	#0,obGfx(a2,d0.w)
 		bra.s	.loc_104AE
 ; ===========================================================================
 
@@ -295,7 +290,7 @@ FBlock_Action:	; Routine 2
 		move.w	fb_origY(a0),d1
 		add.w	d0,d1
 		move.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .loc_1052C:
@@ -305,7 +300,8 @@ FBlock_Action:	; Routine 2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		beq.s	.loc_10512
-		bclr	#0,2(a2,d0.w)
+;		bclr	#0,2(a2,d0.w)
+		bclr	#0,obGfx(a2,d0.w)
 		bra.s	.loc_10512
 ; ===========================================================================
 
@@ -323,14 +319,12 @@ FBlock_Action:	; Routine 2
 		addq.w	#1,fb_height(a0)
 		cmpi.w	#$380,fb_height(a0)
 		bne.s	.locret_10578
-		if Revision<>0
-			move.b	#1,(f_obj56).w
-			clr.b	objoff_38(a0)
-		endif
+		move.b	#1,(f_obj56).w
+		clr.b	objoff_38(a0)
 		clr.b	obSubtype(a0)
 
 .locret_10578:
-		rts	
+		rts
 ; ===========================================================================
 
 .type0C:
@@ -359,7 +353,7 @@ FBlock_Action:	; Routine 2
 		move.w	fb_origX(a0),d1
 		add.w	d0,d1
 		move.w	d1,obX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .loc_105C0:
@@ -369,7 +363,8 @@ FBlock_Action:	; Routine 2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		beq.s	.loc_105A2
-		bset	#0,2(a2,d0.w)
+;		bset	#0,2(a2,d0.w)
+		bset	#0,obGfx(a2,d0.w)
 		bra.s	.loc_105A2
 ; ===========================================================================
 
@@ -410,7 +405,8 @@ FBlock_Action:	; Routine 2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		beq.s	.wtf
-		bclr	#0,2(a2,d0.w)
+;		bclr	#0,2(a2,d0.w)
+		bclr	#0,obGfx(a2,d0.w)
 		bra.s	.wtf
 ; ===========================================================================
 
@@ -499,4 +495,4 @@ FBlock_Action:	; Routine 2
 		neg.w	d1
 		add.w	fb_origX(a0),d1
 		move.w	d1,obX(a0)
-		rts	
+		rts

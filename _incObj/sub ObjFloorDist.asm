@@ -21,7 +21,7 @@ ObjFloorDist:
 
 ObjFloorDist2:
 		move.w	obY(a0),d2
-		moveq	#0,d0
+;		moveq	#0,d0
 		move.b	obHeight(a0),d0
 		ext.w	d0
 		add.w	d0,d2

@@ -141,5 +141,3 @@ Swing_Action2:	; Routine 4
 		bsr.w	MvSonicOnPtfm
 		bsr.w	DisplaySprite
 		bra.w	Swing_ChkDel
-
-		rts

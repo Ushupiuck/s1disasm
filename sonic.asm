@@ -1959,7 +1959,7 @@ WaitForVBla:
 .wait:
 		tst.b	(v_vbla_routine).w ; has VBlank routine finished?
 		bne.s	.wait		; if not, branch
-		rts	
+		rts
 ; End of function WaitForVBla
 
 		include	"_incObj/sub RandomNumber.asm"
@@ -3127,7 +3127,8 @@ GM_Special:
 		move.w	d0,(vdp_control_port).l
 		bsr.w	ClearScreen
 		enable_ints
-		fillVRAM	0,$6FFF,$5000
+;		fillVRAM	0,$6FFF,$5000
+		fillVRAM	0,$FFFF,0
 
 SS_WaitForDMA:
 		move.w	(a5),d1		; read control port ($C00004)
@@ -3201,7 +3202,6 @@ SS_MainLoop:
 SS_ChkEnd:
 		cmpi.b	#id_Special,(v_gamemode).w ; is game mode $10 (special stage)?
 		beq.w	SS_MainLoop	; if yes, branch
-
 		tst.w	(f_demo).w	; is demo mode on?
 		bne.w	SS_ToLevel	; if yes, branch
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
@@ -3231,7 +3231,6 @@ SS_FinLoop:
 loc_47D4:
 		tst.w	(v_demolength).w
 		bne.s	SS_FinLoop
-
 		disable_ints
 		lea	(vdp_control_port).l,a6
 		move.w	#$8200+(vram_fg>>10),(a6) ; set foreground nametable address
@@ -6041,9 +6040,9 @@ BldSpr_ScrPos:	dc.l 0				; blank
 
 
 BuildSprites:
+		lea	(v_spritequeue).w,a4
 		lea	(v_spritetablebuffer).w,a2 ; set address for sprite table
 		moveq	#0,d5
-		lea	(v_spritequeue).w,a4
 		moveq	#7,d7
 
 	.priorityLoop:
@@ -7771,11 +7770,8 @@ loc_1B4DA:
 
 loc_1B4E8:
 		addq.w	#8,a0
-
-loc_1B4EA:
 		dbf	d7,loc_1B4DA
-
-		rts	
+		rts
 ; End of function SS_AniItems
 
 ; ===========================================================================
@@ -8021,10 +8017,8 @@ loc_1B714:
 		move.w	#(v_ssitembuffer_end-v_ssitembuffer)/4-1,d1
 
 loc_1B730:
-
 		clr.l	(a1)+
 		dbf	d1,loc_1B730
-
 		rts
 ; End of function SS_Load
 
