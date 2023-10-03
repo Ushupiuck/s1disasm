@@ -20,9 +20,9 @@ Revision	  = 2
 
 ZoneCount	  = 6	; discrete zones are: GHZ, MZ, SYZ, LZ, SLZ, and SBZ
 
-FixBugs		  = 0	; change to 1 to enable bugfixes
+FixBugs		  = 1	; change to 1 to enable bugfixes
 
-zeroOffsetOptimization = 0	; if 1, makes a handful of zero-offset instructions smaller
+zeroOffsetOptimization = 1	; if 1, makes a handful of zero-offset instructions smaller
 
 	include "MacroSetup.asm"
 	include	"Constants.asm"
@@ -882,10 +882,10 @@ JoypadInit:
 ReadJoypads:
 		lea	(v_jpadhold1).w,a0 ; address where joypad states are written
 		lea	(z80_port_1_data+1).l,a1	; first	joypad port
-		bsr.s	.read		; do the first joypad
+		bsr.s	Joypad_Read	; do the first joypad
 		addq.w	#2,a1		; do the second	joypad
 
-.read:
+Joypad_Read:
 		move.b	#0,(a1)
 		nop	
 		nop	
@@ -1107,7 +1107,7 @@ AddPLC:
 
 .skip:
 		movem.l	(sp)+,a1-a2 ; a1=object
-		rts	
+		rts
 ; End of function AddPLC
 
 
@@ -1142,7 +1142,7 @@ NewPLC:
 
 .skip:
 		movem.l	(sp)+,a1-a2
-		rts	
+		rts
 ; End of function NewPLC
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -1161,7 +1161,7 @@ ClearPLC:
 .loop:
 		clr.l	(a2)+
 		dbf	d0,.loop
-		rts	
+		rts
 ; End of function ClearPLC
 
 ; ---------------------------------------------------------------------------
@@ -1201,7 +1201,7 @@ loc_160E:
 		move.l	d6,(v_plc_shiftvalue).w
 
 Rplc_Exit:
-		rts	
+		rts
 ; End of function RunPLC
 
 
@@ -1264,7 +1264,7 @@ loc_16AA:
 		move.l	d6,(v_plc_shiftvalue).w
 
 locret_16DA:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_16DC:
@@ -1314,7 +1314,7 @@ Qplc_Loop:
 		move.l	d0,(vdp_control_port).l ; converted VRAM address to VDP format
 		bsr.w	NemDec		; decompress
 		dbf	d1,Qplc_Loop	; repeat for length of PLC
-		rts	
+		rts
 ; End of function QuickPLC
 
 		include	"_inc/Enigma Decompression.asm"
@@ -1375,7 +1375,7 @@ PalFadeIn_Alt:				; start position and size are already set
 		bsr.s	FadeIn_FromBlack
 		bsr.w	RunPLC
 		dbf	d4,.mainloop
-		rts	
+		rts
 ; End of function PaletteFadeIn
 
 
@@ -1470,7 +1470,7 @@ PaletteFadeOut:
 		bsr.s	FadeOut_ToBlack
 		bsr.w	RunPLC
 		dbf	d4,.mainloop
-		rts	
+		rts
 ; End of function PaletteFadeOut
 
 
@@ -2060,7 +2060,7 @@ GM_Title:
 
 		clearRAM v_objspace,v_objend
 
-		locVRAM	ArtTile_Sonic_Team_Font*20
+		locVRAM	ArtTile_Sonic_Team_Font*$20
 		lea	(Nem_CreditText).l,a0 ;	load alphabet
 		bsr.w	NemDec
 
@@ -5602,11 +5602,7 @@ Map_Missile:	include	"_maps/Buzz Bomber Missile.asm"
 		include	"_incObj/7C Ring Flash.asm"
 
 		include	"_anim/Rings.asm"
-		if Revision=0
-Map_Ring:	include	"_maps/Rings.asm"
-		else
-Map_Ring:		include	"_maps/Rings (JP1).asm"
-		endif
+Map_Ring:	include	"_maps/Rings (JP1).asm"
 Map_GRing:	include	"_maps/Giant Ring.asm"
 Map_Flash:	include	"_maps/Ring Flash.asm"
 		include	"_incObj/26 Monitor.asm"
