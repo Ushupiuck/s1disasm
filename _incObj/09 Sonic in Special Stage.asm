@@ -74,8 +74,7 @@ Obj09_Display:
 		move.w	(v_ssangle).w,d0
 		add.w	(v_ssrotate).w,d0
 		move.w	d0,(v_ssangle).w
-		jsr	(Sonic_Animate).l
-		rts	
+		jmp	(Sonic_Animate).l
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -133,12 +132,12 @@ loc_1BAA8:
 		sub.l	d1,obX(a0)
 		sub.l	d0,obY(a0)
 		move.w	#0,obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1BAF2:
 		movem.l	(sp)+,d0-d1
-		rts	
+		rts
 ; End of function Obj09_Move
 
 
@@ -159,17 +158,17 @@ loc_1BB06:
 
 loc_1BB14:
 		move.w	d0,obInertia(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1BB1A:
 		subi.w	#$40,d0
 		bcc.s	loc_1BB22
-		nop	
+		nop
 
 loc_1BB22:
 		move.w	d0,obInertia(a0)
-		rts	
+		rts
 ; End of function Obj09_MoveLeft
 
 
@@ -193,13 +192,13 @@ loc_1BB42:
 loc_1BB48:
 		addi.w	#$40,d0
 		bcc.s	loc_1BB50
-		nop	
+		nop
 
 loc_1BB50:
 		move.w	d0,obInertia(a0)
 
 locret_1BB54:
-		rts	
+		rts
 ; End of function Obj09_MoveRight
 
 
@@ -226,7 +225,7 @@ Obj09_Jump:
 		jmp	(PlaySound_Special).l	; play jumping sound
 
 Obj09_NoJump:
-		rts	
+		rts
 ; End of function Obj09_Jump
 
 
@@ -234,7 +233,7 @@ Obj09_NoJump:
 
 
 nullsub_2:
-		rts	
+		rts
 ; End of function nullsub_2
 
 ; ===========================================================================
@@ -250,7 +249,7 @@ nullsub_2:
 		move.w	d1,obVelY(a0)
 
 locret_1BBB4:
-		rts	
+		rts
 ; ---------------------------------------------------------------------------
 ; Subroutine to	fix the	camera on Sonic's position (special stage)
 ; ---------------------------------------------------------------------------
@@ -275,7 +274,7 @@ loc_1BBCE:
 		sub.w	d0,(v_screenposy).w
 
 locret_1BBDE:
-		rts	
+		rts
 ; End of function SS_FixCamera
 
 ; ===========================================================================
@@ -348,7 +347,7 @@ Obj09_Fall:
 		sub.l	d1,d2
 		moveq	#0,d1
 		move.w	d1,obVelY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1BCB0:
@@ -366,7 +365,7 @@ loc_1BCC6:
 		asr.l	#8,d1
 		move.w	d0,obVelX(a0)
 		move.w	d1,obVelY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1BCD4:
@@ -417,7 +416,7 @@ sub_1BCE8:
 		move.b	(a1)+,d4
 		bsr.s	sub_1BD30
 		tst.b	d5
-		rts	
+		rts
 ; End of function sub_1BCE8
 
 
@@ -429,20 +428,20 @@ sub_1BD30:
 		beq.s	locret_1BD44	; branch if 0
 		cmpi.b	#$28,d4		; is the item an extra life?
 		beq.s	locret_1BD44
-		cmpi.b	#$3A,d4		; is the item an emerald or ghost block ($3B+)?
-		blo.s	loc_1BD46
+		cmpi.b	#$3B-1,d4	; is the item an emerald or ghost block ($3B+)?
+		bcs.s	loc_1BD46
 		cmpi.b	#$4B,d4		; is the item a flashing glass block ($4B+)?
-		bhs.s	loc_1BD46
+		bcc.s	loc_1BD46
 
 locret_1BD44:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1BD46:
 		move.b	d4,objoff_30(a0)
 		move.l	a1,objoff_32(a0)
 		moveq	#-1,d5
-		rts	
+		rts
 ; End of function sub_1BD30
 
 
@@ -467,7 +466,7 @@ Obj09_ChkItems:
 		tst.b	objoff_3A(a0)
 		bne.w	Obj09_MakeGhostSolid
 		moveq	#0,d4
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_ChkCont:
@@ -490,7 +489,7 @@ Obj09_GetCont:
 
 Obj09_NoCont:
 		moveq	#0,d4
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_Chk1Up:
@@ -505,9 +504,8 @@ Obj09_Get1Up:
 		addq.b	#1,(v_lives).w	; add 1 to number of lives
 		addq.b	#1,(f_lifecount).w ; update the lives counter
 		move.w	#bgm_ExtraLife,d0
-		jsr	(PlaySound).l	; play extra life music
 		moveq	#0,d4
-		rts	
+		jmp	(PlaySound).l	; play extra life music
 ; ===========================================================================
 
 Obj09_ChkEmer:
@@ -532,9 +530,8 @@ Obj09_GetEmer:
 
 Obj09_NoEmer:
 		move.w	#bgm_Emerald,d0
-		jsr	(PlaySound_Special).l ;	play emerald music
 		moveq	#0,d4
-		rts	
+		jmp	(PlaySound_Special).l ;	play emerald music
 ; ===========================================================================
 
 Obj09_ChkGhost:
@@ -551,7 +548,7 @@ Obj09_ChkGhostTag:
 
 Obj09_NoGhost:
 		moveq	#-1,d4
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_MakeGhostSolid:
@@ -577,7 +574,7 @@ Obj09_NoReplace:
 Obj09_GhostNotSolid:
 		clr.b	objoff_3A(a0)
 		moveq	#0,d4
-		rts	
+		rts
 ; End of function Obj09_ChkItems
 
 
@@ -597,7 +594,7 @@ loc_1BEA0:
 		move.b	#0,objoff_37(a0)
 
 locret_1BEAC:
-		rts	
+		rts
 ; ===========================================================================
 
 Obj09_ChkBumper:
@@ -732,5 +729,5 @@ Obj09_GlassSnd:
 ; ===========================================================================
 
 Obj09_NoGlass:
-		rts	
+		rts
 ; End of function Obj09_ChkItems2
