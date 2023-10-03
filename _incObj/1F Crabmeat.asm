@@ -21,15 +21,15 @@ id_Crab_Delete = ptr_Crab_Delete-Crab_Index	; 4
 id_Crab_BallMain = ptr_Crab_BallMain-Crab_Index	; 6
 id_Crab_BallMove = ptr_Crab_BallMove-Crab_Index	; 8
 
-crab_timedelay = $30	; time to wait for performing an action
-crab_mode = $32		; 0 = moving, 1 = firing
+crab_timedelay = objoff_30
+crab_mode = objoff_32
 ; ===========================================================================
 
 Crab_Main:	; Routine 0
 		move.b	#$10,obHeight(a0)
 		move.b	#8,obWidth(a0)
 		move.l	#Map_Crab,obMap(a0)
-		move.w	#$400,obGfx(a0)
+		move.w	#make_art_tile(ArtTile_Crabmeat,0,0),obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#3,obPriority(a0)
 		move.b	#6,obColType(a0)
@@ -88,7 +88,7 @@ Crab_Action:	; Routine 2
 		move.b	#6,obAnim(a0)	; use firing animation
 		bsr.w	FindFreeObj
 		bne.s	.failleft
-		_move.b	#id_Crabmeat,0(a1) ; load left fireball
+		_move.b	#id_Crabmeat,obID(a1) ; load left fireball
 		move.b	#id_Crab_BallMain,obRoutine(a1)
 		move.w	obX(a0),obX(a1)
 		subi.w	#$10,obX(a1)
@@ -98,7 +98,7 @@ Crab_Action:	; Routine 2
 .failleft:
 		bsr.w	FindFreeObj
 		bne.s	.failright
-		_move.b	#id_Crabmeat,0(a1) ; load right fireball
+		_move.b	#id_Crabmeat,obID(a1) ; load right fireball
 		move.b	#id_Crab_BallMain,obRoutine(a1)
 		move.w	obX(a0),obX(a1)
 		addi.w	#$10,obX(a1)
@@ -160,7 +160,7 @@ Crab_SetAni:
 		move.b	obAngle(a0),d3
 		bmi.s	loc_96A4
 		cmpi.b	#6,d3
-		bcs.s	locret_96A2
+		blo.s	locret_96A2
 		moveq	#1,d0
 		btst	#0,obStatus(a0)
 		bne.s	locret_96A2
@@ -194,7 +194,7 @@ Crab_Delete:	; Routine 4
 Crab_BallMain:	; Routine 6
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Crab,obMap(a0)
-		move.w	#$400,obGfx(a0)
+		move.w	#make_art_tile(ArtTile_Crabmeat,0,0),obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#3,obPriority(a0)
 		move.b	#$87,obColType(a0)

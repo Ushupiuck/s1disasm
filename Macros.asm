@@ -1,13 +1,13 @@
 ; ---------------------------------------------------------------------------
 ; Set a VRAM address via the VDP control port.
-; input: 16-bit VRAM address, control port (default is ($C00004).l)
+; input: 16-bit VRAM address, control port (default is (vdp_control_port).l)
 ; ---------------------------------------------------------------------------
 
 locVRAM:	macro loc,controlport
 		if ("controlport"=="")
-		move.l	#($40000000+((loc&$3FFF)<<16)+((loc&$C000)>>14)),(vdp_control_port).l
+		move.l	#($40000000+(((loc)&$3FFF)<<16)+(((loc)&$C000)>>14)),(vdp_control_port).l
 		else
-		move.l	#($40000000+((loc&$3FFF)<<16)+((loc&$C000)>>14)),controlport
+		move.l	#($40000000+(((loc)&$3FFF)<<16)+(((loc)&$C000)>>14)),controlport
 		endif
 		endm
 
@@ -21,8 +21,8 @@ writeVRAM:	macro source,length,destination
 		move.l	#$94000000+(((length>>1)&$FF00)<<8)+$9300+((length>>1)&$FF),(a5)
 		move.l	#$96000000+(((source>>1)&$FF00)<<8)+$9500+((source>>1)&$FF),(a5)
 		move.w	#$9700+((((source>>1)&$FF0000)>>16)&$7F),(a5)
-		move.w	#$4000+(destination&$3FFF),(a5)
-		move.w	#$80+((destination&$C000)>>14),(v_vdp_buffer2).w
+		move.w	#$4000+((destination)&$3FFF),(a5)
+		move.w	#$80+(((destination)&$C000)>>14),(v_vdp_buffer2).w
 		move.w	(v_vdp_buffer2).w,(a5)
 		endm
 
@@ -53,6 +53,29 @@ fillVRAM:	macro value,length,loc
 		move.w	#$9780,(a5)
 		move.l	#$40000080+((loc&$3FFF)<<16)+((loc&$C000)>>14),(a5)
 		move.w	#value,(vdp_data_port).l
+		endm
+
+; ---------------------------------------------------------------------------
+; Fill portion of RAM with 0
+; input: start, end
+; ---------------------------------------------------------------------------
+
+clearRAM:	macro start,end
+		lea	(start).w,a1
+		moveq	#0,d0
+		move.w	#((end)-(start))/4-1,d1
+
+.loop:
+		move.l	d0,(a1)+
+		dbf	d1,.loop
+
+	if (end-start)&2
+		move.w	d0,(a1)+
+	endif
+
+	if (end-start)&1
+		move.b	d0,(a1)+
+	endif
 		endm
 
 ; ---------------------------------------------------------------------------
@@ -231,11 +254,11 @@ out_of_range:	macro exit,pos
 ; ---------------------------------------------------------------------------
 
 gotoSRAM:	macro
-		move.b	#1,($A130F1).l
+		move.b	#1,(sram_port).l
 		endm
 
 gotoROM:	macro
-		move.b	#0,($A130F1).l
+		move.b	#0,(sram_port).l
 		endm
 
 ; ---------------------------------------------------------------------------
@@ -250,3 +273,24 @@ zonewarning:	macro loc,elementsize
 		warning "Size of loc (\{(._end-loc)/elementsize}) does not match ZoneCount (\{ZoneCount})."
 		endif
 		endm
+
+; ---------------------------------------------------------------------------
+; produce a packed art-tile
+; ---------------------------------------------------------------------------
+
+make_art_tile function addr,pal,pri,((pri&1)<<15)|((pal&3)<<13)|addr
+
+; ---------------------------------------------------------------------------
+; sprite mappings and DPLCs macros
+; ---------------------------------------------------------------------------
+
+SonicMappingsVer = 1
+SonicDplcVer = 1
+		include	"_maps/MapMacros.asm"
+
+; ---------------------------------------------------------------------------
+; turn a sample rate into a djnz loop counter
+; ---------------------------------------------------------------------------
+
+pcmLoopCounter function sampleRate,baseCycles, 1+(53693175/15/(sampleRate)-(baseCycles)+(13/2))/13
+dpcmLoopCounter function sampleRate, pcmLoopCounter(sampleRate,301/2) ; 301 is the number of cycles zPlayPCMLoop takes.

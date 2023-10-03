@@ -11,10 +11,10 @@ FloatingBlock:
 FBlock_Index:	dc.w FBlock_Main-FBlock_Index
 		dc.w FBlock_Action-FBlock_Index
 
-fb_origX = $34		; original x-axis position
-fb_origY = $30		; original y-axis position
-fb_height = $3A		; total object height
-fb_type = $3C		; subtype (2nd digit only)
+fb_origX = objoff_34		; original x-axis position
+fb_origY = objoff_30		; original y-axis position
+fb_height = objoff_3A		; total object height
+fb_type = objoff_3C		; subtype (2nd digit only)
 
 FBlock_Var:	; width/2, height/2
 		dc.b  $10, $10	; subtype 0x/8x
@@ -30,10 +30,10 @@ FBlock_Var:	; width/2, height/2
 FBlock_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_FBlock,obMap(a0)
-		move.w	#$4000,obGfx(a0)
+		move.w	#make_art_tile(ArtTile_Level,2,0),obGfx(a0)
 		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ
 		bne.s	.notLZ
-		move.w	#$43C4,obGfx(a0) ; LZ specific code
+		move.w	#make_art_tile(ArtTile_LZ_Door,2,0),obGfx(a0) ; LZ specific code
 
 .notLZ:
 		move.b	#4,obRender(a0)
@@ -57,12 +57,12 @@ FBlock_Main:	; Routine 0
 		bne.s	.dontdelete
 		cmpi.w	#$1BB8,obX(a0)
 		bne.s	.notatpos
-		tst.b	($FFFFF7CE).w
+		tst.b	(f_obj56).w
 		beq.s	.dontdelete
 		jmp	(DeleteObject).l
 .notatpos:
 		clr.b	obSubtype(a0)
-		tst.b	($FFFFF7CE).w
+		tst.b	(f_obj56).w
 		bne.s	.dontdelete
 		jmp	(DeleteObject).l
 .dontdelete:
@@ -130,9 +130,10 @@ FBlock_Action:	; Routine 2
 .chkdel2:
 		cmpi.b	#$37,obSubtype(a0)
 		bne.s	.delete
-		tst.b	$38(a0)
-		bne.w	DisplaySprite
-.delete:	jmp	(DeleteObject).l
+		tst.b	objoff_38(a0)
+		bne.s	.display
+.delete:
+		jmp	(DeleteObject).l
 ; ===========================================================================
 .index:		dc.w .type00-.index, .type01-.index
 		dc.w .type02-.index, .type03-.index
@@ -204,7 +205,7 @@ FBlock_Action:	; Routine 2
 
 .type05:
 ; moves up when a switch is pressed
-		tst.b	$38(a0)
+		tst.b	objoff_38(a0)
 		bne.s	.loc_104A4
 		cmpi.w	#(id_LZ<<8)+0,(v_zone).w ; is level LZ1 ?
 		bne.s	.aaa		; if not, branch
@@ -213,7 +214,7 @@ FBlock_Action:	; Routine 2
 		clr.b	(f_wtunnelallow).w
 		move.w	(v_player+obX).w,d0
 		cmp.w	obX(a0),d0
-		bcc.s	.aaa
+		bhs.s	.aaa
 		move.b	#1,(f_wtunnelallow).w
 
 .aaa:
@@ -229,7 +230,7 @@ FBlock_Action:	; Routine 2
 		clr.b	(f_wtunnelallow).w
 
 .loc_1049E:
-		move.b	#1,$38(a0)
+		move.b	#1,objoff_38(a0)
 
 .loc_104A4:
 		tst.w	fb_height(a0)
@@ -251,7 +252,7 @@ FBlock_Action:	; Routine 2
 
 .loc_104C8:
 		addq.b	#1,obSubtype(a0)
-		clr.b	$38(a0)
+		clr.b	objoff_38(a0)
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
@@ -262,14 +263,14 @@ FBlock_Action:	; Routine 2
 ; ===========================================================================
 
 .type06:
-		tst.b	$38(a0)
+		tst.b	objoff_38(a0)
 		bne.s	.loc_10500
 		lea	(f_switch).w,a2
 		moveq	#0,d0
 		move.b	fb_type(a0),d0
 		tst.b	(a2,d0.w)
 		bpl.s	.loc_10512
-		move.b	#1,$38(a0)
+		move.b	#1,objoff_38(a0)
 
 .loc_10500:
 		moveq	#0,d0
@@ -294,7 +295,7 @@ FBlock_Action:	; Routine 2
 
 .loc_1052C:
 		subq.b	#1,obSubtype(a0)
-		clr.b	$38(a0)
+		clr.b	objoff_38(a0)
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
@@ -305,11 +306,11 @@ FBlock_Action:	; Routine 2
 ; ===========================================================================
 
 .type07:
-		tst.b	$38(a0)
+		tst.b	objoff_38(a0)
 		bne.s	.loc_1055E
 		tst.b	(f_switch+$F).w	; has switch number $F been pressed?
 		beq.s	.locret_10578
-		move.b	#1,$38(a0)
+		move.b	#1,objoff_38(a0)
 		clr.w	fb_height(a0)
 
 .loc_1055E:
@@ -318,8 +319,8 @@ FBlock_Action:	; Routine 2
 		addq.w	#1,fb_height(a0)
 		cmpi.w	#$380,fb_height(a0)
 		bne.s	.locret_10578
-		move.b	#1,($FFFFF7CE).w
-		clr.b	$38(a0)
+		move.b	#1,(f_obj56).w
+		clr.b	objoff_38(a0)
 		clr.b	obSubtype(a0)
 
 .locret_10578:
@@ -327,14 +328,14 @@ FBlock_Action:	; Routine 2
 ; ===========================================================================
 
 .type0C:
-		tst.b	$38(a0)
+		tst.b	objoff_38(a0)
 		bne.s	.loc_10598
 		lea	(f_switch).w,a2
 		moveq	#0,d0
 		move.b	fb_type(a0),d0
 		btst	#0,(a2,d0.w)
 		beq.s	.loc_105A2
-		move.b	#1,$38(a0)
+		move.b	#1,objoff_38(a0)
 
 .loc_10598:
 		tst.w	fb_height(a0)
@@ -357,7 +358,7 @@ FBlock_Action:	; Routine 2
 
 .loc_105C0:
 		addq.b	#1,obSubtype(a0)
-		clr.b	$38(a0)
+		clr.b	objoff_38(a0)
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
@@ -368,14 +369,14 @@ FBlock_Action:	; Routine 2
 ; ===========================================================================
 
 .type0D:
-		tst.b	$38(a0)
+		tst.b	objoff_38(a0)
 		bne.s	.loc_105F8
 		lea	(f_switch).w,a2
 		moveq	#0,d0
 		move.b	fb_type(a0),d0
 		tst.b	(a2,d0.w)
 		bpl.s	.wtf
-		move.b	#1,$38(a0)
+		move.b	#1,objoff_38(a0)
 
 .loc_105F8:
 		move.w	#$80,d0
@@ -399,7 +400,7 @@ FBlock_Action:	; Routine 2
 
 .loc_10624:
 		subq.b	#1,obSubtype(a0)
-		clr.b	$38(a0)
+		clr.b	objoff_38(a0)
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0

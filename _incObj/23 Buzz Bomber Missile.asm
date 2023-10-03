@@ -14,15 +14,15 @@ Msl_Index:	dc.w Msl_Main-Msl_Index
 		dc.w Msl_Delete-Msl_Index
 		dc.w Msl_FromNewt-Msl_Index
 
-msl_parent = $3C
+msl_parent = objoff_3C
 ; ===========================================================================
 
 Msl_Main:	; Routine 0
-		subq.w	#1,$32(a0)
-		bpl.s	Msl_Animate
+		subq.w	#1,objoff_32(a0)
+		bpl.s	Msl_ChkCancel
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Missile,obMap(a0)
-		move.w	#$2444,obGfx(a0)
+		move.w	#make_art_tile(ArtTile_Buzz_Bomber,1,0),obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#3,obPriority(a0)
 		move.b	#8,obActWid(a0)
@@ -32,19 +32,43 @@ Msl_Main:	; Routine 0
 		move.b	#8,obRoutine(a0) ; run "Msl_FromNewt" routine
 		move.b	#$87,obColType(a0)
 		move.b	#1,obAnim(a0)
-		bra.s	Msl_Animate2
+		lea	(Ani_Missile).l,a1
+		bsr.w	AnimateSprite
+		bra.w	DisplaySprite
+; ===========================================================================
+
+Msl_Animate:	; Routine 2
+		bsr.s	Msl_ChkCancel
+		; Msl_ChkCancel can call DeleteObject, so we shouldn't queue
+		; this object for display or update the animation state.
+		; Failing to account for this results in a null pointer
+		; dereference, which is harmless in Sonic 1 but will crash
+		; Sonic 2. Fun fact: Sonic 2 REV00 has some leftover debug
+		; code in its BuildSprites function for detecting this type
+		; of bug.
+		beq.s	Msl_ChkCancel.return
+		lea	(Ani_Missile).l,a1
+		bsr.w	AnimateSprite
+		bra.w	DisplaySprite
+
 ; ---------------------------------------------------------------------------
 ; Subroutine to	check if the Buzz Bomber which fired the missile has been
 ; destroyed, and if it has, then cancel	the missile
 ; ---------------------------------------------------------------------------
 
-Msl_Animate:	; Routine 2
+Msl_ChkCancel:	; Routine 2
 		movea.l	msl_parent(a0),a1
-		_cmpi.b	#id_ExplosionItem,0(a1) ; has Buzz Bomber been destroyed?
-		beq.s	Msl_Delete	; if yes, branch
-		lea	(Ani_Missile).l,a1
-		bsr.w	AnimateSprite
-		bra.w	DisplaySprite
+		_cmpi.b	#id_ExplosionItem,obID(a1) ; has Buzz Bomber been destroyed?
+		; This adds a return value so that we know if the object has
+		; been freed.
+		bne.s	.return
+		bsr.s	Msl_Delete
+		moveq	#0,d0
+
+.return:
+		rts
+; End of function Msl_ChkCancel
+
 ; ===========================================================================
 
 Msl_FromBuzz:	; Routine 4
@@ -53,17 +77,18 @@ Msl_FromBuzz:	; Routine 4
 		move.b	#$87,obColType(a0)
 		move.b	#1,obAnim(a0)
 		bsr.w	SpeedToPos
-		lea	(Ani_Missile).l,a1
-		bsr.w	AnimateSprite
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has object moved below the level boundary?
-		bcs.s	Msl_Delete	; if yes, branch
+		blo.s	Msl_Delete	; if yes, branch
+
+		lea	(Ani_Missile).l,a1
+		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
 ; ===========================================================================
 
 .explode:
-		_move.b	#id_MissileDissolve,0(a0) ; change object to an explosion (Obj24)
+		_move.b	#id_MissileDissolve,obID(a0) ; change object to an explosion (Obj24)
 		move.b	#0,obRoutine(a0)
 		bra.w	MissileDissolve
 ; ===========================================================================
@@ -76,8 +101,6 @@ Msl_FromNewt:	; Routine 8
 		tst.b	obRender(a0)
 		bpl.s	Msl_Delete
 		bsr.w	SpeedToPos
-
-Msl_Animate2:
 		lea	(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
