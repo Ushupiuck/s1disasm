@@ -131,9 +131,8 @@ FBlock_Action:	; Routine 2
 		cmpi.b	#$37,obSubtype(a0)
 		bne.s	.delete
 		tst.b	objoff_38(a0)
-		bne.s	.display
-.delete:
-		jmp	(DeleteObject).l
+		bne.w	DisplaySprite
+.delete:	jmp	(DeleteObject).l
 ; ===========================================================================
 .index:		dc.w .type00-.index, .type01-.index
 		dc.w .type02-.index, .type03-.index
@@ -395,7 +394,7 @@ FBlock_Action:	; Routine 2
 		move.w	fb_origX(a0),d1
 		add.w	d0,d1
 		move.w	d1,obX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .loc_10624:
@@ -457,7 +456,7 @@ FBlock_Action:	; Routine 2
 		neg.w	d1
 		add.w	fb_origY(a0),d1
 		move.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .loc_106AE:
@@ -471,7 +470,7 @@ FBlock_Action:	; Routine 2
 		addq.w	#1,d1
 		add.w	fb_origX(a0),d1
 		move.w	d1,obX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .loc_106CC:
@@ -485,7 +484,7 @@ FBlock_Action:	; Routine 2
 		addq.w	#1,d1
 		add.w	fb_origY(a0),d1
 		move.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 .loc_106EA:

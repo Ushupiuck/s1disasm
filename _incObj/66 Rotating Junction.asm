@@ -22,15 +22,7 @@ Jun_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.w	#1,d1
 		movea.l	a0,a1
-		bra.s	.makeitem
-; ===========================================================================
-
-.repeat:
-		bsr.w	FindFreeObj
-		bne.s	.fail
-		_move.b	#id_Junction,obID(a1)
-		addq.b	#4,obRoutine(a1) ; goto Jun_Display next
-		move.w	obX(a0),obX(a1)
+.loop		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.b	#3,obPriority(a1)
 		move.b	#$10,obFrame(a1) ; use large circular sprite
@@ -42,9 +34,7 @@ Jun_Main:	; Routine 0
 		bne.s	.fail
 		_move.b	#id_Junction,0(a1)
 		addq.b	#4,obRoutine(a1) ; goto Jun_Display next
-
-.fail:
-		dbf	d1,-
+.fail:		dbf	d1,.loop
 
 		move.b	#$30,obActWid(a0)
 		move.b	#4,obPriority(a0)
