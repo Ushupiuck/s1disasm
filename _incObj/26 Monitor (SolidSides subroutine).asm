@@ -24,21 +24,21 @@ Mon_SolidSides:
 		bmi.s	loc_A4E6
 		add.w	d2,d2
 		cmp.w	d2,d3
-		bhs.s	loc_A4E6
+		bcc.s	loc_A4E6
 		tst.b	(f_playerctrl).w
 		bmi.s	loc_A4E6
 		cmpi.b	#6,(v_player+obRoutine).w
-		bhs.s	loc_A4E6
+		bcc.s	loc_A4E6
 		tst.w	(v_debuguse).w
 		bne.s	loc_A4E6
 		cmp.w	d0,d1
-		bhs.s	loc_A4DC
+		bcc.s	loc_A4DC
 		add.w	d1,d1
 		sub.w	d1,d0
 
 loc_A4DC:
 		cmpi.w	#$10,d3
-		blo.s	loc_A4EA
+		bcs.s	loc_A4EA
 
 loc_A4E2:
 		moveq	#1,d1
@@ -60,7 +60,7 @@ loc_A4EA:
 		sub.w	obX(a0),d1
 		bmi.s	loc_A4E2
 		cmp.w	d2,d1
-		bhs.s	loc_A4E2
+		bcc.s	loc_A4E2
 		moveq	#-1,d1
 		rts	
 ; End of function Mon_SolidSides

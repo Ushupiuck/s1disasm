@@ -61,14 +61,14 @@ NemDec_ProcessCompressedData:
 		move.w	d5,d1
 		lsr.w	d7,d1	; shift so that high bit of the code is in bit position 7
 		cmpi.b	#%11111100,d1	; are the high 6 bits set?
-		bhs.s	NemPCD_InlineData	; if they are, it signifies inline data
+		bcc.s	NemPCD_InlineData	; if they are, it signifies inline data
 		andi.w	#$FF,d1
 		add.w	d1,d1
 		move.b	(a1,d1.w),d0	; get the length of the code in bits
 		ext.w	d0
 		sub.w	d0,d6	; subtract from shift value so that the next code is read next time around
 		cmpi.w	#9,d6	; does a new byte need to be read?
-		bhs.s	loc_14B2	; if not, branch
+		bcc.s	loc_14B2	; if not, branch
 		addq.w	#8,d6
 		asl.w	#8,d5
 		move.b	(a0)+,d5	; read next byte
@@ -106,7 +106,7 @@ NemPCD_WritePixel_Loop:
 NemPCD_InlineData:
 		subq.w	#6,d6	; 6 bits needed to signal inline data
 		cmpi.w	#9,d6
-		bhs.s	loc_14E4
+		bcc.s	loc_14E4
 		addq.w	#8,d6
 		asl.w	#8,d5
 		move.b	(a0)+,d5
@@ -119,7 +119,7 @@ loc_14E4:
 		andi.w	#$F,d1	; get palette index for pixel
 		andi.w	#$70,d0	; high nybble is repeat count for pixel
 		cmpi.w	#9,d6
-		bhs.s	NemPCD_ProcessCompressedData
+		bcc.s	NemPCD_ProcessCompressedData
 		addq.w	#8,d6
 		asl.w	#8,d5
 		move.b	(a0)+,d5
@@ -180,7 +180,7 @@ NemBCT_NewPALIndex:
 NemBCT_Loop:
 		move.b	(a0)+,d0	; read next byte
 		cmpi.b	#$80,d0	; sign bit being set signifies a new palette index
-		bhs.s	NemBCT_ChkEnd	; a bmi could have been used instead of a compare and bcc
+		bcc.s	NemBCT_ChkEnd	; a bmi could have been used instead of a compare and bcc
 		
 		move.b	d0,d1
 		andi.w	#$F,d7	; get palette index

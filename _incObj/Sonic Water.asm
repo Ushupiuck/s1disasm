@@ -6,7 +6,7 @@
 
 
 Sonic_Water:
-		cmpi.b	#id_LZ,(v_zone).w	; is level LZ?
+		cmpi.b	#1,(v_zone).w	; is level LZ?
 		beq.s	.islabyrinth	; if yes, branch
 
 .exit:

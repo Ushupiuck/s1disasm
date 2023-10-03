@@ -32,7 +32,7 @@ ReactToItem:
 		bne.s	.proximity	; if nonzero, branch
 
 .next:
-		lea	object_size(a1),a1	; next object RAM
+		lea	$40(a1),a1	; next object RAM
 		dbf	d6,.loop	; repeat $5F more times
 
 		moveq	#0,d0
@@ -130,8 +130,8 @@ ReactToItem:
 		andi.b	#$3F,d0
 		cmpi.b	#6,d0		; is collision type $46	?
 		beq.s	React_Monitor	; if yes, branch
-		cmpi.w	#90,flashtime(a0)	; is Sonic invincible?
-		bhs.w	.invincible	; if yes, branch
+		cmpi.w	#90,$30(a0)	; is Sonic invincible?
+		bcc.w	.invincible	; if yes, branch
 		addq.b	#2,obRoutine(a1) ; advance the object's routine counter
 
 .invincible:
@@ -145,7 +145,7 @@ React_Monitor:
 		move.w	obY(a0),d0
 		subi.w	#$10,d0
 		cmp.w	obY(a1),d0
-		blo.s	.donothing
+		bcs.s	.donothing
 		neg.w	obVelY(a0)	; reverse Sonic's vertical speed
 		move.w	#-$180,obVelY(a1)
 		tst.b	ob2ndRout(a1)
@@ -193,26 +193,26 @@ React_Enemy:
 		move.w	(v_itembonus).w,d0
 		addq.w	#2,(v_itembonus).w ; add 2 to item bonus counter
 		cmpi.w	#6,d0
-		blo.s	.bonusokay
+		bcs.s	.bonusokay
 		moveq	#6,d0		; max bonus is lvl6
 
 .bonusokay:
-		move.w	d0,objoff_3E(a1)
+		move.w	d0,$3E(a1)
 		move.w	.points(pc,d0.w),d0
 		cmpi.w	#$20,(v_itembonus).w ; have 16 enemies been destroyed?
-		blo.s	.lessthan16	; if not, branch
+		bcs.s	.lessthan16	; if not, branch
 		move.w	#1000,d0	; fix bonus to 10000
-		move.w	#$A,objoff_3E(a1)
+		move.w	#$A,$3E(a1)
 
 .lessthan16:
 		bsr.w	AddPoints
-		_move.b	#id_ExplosionItem,obID(a1) ; change object to explosion
+		_move.b	#id_ExplosionItem,0(a1) ; change object to explosion
 		move.b	#0,obRoutine(a1)
 		tst.w	obVelY(a0)
 		bmi.s	.bouncedown
 		move.w	obY(a0),d0
 		cmp.w	obY(a1),d0
-		bhs.s	.bounceup
+		bcc.s	.bounceup
 		neg.w	obVelY(a0)
 		rts	
 ; ===========================================================================
@@ -243,7 +243,7 @@ React_ChkHurt:
 
 .notinvincible:
 		nop	
-		tst.w	flashtime(a0)		; is Sonic flashing?
+		tst.w	$30(a0)		; is Sonic flashing?
 		bne.s	.isflashing	; if yes, branch
 		movea.l	a1,a2
 
@@ -265,7 +265,7 @@ HurtSonic:
 
 		jsr	(FindFreeObj).l
 		bne.s	.hasshield
-		_move.b	#id_RingLoss,obID(a1) ; load bouncing multi rings object
+		_move.b	#id_RingLoss,0(a1) ; load bouncing multi rings object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 
@@ -285,29 +285,19 @@ HurtSonic:
 .isdry:
 		move.w	obX(a0),d0
 		cmp.w	obX(a2),d0
-		blo.s	.isleft		; if Sonic is left of the object, branch
+		bcs.s	.isleft		; if Sonic is left of the object, branch
 		neg.w	obVelX(a0)	; if Sonic is right of the object, reverse
 
 .isleft:
 		move.w	#0,obInertia(a0)
 		move.b	#id_Hurt,obAnim(a0)
-		move.w	#120,flashtime(a0)	; set temp invincible time to 2 seconds
-	if FixBugs
-		move.w	#sfx_HitSpikes,d0
-		cmpi.b	#id_Spikes,obID(a2)	; was damage caused by spikes?
-		beq.s	.sound
-		cmpi.b	#id_Harpoon,obID(a2)	; was damage caused by LZ harpoon?
-		beq.s	.sound
-		move.w	#sfx_Death,d0
-	else
-		; This is bugged: the harpoon will never play the spike sound!
-		move.w	#sfx_Death,d0
-		cmpi.b	#id_Spikes,obID(a2)	; was damage caused by spikes?
-		bne.s	.sound
-		cmpi.b	#id_Harpoon,obID(a2)	; was damage caused by LZ harpoon?
-		bne.s	.sound
-		move.w	#sfx_HitSpikes,d0
-	endif
+		move.w	#120,$30(a0)	; set temp invincible time to 2 seconds
+		move.w	#sfx_Death,d0	; load normal damage sound
+		cmpi.b	#id_Spikes,(a2)	; was damage caused by spikes?
+		bne.s	.sound		; if not, branch
+		cmpi.b	#id_Harpoon,(a2) ; was damage caused by LZ harpoon?
+		bne.s	.sound		; if not, branch
+		move.w	#sfx_HitSpikes,d0 ; load spikes damage sound
 
 .sound:
 		jsr	(PlaySound_Special).l
@@ -336,23 +326,13 @@ KillSonic:
 		move.w	#-$700,obVelY(a0)
 		move.w	#0,obVelX(a0)
 		move.w	#0,obInertia(a0)
-		move.w	obY(a0),objoff_38(a0)
+		move.w	obY(a0),$38(a0)
 		move.b	#id_Death,obAnim(a0)
 		bset	#7,obGfx(a0)
-	if FixBugs
-		move.w	#sfx_HitSpikes,d0 ; play spikes death sound
-		cmpi.b	#id_Spikes,obID(a2)	; check	if you were killed by spikes
-		beq.s	.sound
-		cmpi.b	#id_Harpoon,obID(a2)	; check	if you were killed by a harpoon
-		beq.s	.sound
 		move.w	#sfx_Death,d0	; play normal death sound
-	else
-		; This fails to check for the harpoon object.
-		move.w	#sfx_Death,d0	; play normal death sound
-		cmpi.b	#id_Spikes,obID(a2)	; check	if you were killed by spikes
+		cmpi.b	#id_Spikes,(a2)	; check	if you were killed by spikes
 		bne.s	.sound
 		move.w	#sfx_HitSpikes,d0 ; play spikes death sound
-	endif
 
 .sound:
 		jsr	(PlaySound_Special).l
@@ -387,7 +367,7 @@ React_Special:
 .yadrin:
 		sub.w	d0,d5
 		cmpi.w	#8,d5
-		bhs.s	.normalenemy
+		bcc.s	.normalenemy
 		move.w	obX(a1),d0
 		subq.w	#4,d0
 		btst	#0,obStatus(a1)

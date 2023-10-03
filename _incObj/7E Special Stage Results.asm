@@ -20,7 +20,7 @@ SSR_Index:	dc.w SSR_ChkPLC-SSR_Index
 		dc.w SSR_Exit-SSR_Index
 		dc.w loc_C91A-SSR_Index
 
-ssr_mainX = objoff_30		; position for card to display on
+ssr_mainX = $30		; position for card to display on
 ; ===========================================================================
 
 SSR_ChkPLC:	; Routine 0
@@ -34,20 +34,20 @@ SSR_Main:
 		lea	(SSR_Config).l,a2
 		moveq	#3,d1
 		cmpi.w	#50,(v_rings).w	; do you have 50 or more rings?
-		blo.s	SSR_Loop	; if no, branch
+		bcs.s	SSR_Loop	; if no, branch
 		addq.w	#1,d1		; if yes, add 1	to d1 (number of sprites)
 
 SSR_Loop:
-		_move.b	#id_SSResult,obID(a1)
+		_move.b	#id_SSResult,0(a1)
 		move.w	(a2)+,obX(a1)	; load start x-position
 		move.w	(a2)+,ssr_mainX(a1) ; load main x-position
 		move.w	(a2)+,obScreenY(a1) ; load y-position
 		move.b	(a2)+,obRoutine(a1)
 		move.b	(a2)+,obFrame(a1)
 		move.l	#Map_SSR,obMap(a1)
-		move.w	#make_art_tile(ArtTile_Title_Card,0,1),obGfx(a1)
+		move.w	#$8580,obGfx(a1)
 		move.b	#0,obRender(a1)
-		lea	object_size(a1),a1
+		lea	$40(a1),a1
 		dbf	d1,SSR_Loop	; repeat sequence 3 or 4 times
 
 		moveq	#7,d0
@@ -78,7 +78,7 @@ loc_C85A:
 		move.w	obX(a0),d0
 		bmi.s	locret_C86A
 		cmpi.w	#$200,d0	; has item moved beyond	$200 on	x-axis?
-		bhs.s	locret_C86A	; if yes, branch
+		bcc.s	locret_C86A	; if yes, branch
 		bra.w	DisplaySprite
 ; ===========================================================================
 
@@ -123,7 +123,7 @@ loc_C8C4:
 		addq.b	#2,obRoutine(a0)
 		move.w	#180,obTimeFrame(a0) ; set time delay to 3 seconds
 		cmpi.w	#50,(v_rings).w	; do you have at least 50 rings?
-		blo.s	locret_C8EA	; if not, branch
+		bcs.s	locret_C8EA	; if not, branch
 		move.w	#60,obTimeFrame(a0) ; set time delay to 1 second
 		addq.b	#4,obRoutine(a0) ; goto "SSR_Continue" routine
 

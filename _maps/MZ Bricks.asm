@@ -1,11 +1,8 @@
 ; ---------------------------------------------------------------------------
 ; Sprite mappings - solid blocks and blocks that fall from the ceiling (MZ)
 ; ---------------------------------------------------------------------------
-Map_Brick_internal:	mappingsTable
-	mappingsTableEntry.w	.brick
-
-.brick:	spriteHeader
-	spritePiece	-$10, -$10, 4, 4, 1, 0, 0, 0, 0
-.brick_End
-
-	even
+Map_Brick_internal:
+		dc.w .brick-Map_Brick_internal
+.brick:		dc.b 1
+		dc.b $F0, $F, 0, 1, $F0
+		even

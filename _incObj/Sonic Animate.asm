@@ -9,9 +9,9 @@ Sonic_Animate:
 		lea	(Ani_Sonic).l,a1
 		moveq	#0,d0
 		move.b	obAnim(a0),d0
-		cmp.b	obPrevAni(a0),d0 ; has animation changed?
+		cmp.b	obNextAni(a0),d0 ; is animation set to restart?
 		beq.s	.do		; if not, branch
-		move.b	d0,obPrevAni(a0)
+		move.b	d0,obNextAni(a0) ; set to "no restart"
 		move.b	#0,obAniFrame(a0) ; reset animation
 		move.b	#0,obTimeFrame(a0) ; reset frame duration
 
@@ -102,7 +102,7 @@ Sonic_Animate:
 .nomodspeed:
 		lea	(SonAni_Run).l,a1 ; use	running	animation
 		cmpi.w	#$600,d2	; is Sonic at running speed?
-		bhs.s	.running	; if yes, branch
+		bcc.s	.running	; if yes, branch
 
 		lea	(SonAni_Walk).l,a1 ; use walking animation
 		move.b	d0,d1
@@ -135,7 +135,7 @@ Sonic_Animate:
 .nomodspeed2:
 		lea	(SonAni_Roll2).l,a1 ; use fast animation
 		cmpi.w	#$600,d2	; is Sonic moving fast?
-		bhs.s	.rollfast	; if yes, branch
+		bcc.s	.rollfast	; if yes, branch
 		lea	(SonAni_Roll).l,a1 ; use slower	animation
 
 .rollfast:

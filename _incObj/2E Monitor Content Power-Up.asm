@@ -16,7 +16,7 @@ Pow_Index:	dc.w Pow_Main-Pow_Index
 
 Pow_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
-		move.w	#make_art_tile(ArtTile_Monitor,0,0),obGfx(a0)
+		move.w	#$680,obGfx(a0)
 		move.b	#$24,obRender(a0)
 		move.b	#3,obPriority(a0)
 		move.b	#8,obActWid(a0)
@@ -119,11 +119,11 @@ Pow_ChkRings:
 		addi.w	#10,(v_rings).w	; add 10 rings to the number of rings you have
 		ori.b	#1,(f_ringcount).w ; update the ring counter
 		cmpi.w	#100,(v_rings).w ; check if you have 100 rings
-		blo.s	Pow_RingSound
+		bcs.s	Pow_RingSound
 		bset	#1,(v_lifecount).w
 		beq.w	ExtraLife
 		cmpi.w	#200,(v_rings).w ; check if you have 200 rings
-		blo.s	Pow_RingSound
+		bcs.s	Pow_RingSound
 		bset	#2,(v_lifecount).w
 		beq.w	ExtraLife
 

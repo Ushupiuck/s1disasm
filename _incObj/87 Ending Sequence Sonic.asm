@@ -15,7 +15,7 @@ ESon_Index:	dc.w ESon_Main-ESon_Index, ESon_MakeEmeralds-ESon_Index
 		dc.w Obj87_MakeLogo-ESon_Index, Obj87_Animate-ESon_Index
 		dc.w Obj87_Leap-ESon_Index, Obj87_Animate-ESon_Index
 
-eson_time = objoff_30	; time to wait between events
+eson_time = $30	; time to wait between events
 ; ===========================================================================
 
 ESon_Main:	; Routine 0
@@ -29,7 +29,7 @@ ESon_Main:	; Routine 0
 ESon_Main2:
 		addq.b	#2,ob2ndRout(a0)
 		move.l	#Map_ESon,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Ending_Sonic,0,0),obGfx(a0)
+		move.w	#$3E1,obGfx(a0)
 		move.b	#4,obRender(a0)
 		clr.b	obStatus(a0)
 		move.b	#2,obPriority(a0)
@@ -49,7 +49,7 @@ ESon_Wait:
 ; ===========================================================================
 
 Obj87_LookUp:	; Routine 6
-		cmpi.w	#$2000,((v_endemeralds+echa_radius)&$FFFFFF).l
+		cmpi.w	#$2000,((v_objspace&$FFFFFF)+$400+$3C).l
 		bne.s	locret_5480
 		move.w	#1,(f_restart).w ; set level to	restart	(causes	flash)
 		move.w	#90,eson_time(a0)
@@ -64,7 +64,7 @@ Obj87_ClrObjRam:
 		subq.w	#1,eson_time(a0)
 		bne.s	ESon_Wait2
 		lea	(v_endemeralds).w,a1
-		move.w	#(v_endemeralds_end-v_endemeralds)/4-1,d1
+		move.w	#$FF,d1
 
 Obj87_ClrLoop:
 		clr.l	(a1)+
@@ -100,7 +100,7 @@ Obj87_Leap:	; Routine $10
 		bne.s	ESon_Wait4
 		addq.b	#2,ob2ndRout(a0)
 		move.l	#Map_ESon,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Ending_Sonic,0,0),obGfx(a0)
+		move.w	#$3E1,obGfx(a0)
 		move.b	#4,obRender(a0)
 		clr.b	obStatus(a0)
 		move.b	#2,obPriority(a0)

@@ -5,11 +5,11 @@ Act ID:     0
 
 Object Def: objdef\s1obj
 
-8x8 Tiles: ghz.nem
+8x8 Tiles: ghz.bin
 
-16x16 Tiles:   ..\map16\GHZ.eni
+16x16 Tiles:   ..\map16\GHZ.bin
 
-256x256 Tiles: ..\map256\GHZ.kos
+256x256 Tiles: ..\map256\GHZ.bin
 
 FG Layout: ..\levels\ghz1.bin
 BG Layout: ..\levels\ghzbg.bin

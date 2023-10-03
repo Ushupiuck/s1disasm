@@ -26,7 +26,7 @@ Obj09_Main:	; Routine 0
 		move.b	#$E,obHeight(a0)
 		move.b	#7,obWidth(a0)
 		move.l	#Map_Sonic,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Sonic,0,0),obGfx(a0)
+		move.w	#$780,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#0,obPriority(a0)
 		move.b	#id_Roll,obAnim(a0)
@@ -41,7 +41,7 @@ Obj09_ChkDebug:	; Routine 2
 		move.w	#1,(v_debuguse).w ; change Sonic into a ring
 
 Obj09_NoDebug:
-		move.b	#0,objoff_30(a0)
+		move.b	#0,$30(a0)
 		moveq	#0,d0
 		move.b	obStatus(a0),d0
 		andi.w	#2,d0
@@ -292,7 +292,7 @@ loc_1BBF4:
 		move.w	#0,(v_ssrotate).w
 		move.w	#$4000,(v_ssangle).w
 		addq.b	#2,obRoutine(a0)
-		move.w	#$3C,objoff_38(a0)
+		move.w	#$3C,$38(a0)
 
 loc_1BC12:
 		move.w	(v_ssangle).w,d0
@@ -305,7 +305,7 @@ loc_1BC12:
 ; ===========================================================================
 
 Obj09_Exit2:
-		subq.w	#1,objoff_38(a0)
+		subq.w	#1,$38(a0)
 		bne.s	loc_1BC40
 		move.b	#id_Level,(v_gamemode).w
 
@@ -390,7 +390,7 @@ loc_1BCD4:
 
 
 sub_1BCE8:
-		lea	(v_ssbuffer1&$FFFFFF).l,a1
+		lea	($FF0000).l,a1
 		moveq	#0,d4
 		swap	d2
 		move.w	d2,d4
@@ -439,8 +439,8 @@ locret_1BD44:
 ; ===========================================================================
 
 loc_1BD46:
-		move.b	d4,objoff_30(a0)
-		move.l	a1,objoff_32(a0)
+		move.b	d4,$30(a0)
+		move.l	a1,$32(a0)
 		moveq	#-1,d5
 		rts	
 ; End of function sub_1BD30
@@ -450,7 +450,7 @@ loc_1BD46:
 
 
 Obj09_ChkItems:
-		lea	(v_ssbuffer1&$FFFFFF).l,a1
+		lea	($FF0000).l,a1
 		moveq	#0,d4
 		move.w	obY(a0),d4
 		addi.w	#$50,d4
@@ -464,7 +464,7 @@ Obj09_ChkItems:
 		adda.w	d4,a1
 		move.b	(a1),d4
 		bne.s	Obj09_ChkCont
-		tst.b	objoff_3A(a0)
+		tst.b	$3A(a0)
 		bne.w	Obj09_MakeGhostSolid
 		moveq	#0,d4
 		rts	
@@ -481,7 +481,7 @@ Obj09_ChkCont:
 Obj09_GetCont:
 		jsr	(CollectRing).l
 		cmpi.w	#50,(v_rings).w	; check if you have 50 rings
-		blo.s	Obj09_NoCont
+		bcs.s	Obj09_NoCont
 		bset	#0,(v_lifecount).w
 		bne.s	Obj09_NoCont
 		addq.b	#1,(v_continues).w ; add 1 to number of continues
@@ -512,7 +512,7 @@ Obj09_Get1Up:
 
 Obj09_ChkEmer:
 		cmpi.b	#$3B,d4		; is the item an emerald?
-		blo.s	Obj09_ChkGhost
+		bcs.s	Obj09_ChkGhost
 		cmpi.b	#$40,d4
 		bhi.s	Obj09_ChkGhost
 		bsr.w	SS_RemoveCollectedItem
@@ -540,14 +540,14 @@ Obj09_NoEmer:
 Obj09_ChkGhost:
 		cmpi.b	#$41,d4		; is the item a	ghost block?
 		bne.s	Obj09_ChkGhostTag
-		move.b	#1,objoff_3A(a0)	; mark the ghost block as "passed"
+		move.b	#1,$3A(a0)	; mark the ghost block as "passed"
 
 Obj09_ChkGhostTag:
 		cmpi.b	#$4A,d4		; is the item a	switch for ghost blocks?
 		bne.s	Obj09_NoGhost
-		cmpi.b	#1,objoff_3A(a0)	; have the ghost blocks	been passed?
+		cmpi.b	#1,$3A(a0)	; have the ghost blocks	been passed?
 		bne.s	Obj09_NoGhost	; if not, branch
-		move.b	#2,objoff_3A(a0)	; mark the ghost blocks	as "solid"
+		move.b	#2,$3A(a0)	; mark the ghost blocks	as "solid"
 
 Obj09_NoGhost:
 		moveq	#-1,d4
@@ -555,13 +555,13 @@ Obj09_NoGhost:
 ; ===========================================================================
 
 Obj09_MakeGhostSolid:
-		cmpi.b	#2,objoff_3A(a0)	; is the ghost marked as "solid"?
+		cmpi.b	#2,$3A(a0)	; is the ghost marked as "solid"?
 		bne.s	Obj09_GhostNotSolid ; if not, branch
-		lea	(v_ssblockbuffer&$FFFFFF).l,a1
-		moveq	#(v_ssblockbuffer_end-v_ssblockbuffer)/$80-1,d1
+		lea	($FF1020).l,a1
+		moveq	#$3F,d1
 
 Obj09_GhostLoop2:
-		moveq	#$40-1,d2
+		moveq	#$3F,d2
 
 Obj09_GhostLoop:
 		cmpi.b	#$41,(a1)	; is the item a	ghost block?
@@ -575,7 +575,7 @@ Obj09_NoReplace:
 		dbf	d1,Obj09_GhostLoop2
 
 Obj09_GhostNotSolid:
-		clr.b	objoff_3A(a0)
+		clr.b	$3A(a0)
 		moveq	#0,d4
 		rts	
 ; End of function Obj09_ChkItems
@@ -585,16 +585,16 @@ Obj09_GhostNotSolid:
 
 
 Obj09_ChkItems2:
-		move.b	objoff_30(a0),d0
+		move.b	$30(a0),d0
 		bne.s	Obj09_ChkBumper
-		subq.b	#1,objoff_36(a0)
+		subq.b	#1,$36(a0)
 		bpl.s	loc_1BEA0
-		move.b	#0,objoff_36(a0)
+		move.b	#0,$36(a0)
 
 loc_1BEA0:
-		subq.b	#1,objoff_37(a0)
+		subq.b	#1,$37(a0)
 		bpl.s	locret_1BEAC
-		move.b	#0,objoff_37(a0)
+		move.b	#0,$37(a0)
 
 locret_1BEAC:
 		rts	
@@ -603,7 +603,7 @@ locret_1BEAC:
 Obj09_ChkBumper:
 		cmpi.b	#$25,d0		; is the item a	bumper?
 		bne.s	Obj09_GOAL
-		move.l	objoff_32(a0),d1
+		move.l	$32(a0),d1
 		subi.l	#$FF0001,d1
 		move.w	d1,d2
 		andi.w	#$7F,d1
@@ -627,7 +627,7 @@ Obj09_ChkBumper:
 		bsr.w	SS_RemoveCollectedItem
 		bne.s	Obj09_BumpSnd
 		move.b	#2,(a2)
-		move.l	objoff_32(a0),d0
+		move.l	$32(a0),d0
 		subq.l	#1,d0
 		move.l	d0,4(a2)
 
@@ -647,13 +647,13 @@ Obj09_GOAL:
 Obj09_UPblock:
 		cmpi.b	#$29,d0		; is the item an "UP" block?
 		bne.s	Obj09_DOWNblock
-		tst.b	objoff_36(a0)
+		tst.b	$36(a0)
 		bne.w	Obj09_NoGlass
-		move.b	#$1E,objoff_36(a0)
-		btst	#6,(v_ssrotate+1).w
+		move.b	#$1E,$36(a0)
+		btst	#6,($FFFFF783).w
 		beq.s	Obj09_UPsnd
 		asl	(v_ssrotate).w	; increase stage rotation speed
-		movea.l	objoff_32(a0),a1
+		movea.l	$32(a0),a1
 		subq.l	#1,a1
 		move.b	#$2A,(a1)	; change item to a "DOWN" block
 
@@ -665,13 +665,13 @@ Obj09_UPsnd:
 Obj09_DOWNblock:
 		cmpi.b	#$2A,d0		; is the item a	"DOWN" block?
 		bne.s	Obj09_Rblock
-		tst.b	objoff_36(a0)
+		tst.b	$36(a0)
 		bne.w	Obj09_NoGlass
-		move.b	#$1E,objoff_36(a0)
+		move.b	#$1E,$36(a0)
 		btst	#6,(v_ssrotate+1).w
 		bne.s	Obj09_DOWNsnd
 		asr	(v_ssrotate).w	; reduce stage rotation speed
-		movea.l	objoff_32(a0),a1
+		movea.l	$32(a0),a1
 		subq.l	#1,a1
 		move.b	#$29,(a1)	; change item to an "UP" block
 
@@ -683,13 +683,13 @@ Obj09_DOWNsnd:
 Obj09_Rblock:
 		cmpi.b	#$2B,d0		; is the item an "R" block?
 		bne.s	Obj09_ChkGlass
-		tst.b	objoff_37(a0)
+		tst.b	$37(a0)
 		bne.w	Obj09_NoGlass
-		move.b	#$1E,objoff_37(a0)
+		move.b	#$1E,$37(a0)
 		bsr.w	SS_RemoveCollectedItem
 		bne.s	Obj09_RevStage
 		move.b	#4,(a2)
-		move.l	objoff_32(a0),d0
+		move.l	$32(a0),d0
 		subq.l	#1,d0
 		move.l	d0,4(a2)
 
@@ -713,7 +713,7 @@ Obj09_Glass:
 		bsr.w	SS_RemoveCollectedItem
 		bne.s	Obj09_GlassSnd
 		move.b	#6,(a2)
-		movea.l	objoff_32(a0),a1
+		movea.l	$32(a0),a1
 		subq.l	#1,a1
 		move.l	a1,4(a2)
 		move.b	(a1),d0

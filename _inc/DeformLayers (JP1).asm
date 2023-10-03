@@ -331,7 +331,7 @@ Deform_MZ:
 		subi.w	#$200,d0	; subtract 512px (unused 2 chunks)
 		move.w	d0,d2
 		cmpi.w	#$100,d0
-		blo.s	.limitY
+		bcs.s	.limitY
 		move.w	#$100,d0
 	.limitY:
 		andi.w	#$1F0,d0
@@ -696,7 +696,7 @@ MoveScreenHoriz:
 
 SH_AheadOfMid:
 		cmpi.w	#16,d0		; is Sonic within 16px of middle area?
-		blo.s	SH_Ahead16	; if yes, branch
+		bcs.s	SH_Ahead16	; if yes, branch
 		move.w	#16,d0		; set to 16 if greater
 
 SH_Ahead16:
@@ -781,7 +781,7 @@ loc_665C:
 
 loc_666C:
 		cmpi.w	#$800,d1
-		bhs.s	loc_6696
+		bcc.s	loc_6696
 		move.w	#$600,d1
 		cmpi.w	#6,d0
 		bgt.s	loc_66F6
