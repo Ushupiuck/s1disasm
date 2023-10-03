@@ -124,8 +124,8 @@ EndOfHeader:
 ; Crash/Freeze the 68000. Unlike Sonic 2, Sonic 1 uses the 68000 for playing music, so it stops too
 
 ErrorTrap:
-		nop	
-		nop	
+		nop
+		nop
 		bra.s	ErrorTrap
 ; ===========================================================================
 
@@ -157,7 +157,7 @@ VDPInitLoop:
 		move.w	d5,(a4)		; move value to	VDP register
 		add.w	d7,d5		; next register
 		dbf	d1,VDPInitLoop
-		
+
 		move.l	(a5)+,(a4)
 		move.w	d0,(a3)		; clear	the VRAM
 		move.w	d7,(a1)		; stop the Z80
@@ -171,7 +171,7 @@ WaitForZ80:
 Z80InitLoop:
 		move.b	(a5)+,(a0)+
 		dbf	d2,Z80InitLoop
-		
+
 		move.w	d0,(a2)
 		move.w	d0,(a1)		; start	the Z80
 		move.w	d7,(a2)		; reset	the Z80
@@ -406,7 +406,7 @@ loc_478:
 		bsr.w	ErrorWaitForC
 		movem.l	(v_regbuffer).w,d0-a7
 		enable_ints
-		rte	
+		rte
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -484,7 +484,7 @@ ShowErrorValue:
 .chars0to9:
 		addi.w	#$7C0,d1
 		move.w	d1,(a6)
-		rts	
+		rts
 ; End of function sub_5CA
 
 
@@ -495,7 +495,7 @@ ErrorWaitForC:
 		bsr.w	ReadJoypads
 		cmpi.b	#btnC,(v_jpadpress1).w ; is button C pressed?
 		bne.w	ErrorWaitForC	; if not, branch
-		rts	
+		rts
 ; End of function ErrorWaitForC
 
 ; ===========================================================================
@@ -536,7 +536,7 @@ VBla_Music:
 VBla_Exit:
 		addq.l	#1,(v_vbla_count).w
 		movem.l	(sp)+,d0-a6
-		rte	
+		rte
 ; ===========================================================================
 VBla_Index:	dc.w VBla_00-VBla_Index, VBla_02-VBla_Index
 		dc.w VBla_04-VBla_Index, VBla_06-VBla_Index
@@ -593,7 +593,7 @@ VBla_14:
 		subq.w	#1,(v_demolength).w
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_04:
@@ -605,12 +605,12 @@ VBla_04:
 		subq.w	#1,(v_demolength).w
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_06:
 		bsr.w	sub_106E
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_10:
@@ -670,7 +670,7 @@ Demo_Time:
 		subq.w	#1,(v_demolength).w ; subtract 1 from time left
 
 .end:
-		rts	
+		rts
 ; End of function Demo_Time
 
 ; ===========================================================================
@@ -696,7 +696,7 @@ VBla_0A:
 		subq.w	#1,(v_demolength).w	; subtract 1 from time left in demo
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_0C:
@@ -731,14 +731,14 @@ VBla_0C:
 		jsr	(AnimateLevelGfx).l
 		jsr	(HUD_Update).l
 		bsr.w	sub_1642
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_0E:
 		bsr.w	sub_106E
 		addq.b	#1,(v_vbla_0e_counter).w ; Unused besides this one write...
 		move.b	#$E,(v_vbla_routine).w
-		rts	
+		rts
 ; ===========================================================================
 
 VBla_12:
@@ -766,7 +766,7 @@ VBla_16:
 		subq.w	#1,(v_demolength).w
 
 .end:
-		rts	
+		rts
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -787,7 +787,7 @@ sub_106E:
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
-		rts	
+		rts
 ; End of function sub_106E
 
 ; ---------------------------------------------------------------------------
@@ -844,7 +844,7 @@ HBlank:
 		bne.s	loc_119E
 
 .nochg:
-		rte	
+		rte
 ; ===========================================================================
 
 loc_119E:
@@ -853,7 +853,7 @@ loc_119E:
 		bsr.w	Demo_Time
 		jsr	(UpdateMusic).l
 		movem.l	(sp)+,d0-a6
-		rte	
+		rte
 ; End of function HBlank
 
 ; ---------------------------------------------------------------------------
@@ -871,7 +871,7 @@ JoypadInit:
 		move.b	d0,(z80_port_2_control+1).l	; init port 2 (joypad 2)
 		move.b	d0,(z80_expansion_control+1).l	; init port 3 (expansion/extra)
 		startZ80
-		rts	
+		rts
 ; End of function JoypadInit
 
 ; ---------------------------------------------------------------------------
@@ -888,14 +888,14 @@ ReadJoypads:
 
 Joypad_Read:
 		move.b	#0,(a1)
-		nop	
-		nop	
+		nop
+		nop
 		move.b	(a1),d0
 		lsl.b	#2,d0
 		andi.b	#$C0,d0
 		move.b	#$40,(a1)
-		nop	
-		nop	
+		nop
+		nop
 		move.b	(a1),d1
 		andi.b	#$3F,d1
 		or.b	d1,d0
@@ -905,7 +905,7 @@ Joypad_Read:
 		move.b	d0,(a0)+
 		and.b	d0,d1
 		move.b	d1,(a0)+
-		rts	
+		rts
 ; End of function ReadJoypads
 
 
@@ -945,7 +945,7 @@ VDPSetupGame:
 
 		move.w	#$8F02,(a5)	; set VDP increment size
 		move.l	(sp)+,d1
-		rts	
+		rts
 ; End of function VDPSetupGame
 
 ; ===========================================================================
@@ -1412,7 +1412,7 @@ FadeIn_FromBlack:
 		dbf	d0,.addcolour2 ; repeat
 
 .exit:
-		rts	
+		rts
 ; End of function FadeIn_FromBlack
 
 
@@ -1430,7 +1430,7 @@ FadeIn_AddColour:
 		cmp.w	d2,d1		; has blue reached threshold level?
 		bhi.s	.addgreen	; if yes, branch
 		move.w	d1,(a0)+	; update palette
-		rts	
+		rts
 ; ===========================================================================
 
 .addgreen:
@@ -1439,17 +1439,17 @@ FadeIn_AddColour:
 		cmp.w	d2,d1
 		bhi.s	.addred
 		move.w	d1,(a0)+	; update palette
-		rts	
+		rts
 ; ===========================================================================
 
 .addred:
 		addq.w	#2,(a0)+	; increase red value
-		rts	
+		rts
 ; ===========================================================================
 
 .next:
 		addq.w	#2,a0		; next colour
-		rts	
+		rts
 ; End of function FadeIn_AddColour
 
 
@@ -1498,7 +1498,7 @@ FadeOut_ToBlack:
 .decolour2:
 		bsr.s	FadeOut_DecColour
 		dbf	d0,.decolour2
-		rts	
+		rts
 ; End of function FadeOut_ToBlack
 
 
@@ -1513,7 +1513,7 @@ FadeOut_DecColour:
 		andi.w	#$E,d1
 		beq.s	.degreen
 		subq.w	#2,(a0)+	; decrease red value
-		rts	
+		rts
 ; ===========================================================================
 
 .degreen:
@@ -1521,7 +1521,7 @@ FadeOut_DecColour:
 		andi.w	#$E0,d1
 		beq.s	.deblue
 		subi.w	#$20,(a0)+	; decrease green value
-		rts	
+		rts
 ; ===========================================================================
 
 .deblue:
@@ -1529,12 +1529,12 @@ FadeOut_DecColour:
 		andi.w	#$E00,d1
 		beq.s	.next
 		subi.w	#$200,(a0)+	; decrease blue	value
-		rts	
+		rts
 ; ===========================================================================
 
 .next:
 		addq.w	#2,a0
-		rts	
+		rts
 ; End of function FadeOut_DecColour
 
 ; ---------------------------------------------------------------------------
@@ -1565,7 +1565,7 @@ PaletteWhiteIn:
 		bsr.s	WhiteIn_FromWhite
 		bsr.w	RunPLC
 		dbf	d4,.mainloop
-		rts	
+		rts
 ; End of function PaletteWhiteIn
 
 
@@ -1600,7 +1600,7 @@ WhiteIn_FromWhite:
 		dbf	d0,.decolour2
 
 .exit:
-		rts	
+		rts
 ; End of function WhiteIn_FromWhite
 
 
@@ -1619,7 +1619,7 @@ WhiteIn_DecColour:
 		cmp.w	d2,d1
 		blo.s	.degreen
 		move.w	d1,(a0)+
-		rts	
+		rts
 ; ===========================================================================
 
 .degreen:
@@ -1629,17 +1629,17 @@ WhiteIn_DecColour:
 		cmp.w	d2,d1
 		blo.s	.dered
 		move.w	d1,(a0)+
-		rts	
+		rts
 ; ===========================================================================
 
 .dered:
 		subq.w	#2,(a0)+	; decrease red value
-		rts	
+		rts
 ; ===========================================================================
 
 .next:
 		addq.w	#2,a0
-		rts	
+		rts
 ; End of function WhiteIn_DecColour
 
 ; ---------------------------------------------------------------------------
@@ -1659,7 +1659,7 @@ PaletteWhiteOut:
 		bsr.s	WhiteOut_ToWhite
 		bsr.w	RunPLC
 		dbf	d4,.mainloop
-		rts	
+		rts
 ; End of function PaletteWhiteOut
 
 
@@ -1686,7 +1686,7 @@ WhiteOut_ToWhite:
 .addcolour2:
 		bsr.s	WhiteOut_AddColour
 		dbf	d0,.addcolour2
-		rts	
+		rts
 ; End of function WhiteOut_ToWhite
 
 
@@ -1703,7 +1703,7 @@ WhiteOut_AddColour:
 		cmpi.w	#cRed,d1
 		beq.s	.addgreen
 		addq.w	#2,(a0)+	; increase red value
-		rts	
+		rts
 ; ===========================================================================
 
 .addgreen:
@@ -1712,7 +1712,7 @@ WhiteOut_AddColour:
 		cmpi.w	#cGreen,d1
 		beq.s	.addblue
 		addi.w	#$20,(a0)+	; increase green value
-		rts	
+		rts
 ; ===========================================================================
 
 .addblue:
@@ -1721,12 +1721,12 @@ WhiteOut_AddColour:
 		cmpi.w	#cBlue,d1
 		beq.s	.next
 		addi.w	#$200,(a0)+	; increase blue	value
-		rts	
+		rts
 ; ===========================================================================
 
 .next:
 		addq.w	#2,a0
-		rts	
+		rts
 ; End of function WhiteOut_AddColour
 
 ; ---------------------------------------------------------------------------
@@ -1783,7 +1783,7 @@ loc_2054:
 loc_2062:
 		move.w	d0,(v_pcyc_num).w
 		moveq	#1,d0
-		rts	
+		rts
 ; ===========================================================================
 
 loc_206A:
@@ -1795,7 +1795,7 @@ loc_206A:
 		cmpi.w	#$30,d0
 		blo.s	loc_2088
 		moveq	#0,d0
-		rts	
+		rts
 ; ===========================================================================
 
 loc_2088:
@@ -1853,7 +1853,7 @@ PalLoad1:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad1
 
 
@@ -1871,7 +1871,7 @@ PalLoad2:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad2
 
 ; ---------------------------------------------------------------------------
@@ -1893,7 +1893,7 @@ PalLoad3_Water:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad3_Water
 
 
@@ -1912,7 +1912,7 @@ PalLoad4_Water:
 .loop:
 		move.l	(a2)+,(a3)+	; move data to RAM
 		dbf	d7,.loop
-		rts	
+		rts
 ; End of function PalLoad4_Water
 
 ; ===========================================================================
@@ -2315,7 +2315,7 @@ LevSel_Level_SS:
 		if Revision<>0
 			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		endif
-		rts	
+		rts
 ; ===========================================================================
 
 LevSel_Level:
@@ -2416,7 +2416,7 @@ loc_33B6:
 		cmpi.w	#$1C00,d0
 		blo.s	loc_33E4
 		move.b	#id_Sega,(v_gamemode).w
-		rts	
+		rts
 ; ===========================================================================
 
 loc_33E4:
@@ -2454,7 +2454,7 @@ Demo_Level:
 		if Revision<>0
 			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		endif
-		rts	
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Levels used in demos
@@ -2528,7 +2528,7 @@ LevSel_Refresh2:
 		bsr.w	LevSelTextLoad	; refresh text
 
 LevSel_NoMove:
-		rts	
+		rts
 ; End of function LevSelControls
 
 ; ---------------------------------------------------------------------------
@@ -2585,7 +2585,7 @@ LevSel_DrawSnd:
 		bsr.w	LevSel_ChgSnd	; draw 1st digit
 		move.b	d2,d0
 		bsr.w	LevSel_ChgSnd	; draw 2nd digit
-		rts	
+		rts
 ; End of function LevSelTextLoad
 
 
@@ -2601,7 +2601,7 @@ LevSel_ChgSnd:
 LevSel_Numb:
 		add.w	d3,d0
 		move.w	d0,(a6)
-		rts	
+		rts
 ; End of function LevSel_ChgSnd
 
 
@@ -2617,7 +2617,7 @@ LevSel_LineLoop:
 		bpl.s	LevSel_CharOk	; branch if valid
 		move.w	#0,(a6)		; use blank character
 		dbf	d2,LevSel_LineLoop
-		rts	
+		rts
 
 
 LevSel_CharOk:
@@ -2972,7 +2972,7 @@ Level_FDLoop:
 loc_3BC8:
 		tst.w	(v_demolength).w
 		bne.s	Level_FDLoop
-		rts	
+		rts
 ; ===========================================================================
 
 		include	"_inc/LZWaterFeatures.asm"
@@ -2990,7 +2990,7 @@ ColIndexLoad:
 		move.b	(v_zone).w,d0
 		lsl.w	#2,d0
 		move.l	ColPointers(pc,d0.w),(v_collindex).w
-		rts	
+		rts
 ; End of function ColIndexLoad
 
 ; ===========================================================================
@@ -3822,7 +3822,7 @@ End_MoveSonic:
 		addq.b	#2,(v_sonicend).w
 		move.b	#1,(f_lockctrl).w ; lock player's controls
 		move.w	#(btnR<<8),(v_jpadhold2).w ; move Sonic to the right
-		rts	
+		rts
 ; ===========================================================================
 
 End_MoveSon2:
@@ -3840,7 +3840,7 @@ End_MoveSon2:
 		move.b	#fr_Wait2,(v_player+obFrame).w
 		move.w	#(id_Wait<<8)+id_Wait,(v_player+obAnim).w ; use "standing" animation
 		move.b	#3,(v_player+obTimeFrame).w
-		rts	
+		rts
 ; ===========================================================================
 
 End_MoveSon3:
@@ -3852,7 +3852,7 @@ End_MoveSon3:
 		clr.w	(v_player+obRoutine).w
 
 End_MoveSonExit:
-		rts	
+		rts
 ; End of function End_MoveSonic
 
 ; ===========================================================================
@@ -4480,7 +4480,7 @@ locj_6E72:
 			tst.b	(a2)
 			bne.s	locj_6E78
 			rts
-;===============================================================================			
+;===============================================================================
 locj_6E78:
 			moveq	#-16,d4
 			moveq	#-16,d5
@@ -4496,7 +4496,7 @@ locj_6E8C:
 			andi.w	#$1F0,d0
 			lsr.w	#4,d0
 			lea	(a0,d0.w),a0
-			bra.w	locj_6FEC						
+			bra.w	locj_6FEC
 ;===============================================================================
 
 
@@ -4573,7 +4573,7 @@ locj_6FAE:
 			tst.b	(a2)
 			bne.s	locj_6FB4
 			rts
-;===============================================================================			
+;===============================================================================
 locj_6FB4:
 			moveq	#-16,d4
 			moveq	#-16,d5
@@ -4591,13 +4591,13 @@ locj_6FC8:
 			lsr.w	#4,d0
 			lea	(a0,d0.w),a0
 			bra.w	locj_6FEC
-;===============================================================================			
+;===============================================================================
 locj_6FE4:
 			dc.w v_bgscreenposx_dup, v_bgscreenposx_dup, v_bg2screenposx_dup, v_bg3screenposx_dup
 locj_6FEC:
 			moveq	#((224+16+16)/16)-1,d6
 			move.l	#$800000,d7
-locj_6FF4:			
+locj_6FF4:
 			moveq	#0,d0
 			move.b	(a0)+,d0
 			btst	d0,(a2)
@@ -4614,7 +4614,7 @@ locj_701C:
 			addi.w	#16,d4
 			dbf	d6,locj_6FF4
 			clr.b	(a2)
-			rts			
+			rts
 
 		endif
 
@@ -4659,7 +4659,7 @@ DrawBlocks_LR_3:
 		movem.l	(sp)+,d4-d5
 		addi.w	#16,d5
 		dbf	d6,.loop
-		rts	
+		rts
 ; End of function DrawBlocks_LR_3
 		endif
 
@@ -4686,7 +4686,7 @@ DrawBlocks_TB_2:
 		movem.l	(sp)+,d4-d5
 		addi.w	#16,d4		; Move X coordinate one block ahead
 		dbf	d6,.loop
-		rts	
+		rts
 ; End of function DrawBlocks_TB_2
 
 
@@ -4714,7 +4714,7 @@ DrawBlock:
 		add.l	d7,d0		; Next row
 		move.l	d0,(a5)
 		move.l	(a1)+,(a6)	; Write bottom two tiles
-		rts	
+		rts
 ; ===========================================================================
 
 DrawFlipX:
@@ -4729,7 +4729,7 @@ DrawFlipX:
 		eori.l	#$8000800,d4
 		swap	d4
 		move.l	d4,(a6)		; Write bottom two tiles
-		rts	
+		rts
 ; ===========================================================================
 
 DrawFlipY:
@@ -4744,7 +4744,7 @@ DrawFlipY:
 		move.l	d0,(a5)
 		eori.l	#$10001000,d5
 		move.l	d5,(a6)
-		rts	
+		rts
 ; ===========================================================================
 
 DrawFlipXY:
@@ -4759,7 +4759,7 @@ DrawFlipXY:
 		eori.l	#$18001800,d5
 		swap	d5
 		move.l	d5,(a6)
-		rts	
+		rts
 ; End of function DrawBlocks
 
 ; ===========================================================================
@@ -5179,7 +5179,7 @@ loc_7512:
 		bset	#3,obStatus(a0)
 
 Plat_Exit:
-		rts	
+		rts
 ; End of function PlatformObject
 
 ; ---------------------------------------------------------------------------
@@ -5266,7 +5266,7 @@ loc_75E0:
 		bclr	#3,obStatus(a0)
 
 locret_75F2:
-		rts	
+		rts
 ; End of function ExitPlatform
 
 		include	"_incObj/11 Bridge (part 3).asm"
@@ -5426,7 +5426,7 @@ loc_854E:
 		sub.w	d2,obX(a1)
 
 locret_856E:
-		rts	
+		rts
 ; End of function SlopeObject2
 
 ; ===========================================================================
@@ -5479,7 +5479,7 @@ loc_8A92:
 		bne.s	loc_8AB6
 		bset	#5,obStatus(a1)
 		bset	#5,obStatus(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_8AA8:
@@ -5492,7 +5492,7 @@ loc_8AB6:
 		bclr	#5,obStatus(a1)
 
 locret_8AC2:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_8AC4:
@@ -5558,17 +5558,17 @@ loc_8B3C:
 		cmp.w	d1,d5
 		bhi.s	loc_8B44
 		moveq	#1,d4
-		rts	
+		rts
 ; ===========================================================================
 
 loc_8B44:
 		moveq	#-1,d4
-		rts	
+		rts
 ; ===========================================================================
 
 loc_8B48:
 		moveq	#0,d4
-		rts	
+		rts
 ; End of function Obj44_SolidWall2
 
 ; ===========================================================================
@@ -5975,7 +5975,7 @@ loc_D348:
 loc_D358:
 		lea	object_size(a0),a0	; next object
 		dbf	d7,loc_D348
-		rts	
+		rts
 ; ===========================================================================
 
 loc_D362:
@@ -5996,7 +5996,7 @@ loc_D378:
 
 loc_D37C:
 		dbf	d7,loc_D368
-		rts	
+		rts
 ; End of function ExecuteObjects
 
 ; ===========================================================================
@@ -6127,7 +6127,7 @@ BuildSprites:
 
 	.spriteLimit:
 		move.b	#0,-5(a2)	; set last sprite link
-		rts	
+		rts
 ; End of function BuildSprites
 
 
@@ -6173,7 +6173,7 @@ BuildSpr_Normal:
 		dbf	d1,BuildSpr_Normal	; process next sprite piece
 
 	.return:
-		rts	
+		rts
 ; End of function BuildSpr_Normal
 
 ; ===========================================================================
@@ -6190,12 +6190,12 @@ BuildSpr_FlipX:
 		add.w	d2,d0
 		move.w	d0,(a2)+
 		move.b	(a1)+,d4	; size
-		move.b	d4,(a2)+	
+		move.b	d4,(a2)+
 		addq.b	#1,d5		; link
 		move.b	d5,(a2)+
 		move.b	(a1)+,d0	; art tile
 		lsl.w	#8,d0
-		move.b	(a1)+,d0	
+		move.b	(a1)+,d0
 		add.w	a3,d0
 		eori.w	#$800,d0	; toggle flip-x in VDP
 		move.w	d0,(a2)+	; write to buffer
@@ -6216,7 +6216,7 @@ BuildSpr_FlipX:
 		dbf	d1,.loop		; process next sprite piece
 
 	.return:
-		rts	
+		rts
 ; ===========================================================================
 
 BuildSpr_FlipY:
@@ -6253,7 +6253,7 @@ BuildSpr_FlipY:
 		dbf	d1,BuildSpr_FlipY	; process next sprite piece
 
 	.return:
-		rts	
+		rts
 ; ===========================================================================
 
 BuildSpr_FlipXY:
@@ -6296,7 +6296,7 @@ BuildSpr_FlipXY:
 		dbf	d1,BuildSpr_FlipXY	; process next sprite piece
 
 	.return:
-		rts	
+		rts
 
 		include	"_incObj/sub ChkObjectVisible.asm"
 
@@ -6447,7 +6447,7 @@ loc_D9EC:
 
 loc_D9F0:
 		move.l	a0,(v_opl_data).w
-		rts	
+		rts
 ; ===========================================================================
 
 loc_D9F6:
@@ -6489,7 +6489,7 @@ loc_DA36:
 		move.l	a0,(v_opl_data+4).w
 
 locret_DA3A:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_DA3C:
@@ -6499,7 +6499,7 @@ loc_DA3C:
 		beq.s	OPL_MakeItem
 		addq.w	#6,a0
 		moveq	#0,d0
-		rts	
+		rts
 ; ===========================================================================
 
 OPL_MakeItem:
@@ -6525,7 +6525,7 @@ loc_DA80:
 		moveq	#0,d0
 
 locret_DA8A:
-		rts	
+		rts
 
 		include	"_incObj/sub FindFreeObj.asm"
 		include	"_incObj/41 Springs.asm"
@@ -6860,7 +6860,7 @@ ResumeMusic:
 .over12:
 		move.w	#30,(v_air).w	; reset air to 30 seconds
 		clr.b	(v_sonicbubbles+$32).w
-		rts	
+		rts
 ; End of function ResumeMusic
 
 ; ===========================================================================
@@ -7008,7 +7008,7 @@ loc_14DDE:
 		move.b	d2,d3
 
 locret_14DE6:
-		rts	
+		rts
 
 ; End of function Sonic_HitFloor
 
@@ -7032,7 +7032,7 @@ loc_14E0A:
 		move.b	d2,d3
 
 locret_14E16:
-		rts	
+		rts
 
 		include	"_incObj/sub ObjFloorDist.asm"
 
@@ -7118,7 +7118,7 @@ ObjHitWallRight:
 		move.b	#-$40,d3
 
 locret_14F06:
-		rts	
+		rts
 
 ; End of function ObjHitWallRight
 
@@ -7204,7 +7204,7 @@ ObjHitCeiling:
 		move.b	#-$80,d3
 
 locret_14FD4:
-		rts	
+		rts
 ; End of function ObjHitCeiling
 
 ; ===========================================================================
@@ -7294,7 +7294,7 @@ ObjHitWallLeft:
 		move.b	#$40,d3
 
 locret_15098:
-		rts	
+		rts
 ; End of function ObjHitWallLeft
 
 ; ===========================================================================
@@ -7377,7 +7377,7 @@ BossDefeated:
 		add.w	d0,obY(a1)
 
 locret_178A2:
-		rts	
+		rts
 ; End of function BossDefeated
 
 ; ---------------------------------------------------------------------------
@@ -7400,7 +7400,7 @@ BossMove:
 		add.l	d0,d3
 		move.l	d2,objoff_30(a0)
 		move.l	d3,objoff_38(a0)
-		rts	
+		rts
 ; End of function BossMove
 
 ; ===========================================================================
@@ -7573,12 +7573,12 @@ loc_1B268:
 		cmpi.b	#$50,d5
 		beq.s	loc_1B288
 		move.l	#0,(a2)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1B288:
 		move.b	#0,-5(a2)
-		rts	
+		rts
 ; End of function SS_ShowLayout
 
 ; ---------------------------------------------------------------------------
@@ -7693,7 +7693,7 @@ loc_1B350:
 		move.w	$E(a0),$38(a1)
 		adda.w	#$20,a0
 		adda.w	#$48,a1
-		rts	
+		rts
 ; End of function SS_AniWallsRings
 
 ; ===========================================================================
@@ -7723,7 +7723,7 @@ loc_1B4C4:
 		dbf	d0,loc_1B4C4
 
 locret_1B4CE:
-		rts	
+		rts
 ; End of function SS_RemoveCollectedItem
 
 ; ---------------------------------------------------------------------------
@@ -7775,7 +7775,7 @@ SS_AniRingSparks:
 		clr.l	4(a0)
 
 locret_1B530:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniRingData:	dc.b $42, $43, $44, $45, 0, 0
 ; ===========================================================================
@@ -7793,14 +7793,14 @@ SS_AniBumper:
 		clr.l	(a0)
 		clr.l	4(a0)
 		move.b	#$25,(a1)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1B564:
 		move.b	d0,(a1)
 
 locret_1B566:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniBumpData:	dc.b $32, $33, $32, $33, 0, 0
 ; ===========================================================================
@@ -7820,7 +7820,7 @@ SS_Ani1Up:
 		clr.l	4(a0)
 
 locret_1B596:
-		rts	
+		rts
 ; ===========================================================================
 SS_Ani1UpData:	dc.b $46, $47, $48, $49, 0, 0
 ; ===========================================================================
@@ -7838,14 +7838,14 @@ SS_AniReverse:
 		clr.l	(a0)
 		clr.l	4(a0)
 		move.b	#$2B,(a1)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_1B5CA:
 		move.b	d0,(a1)
 
 locret_1B5CC:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniRevData:	dc.b $2B, $31, $2B, $31, 0, 0
 ; ===========================================================================
@@ -7868,7 +7868,7 @@ SS_AniEmeraldSparks:
 		jmp	(PlaySound_Special).l	; play special stage GOAL sound
 
 locret_1B60C:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniEmerData:	dc.b $46, $47, $48, $49, 0, 0
 ; ===========================================================================
@@ -7889,7 +7889,7 @@ SS_AniGlassBlock:
 		clr.l	4(a0)
 
 locret_1B640:
-		rts	
+		rts
 ; ===========================================================================
 SS_AniGlassData:dc.b $4B, $4C, $4D, $4E, $4B, $4C, $4D,	$4E, 0,	0
 
@@ -7934,7 +7934,7 @@ SS_ChkEmldNum:
 		blo.s	SS_LoadData
 		lea	(v_emldlist).w,a3 ; check which emeralds you have
 
-SS_ChkEmldLoop:	
+SS_ChkEmldLoop:
 		cmp.b	(a3,d1.w),d0
 		bne.s	SS_ChkEmldRepeat
 		bra.s	SS_Load
@@ -8070,7 +8070,7 @@ AddPoints:
 
 .locret_1C6B6:
 .noextralife:
-		rts	
+		rts
 ; End of function AddPoints
 
 		include	"_inc/HUD_Update.asm"
@@ -8123,7 +8123,7 @@ loc_1C962:
 		move.l	(a3)+,(a6)
 		dbf	d6,ContScr_Loop	; repeat 1 more	time
 
-		rts	
+		rts
 ; End of function ContScrCounter
 
 ; ===========================================================================
