@@ -319,7 +319,7 @@ v_obj31ypos:		ds.w	1		; y-position of object 31 (MZ stomper)
 			ds.b	1		; unused
 v_bossstatus:		ds.b	1		; status of boss and prison capsule (01 = boss defeated; 02 = prison opened)
 v_trackpos:		ds.w	1		; position tracking reference number
-v_trackbyte = v_trackpos+1			; low byte for position tracking
+v_trackbyte =		v_trackpos+1		; low byte for position tracking
 f_lockscreen:		ds.b	1		; flag set to lock screen during bosses
 			ds.b	1		; unused
 v_256loop1:		ds.b	1		; 256x256 level tile which contains a loop (GHZ/SLZ)
