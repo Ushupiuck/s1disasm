@@ -603,5 +603,5 @@ ArtTile_SS_Zone_6:		equ $7A9
 ArtTile_SS_Results_Emeralds:	equ $541
 
 ; Font
-ArtTile_Sonic_Team_Font:	equ $020
+ArtTile_Sonic_Team_Font:	equ $0A6
 ArtTile_Credits_Font:		equ $5A0

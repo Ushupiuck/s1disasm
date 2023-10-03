@@ -1274,6 +1274,8 @@ loc_16DC:
 loc_16E2:
 		move.l	6(a0),(a0)+
 		dbf	d0,loc_16E2
+
+	if FixBugs
 		; The above code does not properly 'pop' the 16th PLC entry.
 		; Because of this, occupying the 16th slot will cause it to
 		; be repeatedly decompressed infinitely.
@@ -1286,7 +1288,9 @@ loc_16E2:
 	endif
 
 		clr.l	(v_plc_buffer_only_end-6).w
-		rts
+	endif
+
+		rts	
 ; End of function ProcessDPLC2
 
 ; ---------------------------------------------------------------------------
@@ -2060,7 +2064,7 @@ GM_Title:
 
 		clearRAM v_objspace,v_objend
 
-		locVRAM	ArtTile_Sonic_Team_Font*20
+		locVRAM	ArtTile_Sonic_Team_Font;*20
 		lea	(Nem_CreditText).l,a0 ;	load alphabet
 		bsr.w	NemDec
 
@@ -2278,6 +2282,14 @@ LevelSelect:
 		beq.s	LevSel_Ending	; if yes, branch
 		cmpi.w	#$9E,d0		; is sound $9E being played?
 		beq.s	LevSel_Credits	; if yes, branch
+
+LevSel_NoCheat:
+		; This is a workaround for a bug; see PlaySoundID for more.
+		; Once you've fixed the bugs there, comment these four instructions out.
+		cmpi.w	#bgm__Last+1,d0	; is sound $80-$93 being played?
+		blo.s	LevSel_PlaySnd	; if yes, branch
+		cmpi.w	#sfx__First,d0	; is sound $94-$9F being played?
+		blo.s	LevelSelect	; if yes, branch
 
 LevSel_PlaySnd:
 		bsr.w	PlaySound_Special
@@ -6337,15 +6349,23 @@ OPL_Main:
 		move.l	a1,(v_opl_data+$C).w
 		lea	(v_objstate).w,a2
 		move.w	#$101,(a2)+
+	if FixBugs
 		move.w	#(v_objstate_end-v_objstate-2)/4-1,d0
+	else
+		; This clears longwords, but the loop counter is measured in words!
+		; This causes $17C bytes to be cleared instead of $BE.
+		move.w	#(v_objstate_end-v_objstate-2)/2-1,d0
+	endif
 
 OPL_ClrList:
 		clr.l	(a2)+
 		dbf	d0,OPL_ClrList	; clear	pre-destroyed object list
 
+	if FixBugs
 		; Clear the last word, since the above loop only does longwords.
 	if (v_objstate_end-v_objstate-2)&2
 		clr.w	(a2)+
+	endif
 	endif
 
 		lea	(v_objstate).w,a2
