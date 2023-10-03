@@ -11,7 +11,7 @@ Sonic_AnglePos:
 		moveq	#0,d0
 		move.b	d0,(v_anglebuffer).w
 		move.b	d0,(v_anglebuffer2).w
-		rts	
+		rts
 ; ===========================================================================
 
 loc_14602:
@@ -105,10 +105,6 @@ loc_146CC:
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
 		rts
-; ===========================================================================
-
-locret_146E6:
-		rts
 ; End of function Sonic_AnglePos
 
 ; ---------------------------------------------------------------------------
@@ -137,7 +133,7 @@ loc_1476A:
 		addi.b	#$20,d2
 		andi.b	#$C0,d2
 		move.b	d2,obAngle(a0)
-		rts	
+		rts
 ; End of function Sonic_Angle
 
 ; ---------------------------------------------------------------------------
@@ -188,7 +184,7 @@ Sonic_WalkVertR:
 		add.w	d1,obX(a0)
 
 locret_147F0:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_147F2:
@@ -197,7 +193,7 @@ loc_147F2:
 
 loc_147F8:
 		add.w	d1,obX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_147FE:
@@ -206,7 +202,7 @@ loc_147FE:
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
-		rts	
+		rts
 ; End of function Sonic_WalkVertR
 
 ; ---------------------------------------------------------------------------
@@ -258,7 +254,7 @@ Sonic_WalkCeiling:
 		sub.w	d1,obY(a0)
 
 locret_14892:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_14894:
@@ -267,7 +263,7 @@ loc_14894:
 
 loc_1489A:
 		sub.w	d1,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_148A0:
@@ -276,7 +272,7 @@ loc_148A0:
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
-		rts	
+		rts
 ; End of function Sonic_WalkCeiling
 
 ; ---------------------------------------------------------------------------
@@ -328,7 +324,7 @@ Sonic_WalkVertL:
 		sub.w	d1,obX(a0)
 
 locret_14934:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_14936:
@@ -337,7 +333,7 @@ loc_14936:
 
 loc_1493C:
 		sub.w	d1,obX(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 loc_14942:
@@ -346,5 +342,5 @@ loc_14942:
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
-		rts	
+		rts
 ; End of function Sonic_WalkVertL
