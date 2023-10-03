@@ -55,8 +55,6 @@ loc_8CA4:
 Cbal_ChkExplode:
 		subq.w	#1,cbal_time(a0) ; subtract 1 from explosion time
 		bpl.s	Cbal_Animate	; if time is > 0, branch
-
-Cbal_Explode:
 		_move.b	#id_MissileDissolve,obID(a0)
 		_move.b	#id_ExplosionBomb,obID(a0)	; change object	to an explosion	($3F)
 		move.b	#0,obRoutine(a0) ; reset routine counter
@@ -73,5 +71,5 @@ Cbal_Display:
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has object fallen off	the level?
-		blo.w	DeleteObject	; if yes, branch
+		bcs.w	DeleteObject	; if yes, branch
 		bra.w	DisplaySprite
