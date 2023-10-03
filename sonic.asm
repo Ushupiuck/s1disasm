@@ -585,7 +585,7 @@ VBla_00:
 ; ===========================================================================
 
 VBla_02:
-		bsr.w	sub_106E
+		bsr.w	Do_ControllerPal
 
 VBla_14:
 		tst.w	(v_demolength).w
@@ -597,7 +597,7 @@ VBla_14:
 ; ===========================================================================
 
 VBla_04:
-		bsr.w	sub_106E
+		bsr.w	Do_ControllerPal
 		bsr.w	LoadTilesAsYouMove_BGOnly
 		bsr.w	sub_1642
 		tst.w	(v_demolength).w
@@ -609,8 +609,7 @@ VBla_04:
 ; ===========================================================================
 
 VBla_06:
-		bsr.w	sub_106E
-		rts
+		bra.w	Do_ControllerPal
 ; ===========================================================================
 
 VBla_10:
@@ -735,14 +734,14 @@ VBla_0C:
 ; ===========================================================================
 
 VBla_0E:
-		bsr.w	sub_106E
+		bsr.w	Do_ControllerPal
 		addq.b	#1,(v_vbla_0e_counter).w ; Unused besides this one write...
 		move.b	#$E,(v_vbla_routine).w
 		rts
 ; ===========================================================================
 
 VBla_12:
-		bsr.w	sub_106E
+		bsr.w	Do_ControllerPal
 		move.w	(v_hbla_hreg).w,(a5)
 		bra.w	sub_1642
 ; ===========================================================================
@@ -771,7 +770,7 @@ VBla_16:
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-sub_106E:
+Do_ControllerPal:
 		stopZ80
 		waitZ80
 		bsr.w	ReadJoypads
@@ -788,7 +787,7 @@ sub_106E:
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
 		rts
-; End of function sub_106E
+; End of function Do_ControllerPal
 
 ; ---------------------------------------------------------------------------
 ; Horizontal interrupt
@@ -891,13 +890,11 @@ Joypad_Read:
 		nop
 		nop
 		move.b	(a1),d0
-		lsl.b	#2,d0
-		andi.b	#$C0,d0
+		asl.b	#2,d0
 		move.b	#$40,(a1)
-		nop
-		nop
+		andi.w	#$C0,d0
 		move.b	(a1),d1
-		andi.b	#$3F,d1
+		andi.w	#$3F,d1
 		or.b	d1,d0
 		not.b	d0
 		move.b	(a0),d1

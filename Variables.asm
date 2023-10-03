@@ -229,7 +229,7 @@ f_doupdatesinhblank:	ds.b	1		; defers performing various tasks to the Horizontal
 v_pal_buffer:		ds.b	$30		; palette data buffer (used for palette cycling)
 v_misc_variables_end:
 
-v_plc_buffer:		ds.b	6*16		; pattern load cues buffer (maximum $10 PLCs)
+v_plc_buffer:		ds.b	6*$10		; pattern load cues buffer (maximum $10 PLCs)
 v_plc_buffer_only_end:
 v_plc_ptrnemcode:	ds.l	1		; pointer for nemesis decompression code ($1502 or $150C)
 v_plc_repeatcount:	ds.l	1

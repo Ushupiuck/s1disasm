@@ -160,7 +160,7 @@ loc_6ED0:
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0
-		bra.w	AddPLC		; load boss patterns
+		jmp	(AddPLC).l		; load boss patterns
 ; ===========================================================================
 
 locret_6EE8:
@@ -219,7 +219,7 @@ loc_6F4A:
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0
-		bra.w	AddPLC		; load boss patterns
+		jmp	(AddPLC).l		; load boss patterns
 ; ===========================================================================
 
 locret_6F62:
@@ -321,10 +321,8 @@ loc_702E:
 loc_703C:
 		cmpi.w	#$500,(v_screenposy).w
 		blo.s	locret_704E
-		if Revision<>0
-			cmpi.w	#$B80,(v_screenposx).w
-			bcs.s	locret_704E
-		endif
+		cmpi.w	#$B80,(v_screenposx).w
+		bcs.s	locret_704E
 		move.w	#$500,(v_limittop2).w
 		addq.b	#2,(v_dle_routine).w
 
@@ -333,21 +331,19 @@ locret_704E:
 ; ===========================================================================
 
 loc_7050:
-		if Revision<>0
-			cmpi.w	#$B80,(v_screenposx).w
-			bcc.s	locj_76B8
-			cmpi.w	#$340,(v_limittop2).w
-			beq.s	locret_7072
-			subq.w	#2,(v_limittop2).w
-			rts
+		cmpi.w	#$B80,(v_screenposx).w
+		bcc.s	locj_76B8
+		cmpi.w	#$340,(v_limittop2).w
+		beq.s	locret_7072
+		subq.w	#2,(v_limittop2).w
+		rts
 locj_76B8:
-			cmpi.w	#$500,(v_limittop2).w
-			beq.s	locj_76CE
-			cmpi.w	#$500,(v_screenposy).w
-			bcs.s	locret_7072
-			move.w	#$500,(v_limittop2).w
+		cmpi.w	#$500,(v_limittop2).w
+		beq.s	locj_76CE
+		cmpi.w	#$500,(v_screenposy).w
+		bcs.s	locret_7072
+		move.w	#$500,(v_limittop2).w
 locj_76CE:
-		endif
 
 		cmpi.w	#$E70,(v_screenposx).w
 		blo.s	locret_7072
@@ -400,7 +396,7 @@ loc_70D0:
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0
-		bra.w	AddPLC		; load boss patterns
+		jmp	(AddPLC).l		; load boss patterns
 ; ===========================================================================
 
 locret_70E8:
@@ -465,7 +461,7 @@ loc_7144:
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0
-		bra.w	AddPLC		; load boss patterns
+		jmp	(AddPLC).l		; load boss patterns
 ; ===========================================================================
 
 locret_715C:
@@ -546,7 +542,7 @@ loc_71EC:
 		jsr	(PlaySound).l	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
 		moveq	#plcid_Boss,d0
-		bra.w	AddPLC		; load boss patterns
+		jmp	(AddPLC).l		; load boss patterns
 ; ===========================================================================
 
 locret_7200:
@@ -613,22 +609,18 @@ locret_727A:
 
 DLE_SBZ2boss:
 		cmpi.w	#boss_sbz2_x-$1A0,(v_screenposx).w
-		blo.s	locret_7298
+		blo.s	locret_727A
 		bsr.w	FindFreeObj
-		bne.s	locret_7298
+		bne.s	locret_727A
 		move.b	#id_FalseFloor,obID(a1) ; load collapsing block object
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_EggmanSBZ2,d0
-		bra.w	AddPLC		; load SBZ2 Eggman patterns
-; ===========================================================================
-
-locret_7298:
-		rts
+		jmp	(AddPLC).l		; load SBZ2 Eggman patterns
 ; ===========================================================================
 
 DLE_SBZ2boss2:
 		cmpi.w	#boss_sbz2_x-$F0,(v_screenposx).w
-		blo.s	loc_72B6
+		blo.s	loc_72C2
 		bsr.w	FindFreeObj
 		bne.s	loc_72B0
 		move.b	#id_ScrapEggman,obID(a1) ; load SBZ2 Eggman object
@@ -636,9 +628,8 @@ DLE_SBZ2boss2:
 
 loc_72B0:
 		move.b	#1,(f_lockscreen).w ; lock screen
-
-loc_72B6:
-		bra.s	loc_72C2
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts
 ; ===========================================================================
 
 DLE_SBZ2end:
@@ -668,7 +659,7 @@ DLE_FZmain:
 		blo.s	loc_72F4
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_FZBoss,d0
-		bsr.w	AddPLC		; load FZ boss patterns
+		jsr	(AddPLC).l	; load FZ boss patterns
 
 loc_72F4:
 		bra.s	loc_72C2
@@ -676,24 +667,22 @@ loc_72F4:
 
 DLE_FZboss:
 		cmpi.w	#boss_fz_x-$150,(v_screenposx).w
-		blo.s	loc_7312
+		blo.s	loc_72C2
 		bsr.w	FindFreeObj
-		bne.s	loc_7312
+		bne.s	loc_72C2
 		move.b	#id_BossFinal,obID(a1) ; load FZ boss object
 		addq.b	#2,(v_dle_routine).w
 		move.b	#1,(f_lockscreen).w ; lock screen
-
-loc_7312:
-		bra.s	loc_72C2
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts
 ; ===========================================================================
 
 DLE_FZend:
 		cmpi.w	#boss_fz_x,(v_screenposx).w
-		blo.s	loc_7320
+		blo.s	loc_72C2
 		addq.b	#2,(v_dle_routine).w
-
-loc_7320:
-		bra.s	loc_72C2
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts
 ; ===========================================================================
 
 locret_7322:
@@ -701,7 +690,8 @@ locret_7322:
 ; ===========================================================================
 
 DLE_FZend2:
-		bra.s	loc_72C2
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Ending sequence dynamic level events (empty)

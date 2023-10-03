@@ -279,6 +279,7 @@ PLC_SpecialStage:	dc.w ((PLC_SpeStageend-PLC_SpecialStage-2)/6)-1
 		plcm	Nem_SSWBlock,   ArtTile_SS_W_Block           ; W block
 		plcm	Nem_SSGlass,    ArtTile_SS_Glass             ; glass block
 		plcm	Nem_SSEmerald,  ArtTile_SS_Emerald           ; emeralds
+		plcm	Nem_Ring,       ArtTile_Ring                 ; rings
 		plcm	Nem_SSZone1,    ArtTile_SS_Zone_1            ; ZONE 1 block
 		plcm	Nem_SSZone2,    ArtTile_SS_Zone_2            ; ZONE 2 block
 		plcm	Nem_SSZone3,    ArtTile_SS_Zone_3            ; ZONE 3 block
