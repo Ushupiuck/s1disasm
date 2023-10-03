@@ -17,7 +17,9 @@ TwizVRAM	= ramaddr (TwizHuffCopy+(TwizHuffCopyMax*$02))	; $4 bytes
 TwizSize	= ramaddr (TwizVRAM+$04)			; $2 bytes
 ; ---------------------------------------------------------------------------
 TwizBufferSize	=	$1000
+TwizBufferPre	= ramaddr ($FFFF8400)				; $1000 bytes
 TwizBuffer	= ramaddr ($FFFF9400)				; $1000 bytes
+; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Twizzler decompression
 ; --- Inputs ----------------------------------------------------------------
@@ -205,6 +207,7 @@ TD_DecompTwiz:
 
 	; --- Huffman Retrace ---
 
+	;	lea	(TwizHuffRet-$04).w,a3	; x86 long	; reset Retrace huffman list address
 		lea	(TwizHuffRet-$02).w,a3	; 68k word	; reset Retrace huffman list address
 
 TD_RetHuffNext:
@@ -212,6 +215,7 @@ TD_RetHuffNext:
 		MAC_ReadBit					; load next bitfield bit to carry
 		bcs.s	TD_RetHuffNext				; if set, branch to read another
 		lea	(a1),a2					; copy output address to a2 for Retrace
+	;	sub.l	(a3),a2			; x86 long	; load Retrace address
 		sub.w	(a3),a2			; 68k word	; load Retrace address
 		bra.s	TD_CopyRead				; continue
 
@@ -248,6 +252,7 @@ TD_RetDistant:
 		addq.w	#$01,a2					; add Retrace short distance to address
 
 TD_RetConvert:
+	;	sub.l	d0,a2			; x86 long	; move Retrace address back
 		sub.w	d0,a2			; 68k word	; move Retrace address back
 
 ; ---------------------------------------------------------------------------
@@ -405,7 +410,7 @@ TD_CopyList:	rts						; return
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Decompression loo, Section count, and final
+; Decompression loop, Section count, and final
 ; ---------------------------------------------------------------------------
 
 TD_CopyStream:
@@ -457,6 +462,7 @@ TDM_NextSection:
 
 	; --- Huffman Retrace ---
 
+	;	lea	(TwizHuffRet-$04).w,a3	; x86 long	; reset Retrace huffman list address
 		lea	(TwizHuffRet-$02).w,a3	; 68k word	; reset Retrace huffman list address
 
 TDM_RetHuffNext:
@@ -464,6 +470,7 @@ TDM_RetHuffNext:
 		MAC_ReadBit					; load next bitfield bit to carry
 		bcs.s	TDM_RetHuffNext				; if set, branch to read another
 		lea	(a1),a2					; copy output address to a2 for Retrace
+	;	sub.l	(a3),a2			; x86 long	; load Retrace address
 		sub.w	(a3),a2			; 68k word	; load Retrace address
 		bra.s	TDM_CopyRead				; continue
 
@@ -500,6 +507,7 @@ TDM_RetDistant:
 		addq.w	#$01,a2					; add Retrace short distance to address
 
 TDM_RetConvert:
+	;	sub.l	d0,a2			; x86 long	; move Retrace address back
 		sub.w	d0,a2			; 68k word	; move Retrace address back
 
 ; ---------------------------------------------------------------------------
@@ -734,7 +742,7 @@ TDM_CopyList:	rts						; return
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Decompression loop, Section count, and final
+; Decompression loo, Section count, and final
 ; ---------------------------------------------------------------------------
 
 TDM_CopyStream:
@@ -862,564 +870,569 @@ TD_LB_Routine:	dc.w	TD_L01_R00-(TD_LB_Routine-$02), TD_L02_R00-(TD_LB_Routine-$0
 ; Bitfield loading subroutines
 ; ---------------------------------------------------------------------------
 
+addxs		macro
+	;	addx.l	d0,d0			; x86 long	; stack it onto d0
+		addx.w	d0,d0			; 68k word	; stack it onto d0
+		endm
+
 TD_L20_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1F_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1E_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1D_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1C_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1B_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1A_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L19_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L18_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L17_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L16_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L15_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L14_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L13_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L12_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L11_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L10_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0F_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0E_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0D_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0C_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0B_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0A_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L09_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L08_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L07_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L06_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L05_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L04_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L03_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L02_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L01_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 		rts						; return
 
 TD_L20_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1F_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1E_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1D_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1C_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1B_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1A_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L19_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L18_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L17_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L16_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L15_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L14_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L13_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L12_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L11_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L10_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0F_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0E_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0D_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0C_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0B_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0A_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L09_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L08_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L07_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L06_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L05_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L04_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L03_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L02_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L01_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 		rts						; return
 
 TD_L20_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1F_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1E_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1D_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1C_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1B_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1A_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L19_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L18_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L17_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L16_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L15_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L14_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L13_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L12_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L11_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L10_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0F_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0E_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0D_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0C_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0B_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0A_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L09_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L08_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L07_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L06_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L05_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L04_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L03_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L02_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L01_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 		rts						; return
 
 TD_L20_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1F_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1E_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1D_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1C_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1B_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1A_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L19_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L18_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L17_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L16_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L15_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L14_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L13_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L12_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L11_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L10_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0F_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0E_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0D_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0C_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0B_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0A_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L09_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L08_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L07_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L06_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L05_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L04_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L03_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L02_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L01_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 		rts						; return
 
 TD_L20_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1F_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1E_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1D_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1C_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1B_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1A_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L19_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L18_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L17_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L16_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L15_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L14_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L13_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L12_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L11_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L10_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0F_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0E_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0D_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0C_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0B_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0A_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L09_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L08_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L07_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L06_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L05_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L04_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L03_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L02_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L01_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 		rts						; return
 
 TD_L20_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1F_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1E_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1D_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1C_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1B_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1A_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L19_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L18_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L17_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L16_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L15_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L14_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L13_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L12_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L11_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L10_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0F_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0E_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0D_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0C_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0B_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0A_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L09_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L08_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L07_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L06_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L05_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L04_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L03_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L02_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L01_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 		rts						; return
 
 TD_L20_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1F_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1E_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1D_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1C_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1B_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1A_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L19_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L18_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L17_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L16_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L15_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L14_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L13_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L12_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L11_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L10_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0F_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0E_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0D_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0C_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0B_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0A_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L09_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L08_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L07_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L06_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L05_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L04_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L03_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L02_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L01_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 		rts						; return
 
 TD_L20_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1F_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1E_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1D_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1C_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1B_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L1A_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L19_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L18_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L17_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L16_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L15_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L14_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L13_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L12_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L11_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L10_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0F_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0E_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0D_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0C_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0B_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L0A_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L09_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L08_R07:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L07_R06:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L06_R05:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L05_R04:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L04_R03:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L03_R02:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L02_R01:	add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 TD_L01_R00:	move.b	(a0)+,d3				; load bitfield
 		add.b	d3,d3					; load next bit to carry
-		addx.w	d0,d0					; stack it onto d0
+		addxs						; stack it onto d0
 		rts						; return
 
 ; ===========================================================================
