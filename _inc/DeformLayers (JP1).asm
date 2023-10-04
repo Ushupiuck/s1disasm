@@ -716,7 +716,7 @@ SH_SetScreen:
 
 SH_BehindMid:
 		cmpi.w	#$FFF0,d0	; has the screen moved more than 10 pixels left?
-		bcc.s	Left_NoMax	; if not, branch
+		bcc.s	SH_Behind16	; if not, branch
 		move.w	#$FFF0,d0	; set the maximum move distance to 10 pixels left
 
 SH_Behind16:
