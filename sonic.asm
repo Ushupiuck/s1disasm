@@ -2119,7 +2119,7 @@ Tit_LoadText:
 		move.w	#0,d0
 		bsr.w	EniDec
 
-		copyTilemap	v_256x256&$FFFFFF,$C206,$21,$15
+		copyTilemap	v_256x256&$FFFFFF,$C208,$21,$15
 
 		locVRAM	ArtTile_Level*$20
 		lea	(Nem_GHZ_1st).l,a0 ; load GHZ patterns
