@@ -6,47 +6,56 @@
 
 
 Sonic_AnglePos:
-		btst	#3,obStatus(a0)
-		beq.s	loc_14602
-		moveq	#0,d0
+		btst	#3,obStatus(a0)		; Are we standing on an object?
+		beq.s	.OnGround		; If not, then we are on the ground
+		moveq	#0,d0			; Reset angle buffers
 		move.b	d0,(v_anglebuffer).w
 		move.b	d0,(v_anglebuffer2).w
 		rts
 ; ===========================================================================
 
-loc_14602:
-		moveq	#3,d0
+.OnGround:
+		moveq	#3,d0			; Reset angle buffers
 		move.b	d0,(v_anglebuffer).w
 		move.b	d0,(v_anglebuffer2).w
-		move.b	obAngle(a0),d0
+		move.b	obAngle(a0),d0		; Get the quadrant that we are in
 		addi.b	#$20,d0
-		bpl.s	loc_14624
+		bpl.s	.HighAngle
 		move.b	obAngle(a0),d0
-		bpl.s	loc_1461E
+		bpl.s	.SkipSub
 		subq.b	#1,d0
 
-loc_1461E:
+.SkipSub:
 		addi.b	#$20,d0
-		bra.s	loc_14630
+		bra.s	.GotAngle
 ; ===========================================================================
 
-loc_14624:
+.HighAngle:
 		move.b	obAngle(a0),d0
-		bpl.s	loc_1462C
+		bpl.s	.SkipAdd
 		addq.b	#1,d0
 
-loc_1462C:
+.SkipAdd:
 		addi.b	#$1F,d0
 
-loc_14630:
+.GotAngle:
 		andi.b	#$C0,d0
-		cmpi.b	#$40,d0
-		beq.w	Sonic_WalkVertL
-		cmpi.b	#$80,d0
-		beq.w	Sonic_WalkCeiling
-		cmpi.b	#$C0,d0
-		beq.w	Sonic_WalkVertR
-		move.w	obY(a0),d2
+		cmpi.b	#$40,d0			; Are we on a left wall?
+		beq.w	Sonic_WalkVertL		; If so, branch
+		cmpi.b	#$80,d0			; Are we on a ceiling?
+		beq.w	Sonic_WalkCeiling	; If so, branch
+		cmpi.b	#$C0,d0			; Are we on a right wall?
+		beq.w	Sonic_WalkVertR		; If so, branch
+
+; -------------------------------------------------------------------------
+; Move the player along a floor
+; -------------------------------------------------------------------------
+; PARAMETERS:
+;	a0.l - Player object RAM
+; -------------------------------------------------------------------------
+
+Player_WalkFloor:
+		move.w	obY(a0),d2		; Get primary sensor position
 		move.w	obX(a0),d3
 		moveq	#0,d0
 		move.b	obHeight(a0),d0
@@ -55,13 +64,13 @@ loc_14630:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	(v_anglebuffer).w,a4
+		lea	(v_anglebuffer).w,a4	; Get floor information from this sensor
 		movea.w	#$10,a3
 		move.w	#0,d6
 		moveq	#$D,d5
 		bsr.w	FindFloor
 		move.w	d1,-(sp)
-		move.w	obY(a0),d2
+		move.w	obY(a0),d2		; Get secondary sensor position
 		move.w	obX(a0),d3
 		moveq	#0,d0
 		move.b	obHeight(a0),d0
@@ -71,37 +80,37 @@ loc_14630:
 		ext.w	d0
 		neg.w	d0
 		add.w	d0,d3
-		lea	(v_anglebuffer2).w,a4
+		lea	(v_anglebuffer2).w,a4	; Get floor information from this sensor
 		movea.w	#$10,a3
 		move.w	#0,d6
 		moveq	#$D,d5
 		bsr.w	FindFloor
 		move.w	(sp)+,d0
-		bsr.w	Sonic_Angle
-		tst.w	d1
-		beq.s	locret_146BE
-		bpl.s	loc_146C0
-		cmpi.w	#-$E,d1
-		blt.s	locret_146BE
-		add.w	d1,obY(a0)
+		bsr.w	Sonic_Angle		; Choose which height and angle to go with
+		tst.w	d1			; Are we perfectly aligned to the ground?
+		beq.s	.End			; If so, branch
+		bpl.s	.CheckLedge		; If we are outside the floor, branch
+		cmpi.w	#-$E,d1			; Have we hit a wall?
+		blt.s	.End			; If so, branch
+		add.w	d1,obY(a0)		; Align outselves onto the floor
 
-locret_146BE:
+.End:
 		rts
 ; ===========================================================================
 
-loc_146C0:
-		cmpi.w	#$E,d1
-		bgt.s	loc_146CC
+.CheckLedge:
+		cmpi.w	#$E,d1			; Are we about to fall off?
+		bgt.s	.CheckStick		; If so, branch
 
-loc_146C6:
-		add.w	d1,obY(a0)
+.SetY:
+		add.w	d1,obY(a0)		; Align ourselves onto the floor
 		rts
 ; ===========================================================================
 
-loc_146CC:
-		tst.b	stick_to_convex(a0)
-		bne.s	loc_146C6
-		bset	#1,obStatus(a0)
+.CheckStick:
+		tst.b	stick_to_convex(a0)	; Are we sticking to a surface?
+		bne.s	.SetY		; If so, align to the floor anyways
+		bset	#1,obStatus(a0)		; Fall off the ground
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
 		rts
@@ -115,21 +124,21 @@ loc_146CC:
 
 
 Sonic_Angle:
-		move.b	(v_anglebuffer2).w,d2
-		cmp.w	d0,d1
-		ble.s	loc_1475E
-		move.b	(v_anglebuffer).w,d2
-		move.w	d0,d1
+		move.b	(v_anglebuffer2).w,d2	; Use secondary angle
+		cmp.w	d0,d1			; Is the primary sensor on the higher ground?
+		ble.s	.GotAngle		; If not, branch
+		move.b	(v_anglebuffer).w,d2	; Use primary angle
+		move.w	d0,d1			; Use primary floor height
 
-loc_1475E:
-		btst	#0,d2
-		bne.s	loc_1476A
-		move.b	d2,obAngle(a0)
+.GotAngle:
+		btst	#0,d2			; Was the level block found a flat surface?
+		bne.s	.FlatSurface		; If so, branch
+		move.b	d2,obAngle(a0)		; Update angle
 		rts
 ; ===========================================================================
 
-loc_1476A:
-		move.b	obAngle(a0),d2
+.FlatSurface:
+		move.b	obAngle(a0),d2		; Shift ourselves to the next quadrant
 		addi.b	#$20,d2
 		andi.b	#$C0,d2
 		move.b	d2,obAngle(a0)
@@ -144,7 +153,7 @@ loc_1476A:
 
 
 Sonic_WalkVertR:
-		move.w	obY(a0),d2
+		move.w	obY(a0),d2		; Get primary sensor position
 		move.w	obX(a0),d3
 		moveq	#0,d0
 		move.b	obWidth(a0),d0
@@ -154,13 +163,13 @@ Sonic_WalkVertR:
 		move.b	obHeight(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	(v_anglebuffer).w,a4
+		lea	(v_anglebuffer).w,a4	; Get floor information from this sensor
 		movea.w	#$10,a3
 		move.w	#0,d6
 		moveq	#$D,d5
 		bsr.w	FindWall
 		move.w	d1,-(sp)
-		move.w	obY(a0),d2
+		move.w	obY(a0),d2		; Get secondary sensor position
 		move.w	obX(a0),d3
 		moveq	#0,d0
 		move.b	obWidth(a0),d0
@@ -169,37 +178,37 @@ Sonic_WalkVertR:
 		move.b	obHeight(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	(v_anglebuffer2).w,a4
+		lea	(v_anglebuffer2).w,a4	; Get floor information from this sensor
 		movea.w	#$10,a3
 		move.w	#0,d6
 		moveq	#$D,d5
 		bsr.w	FindWall
 		move.w	(sp)+,d0
-		bsr.w	Sonic_Angle
-		tst.w	d1
-		beq.s	locret_147F0
-		bpl.s	loc_147F2
-		cmpi.w	#-$E,d1
-		blt.s	locret_147F0
-		add.w	d1,obX(a0)
+		bsr.w	Sonic_Angle		; Choose which height and angle to go with
+		tst.w	d1			; Are we perfectly aligned to the ground?
+		beq.s	.End			; If so, branch
+		bpl.s	.CheckLedge		; If we are outside the wall, branch
+		cmpi.w	#-$E,d1			; Have we hit a wall?
+		blt.s	.End 			; If so, branch
+		add.w	d1,obX(a0)		; Align outselves onto the wall
 
-locret_147F0:
+.End:
 		rts
 ; ===========================================================================
 
-loc_147F2:
-		cmpi.w	#$E,d1
-		bgt.s	loc_147FE
+.CheckLedge:
+		cmpi.w	#$E,d1			; Are we about to fall off?
+		bgt.s	.CheckStick		; If so, branch
 
-loc_147F8:
-		add.w	d1,obX(a0)
+.SetX:
+		add.w	d1,obX(a0)		; Align ourselves onto the wall
 		rts
 ; ===========================================================================
 
-loc_147FE:
-		tst.b	stick_to_convex(a0)
-		bne.s	loc_147F8
-		bset	#1,obStatus(a0)
+.CheckStick:
+		tst.b	stick_to_convex(a0)	; Are we sticking to a surface?
+		bne.s	.SetX			; If so, align to the wall anyways
+		bset	#1,obStatus(a0)		; Fall off the ground
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
 		rts
@@ -213,7 +222,7 @@ loc_147FE:
 
 
 Sonic_WalkCeiling:
-		move.w	obY(a0),d2
+		move.w	obY(a0),d2		; Get primary sensor position
 		move.w	obX(a0),d3
 		moveq	#0,d0
 		move.b	obHeight(a0),d0
@@ -223,13 +232,13 @@ Sonic_WalkCeiling:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	(v_anglebuffer).w,a4
+		lea	(v_anglebuffer).w,a4	; Get floor information from this sensor
 		movea.w	#-$10,a3
 		move.w	#$1000,d6
 		moveq	#$D,d5
 		bsr.w	FindFloor
 		move.w	d1,-(sp)
-		move.w	obY(a0),d2
+		move.w	obY(a0),d2		; Get secondary sensor position
 		move.w	obX(a0),d3
 		moveq	#0,d0
 		move.b	obHeight(a0),d0
@@ -239,37 +248,37 @@ Sonic_WalkCeiling:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		sub.w	d0,d3
-		lea	(v_anglebuffer2).w,a4
+		lea	(v_anglebuffer2).w,a4	; Get floor information from this sensor
 		movea.w	#-$10,a3
 		move.w	#$1000,d6
 		moveq	#$D,d5
 		bsr.w	FindFloor
 		move.w	(sp)+,d0
-		bsr.w	Sonic_Angle
-		tst.w	d1
-		beq.s	locret_14892
-		bpl.s	loc_14894
-		cmpi.w	#-$E,d1
-		blt.w	locret_14892
-		sub.w	d1,obY(a0)
+		bsr.w	Sonic_Angle		; Choose which height and angle to go with
+		tst.w	d1			; Are we perfectly aligned to the ground?
+		beq.s	.End			; If so, branch
+		bpl.s	.CheckLedge		; If we are outside the ceiling, branch
+		cmpi.w	#-$E,d1			; Have we hit a ceiling?
+		blt.w	.End			; If so, branch
+		sub.w	d1,obY(a0)		; Align outselves onto the ceiling
 
-locret_14892:
+.End:
 		rts
 ; ===========================================================================
 
-loc_14894:
-		cmpi.w	#$E,d1
-		bgt.s	loc_148A0
+.CheckLedge:
+		cmpi.w	#$E,d1			; Are we about to fall off?
+		bgt.s	.CheckStick		; If so, branch
 
-loc_1489A:
-		sub.w	d1,obY(a0)
+.SetY:
+		sub.w	d1,obY(a0)		; Align ourselves onto the ceiling
 		rts
 ; ===========================================================================
 
-loc_148A0:
-		tst.b	stick_to_convex(a0)
-		bne.s	loc_1489A
-		bset	#1,obStatus(a0)
+.CheckStick:
+		tst.b	stick_to_convex(a0)	; Are we sticking to a surface?
+		bne.s	.SetY			; If so, align to the ceiling anyways
+		bset	#1,obStatus(a0)		; Fall off the ground
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
 		rts
@@ -283,7 +292,7 @@ loc_148A0:
 
 
 Sonic_WalkVertL:
-		move.w	obY(a0),d2
+		move.w	obY(a0),d2		; Get primary sensor position
 		move.w	obX(a0),d3
 		moveq	#0,d0
 		move.b	obWidth(a0),d0
@@ -293,13 +302,13 @@ Sonic_WalkVertL:
 		ext.w	d0
 		sub.w	d0,d3
 		eori.w	#$F,d3
-		lea	(v_anglebuffer).w,a4
+		lea	(v_anglebuffer).w,a4	; Get floor information from this sensor
 		movea.w	#-$10,a3
 		move.w	#$800,d6
 		moveq	#$D,d5
 		bsr.w	FindWall
 		move.w	d1,-(sp)
-		move.w	obY(a0),d2
+		move.w	obY(a0),d2		; Get secondary sensor position
 		move.w	obX(a0),d3
 		moveq	#0,d0
 		move.b	obWidth(a0),d0
@@ -309,37 +318,37 @@ Sonic_WalkVertL:
 		ext.w	d0
 		sub.w	d0,d3
 		eori.w	#$F,d3
-		lea	(v_anglebuffer2).w,a4
+		lea	(v_anglebuffer2).w,a4	; Get floor information from this sensor
 		movea.w	#-$10,a3
 		move.w	#$800,d6
 		moveq	#$D,d5
 		bsr.w	FindWall
 		move.w	(sp)+,d0
-		bsr.w	Sonic_Angle
-		tst.w	d1
-		beq.s	locret_14934
-		bpl.s	loc_14936
-		cmpi.w	#-$E,d1
-		blt.w	locret_14934
-		sub.w	d1,obX(a0)
+		bsr.w	Sonic_Angle		; Choose which height and angle to go with
+		tst.w	d1			; Are we perfectly aligned to the ground?
+		beq.s	.End			; If so, branch
+		bpl.s	.CheckLedge		; If we are outside the wall, branch
+		cmpi.w	#-$E,d1			; Have we hit a wall?
+		blt.w	.End			; If so, branch
+		sub.w	d1,obX(a0)		; Align outselves onto the wall
 
-locret_14934:
+.End:
 		rts
 ; ===========================================================================
 
-loc_14936:
-		cmpi.w	#$E,d1
-		bgt.s	loc_14942
+.CheckLedge:
+		cmpi.w	#$E,d1			; Are we about to fall off?
+		bgt.s	.CheckStick		; If so, branch
 
-loc_1493C:
-		sub.w	d1,obX(a0)
+.SetX:
+		sub.w	d1,obX(a0)		; Align ourselves onto the wall
 		rts
 ; ===========================================================================
 
-loc_14942:
-		tst.b	stick_to_convex(a0)
-		bne.s	loc_1493C
-		bset	#1,obStatus(a0)
+.CheckStick:
+		tst.b	stick_to_convex(a0)	; Are we sticking to a surface?
+		bne.s	.SetX			; If so, align to the wall anyways
+		bset	#1,obStatus(a0)		; Fall off the ground
 		bclr	#5,obStatus(a0)
 		move.b	#id_Run,obPrevAni(a0) ; restart Sonic's animation
 		rts
