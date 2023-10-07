@@ -7,32 +7,20 @@
 
 LevelSizeLoad:
 		moveq	#0,d0
-		move.b	d0,(v_unused7).w
-		move.b	d0,(v_unused8).w
-		move.b	d0,(v_unused9).w
-		move.b	d0,(v_unused10).w
 		move.b	d0,(v_dle_routine).w
 		move.w	(v_zone).w,d0
 		lsl.b	#6,d0
-		lsr.w	#4,d0
-		move.w	d0,d1
-		add.w	d0,d0
-		add.w	d1,d0
-		lea	LevelSizeArray(pc,d0.w),a0 ; load level	boundaries
-		move.w	(a0)+,d0
-		move.w	d0,(v_unused11).w
+		lsr.w	#3,d0		; From Nick arcade: 4 to 3 (reduces code by 3 instructions)
+		lea	LevelSizeArray(pc,d0.w),a0	; load level boundaries
 		move.l	(a0)+,d0
 		move.l	d0,(v_limitleft2).w
-		move.l	d0,(v_limitleft1).w
+		move.l	d0,(v_limitleft1).w	; unused (but neccesary) until Sonic 3
 		move.l	(a0)+,d0
 		move.l	d0,(v_limittop2).w
-		move.l	d0,(v_limittop1).w
+		move.l	d0,(v_limittop1).w	; unused (but neccesary) until Sonic 3
 		move.w	(v_limitleft2).w,d0
-		addi.w	#$240,d0
-		move.w	d0,(v_limitleft3).w
 		move.w	#$1010,(v_fg_xblock).w ; and v_fg_yblock
-		move.w	(a0)+,d0
-		move.w	d0,(v_lookshift).w
+		move.w	#(224/2)-16,(v_lookshift).w
 		bra.w	LevSz_ChkLamp
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -40,41 +28,41 @@ LevelSizeLoad:
 ; ---------------------------------------------------------------------------
 LevelSizeArray:
 		; GHZ
-		dc.w $0004, $0000, $24BF, $0000, $0300, $0060
-		dc.w $0004, $0000, $1EBF, $0000, $0300, $0060
-		dc.w $0004, $0000, $2960, $0000, $0300, $0060
-		dc.w $0004, $0000, $2ABF, $0000, $0300, $0060
+		dc.w $0000, $24BF, $0000, $0300
+		dc.w $0000, $1EBF, $0000, $0300
+		dc.w $0000, $2960, $0000, $0300
+		dc.w $0000, $2ABF, $0000, $0300
 		; LZ
-		dc.w $0004, $0000, $19BF, $0000, $0530, $0060
-		dc.w $0004, $0000, $10AF, $0000, $0720, $0060
-		dc.w $0004, $0000, $202F, $FF00, $0800, $0060
-		dc.w $0004, $0000, $20BF, $0000, $0720, $0060
+		dc.w $0000, $19BF, $0000, $0530
+		dc.w $0000, $10AF, $0000, $0720
+		dc.w $0000, $202F, -$100, $0800
+		dc.w $0000, $20BF, $0000, $0720
 		; MZ
-		dc.w $0004, $0000, $17BF, $0000, $01D0, $0060
-		dc.w $0004, $0000, $17BF, $0000, $0520, $0060
-		dc.w $0004, $0000, $1800, $0000, $0720, $0060
-		dc.w $0004, $0000, $16BF, $0000, $0720, $0060
+		dc.w $0000, $17BF, $0000, $01D0
+		dc.w $0000, $17BF, $0000, $0520
+		dc.w $0000, $1800, $0000, $0720
+		dc.w $0000, $16BF, $0000, $0720
 		; SLZ
-		dc.w $0004, $0000, $1FBF, $0000, $0640, $0060
-		dc.w $0004, $0000, $1FBF, $0000, $0640, $0060
-		dc.w $0004, $0000, $2000, $0000, $06C0, $0060
-		dc.w $0004, $0000, $3EC0, $0000, $0720, $0060
+		dc.w $0000, $1FBF, $0000, $0640
+		dc.w $0000, $1FBF, $0000, $0640
+		dc.w $0000, $2000, $0000, $06C0
+		dc.w $0000, $3EC0, $0000, $0720
 		; SYZ
-		dc.w $0004, $0000, $22C0, $0000, $0420, $0060
-		dc.w $0004, $0000, $28C0, $0000, $0520, $0060
-		dc.w $0004, $0000, $2C00, $0000, $0620, $0060
-		dc.w $0004, $0000, $2EC0, $0000, $0620, $0060
+		dc.w $0000, $22C0, $0000, $0420
+		dc.w $0000, $28C0, $0000, $0520
+		dc.w $0000, $2C00, $0000, $0620
+		dc.w $0000, $2EC0, $0000, $0620
 		; SBZ
-		dc.w $0004, $0000, $21C0, $0000, $0720, $0060
-		dc.w $0004, $0000, $1E40, $FF00, $0800, $0060
-		dc.w $0004, $2080, $2460, $0510, $0510, $0060
-		dc.w $0004, $0000, $3EC0, $0000, $0720, $0060
+		dc.w $0000, $21C0, $0000, $0720
+		dc.w $0000, $1E40, -$100, $0800
+		dc.w $0000, $2460, $0510, $0510
+		dc.w $0000, $3EC0, $0000, $0720
 		zonewarning LevelSizeArray,$30
 		; Ending
-		dc.w $0004, $0000, $0500, $0110, $0110, $0060
-		dc.w $0004, $0000, $0DC0, $0110, $0110, $0060
-		dc.w $0004, $0000, $2FFF, $0000, $0320, $0060
-		dc.w $0004, $0000, $2FFF, $0000, $0320, $0060
+		dc.w $0000, $0500, $0110, $0110
+		dc.w $0000, $0DC0, $0110, $0110
+		dc.w $0000, $3FFF, $0000, $0720
+		dc.w $0000, $3FFF, $0000, $0720
 
 ; ---------------------------------------------------------------------------
 ; Ending start location array
@@ -87,7 +75,6 @@ EndingStLocArray:
 LevSz_ChkLamp:
 		tst.b	(v_lastlamp).w	; have any lampposts been hit?
 		beq.s	LevSz_StartLoc	; if not, branch
-
 		jsr	(Lamp_LoadInfo).l
 		move.w	(v_player+obX).w,d1
 		move.w	(v_player+obY).w,d0
@@ -219,11 +206,11 @@ BgScroll_GHZ:
 BgScroll_LZ:
 		asr.l	#1,d0
 		move.w	d0,(v_bgscreenposy).w
-		rts	
+		rts
 ; ===========================================================================
 
 BgScroll_MZ:
-		rts	
+		rts
 ; ===========================================================================
 
 BgScroll_SLZ:
@@ -231,7 +218,7 @@ BgScroll_SLZ:
 		addi.w	#$C0,d0
 		move.w	d0,(v_bgscreenposy).w
 		clr.l	(v_bgscreenposx).w
-		rts	
+		rts
 ; ===========================================================================
 
 BgScroll_SYZ:
@@ -243,7 +230,7 @@ BgScroll_SYZ:
 		addq.w	#1,d0
 		move.w	d0,(v_bgscreenposy).w
 		clr.l	(v_bgscreenposx).w
-		rts	
+		rts
 ; ===========================================================================
 
 BgScroll_SBZ:
@@ -251,7 +238,7 @@ BgScroll_SBZ:
 		asr.w	#3,d0
 		addq.w	#1,d0
 		move.w	d0,(v_bgscreenposy).w
-		rts	
+		rts
 ; ===========================================================================
 
 BgScroll_End:
