@@ -715,9 +715,9 @@ SH_SetScreen:
 ; ===========================================================================
 
 SH_BehindMid:
-		cmpi.w	#$FFF0,d0	; has the screen moved more than 10 pixels left?
+		cmpi.w	#-16,d0	; has the screen moved more than 10 pixels left?
 		bcc.s	SH_Behind16	; if not, branch
-		move.w	#$FFF0,d0	; set the maximum move distance to 10 pixels left
+		move.w	#-16,d0	; set the maximum move distance to 10 pixels left
 
 SH_Behind16:
 		add.w	(v_screenposx).w,d0
@@ -747,7 +747,6 @@ ScrollVertical:
 SV_NotRolling:
 		btst	#1,(v_player+obStatus).w ; is Sonic jumping?
 		beq.s	loc_664A	; if not, branch
-
 		addi.w	#32,d0
 		sub.w	(v_lookshift).w,d0
 		bcs.s	loc_6696
