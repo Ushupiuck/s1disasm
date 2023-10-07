@@ -8,7 +8,7 @@
 DeformLayers:
 		tst.b	(f_nobgscroll).w
 		beq.s	.bgscroll
-		rts	
+		rts
 ; ===========================================================================
 
 	.bgscroll:
@@ -84,7 +84,7 @@ Deform_GHZ:
 		addi.l	#$10000,(a2)+
 		addi.l	#$C000,(a2)+
 		addi.l	#$8000,(a2)+
-	; calculate background scroll	
+	; calculate background scroll
 		move.w	(v_bgscroll_buffer).w,d0
 		add.w	(v_bg3screenposx).w,d0
 		neg.w	d0
@@ -188,7 +188,7 @@ Deform_LZ:
 		move.w	(v_waterpos1).w,d4
 		move.w	(v_screenposy).w,d5
 	; write normal scroll before meeting water position
-	.normalLoop:		
+	.normalLoop:
 		cmp.w	d4,d5	; is current y >= water y?
 		bge.s	.underwaterLoop	; if yes, branch
 		move.l	d0,(a1)+
@@ -263,7 +263,7 @@ Deform_MZ:
 	; calculate y-position of background
 		move.w	#$200,d0	; start with 512px, ignoring 2 chunks
 		move.w	(v_screenposy).w,d1
-		subi.w	#$1C8,d1	; 0% scrolling when y <= 56px 
+		subi.w	#$1C8,d1	; 0% scrolling when y <= 56px
 		bcs.s	.noYscroll
 		move.w	d1,d2
 		add.w	d1,d1
@@ -298,7 +298,7 @@ Deform_MZ:
 		move.w	d2,d3
 		asr.w	#1,d3
 		move.w	#4,d1
-	.cloudLoop:		
+	.cloudLoop:
 		move.w	d3,(a1)+
 		swap	d3
 		add.l	d0,d3
@@ -308,21 +308,21 @@ Deform_MZ:
 		move.w	(v_bg3screenposx).w,d0
 		neg.w	d0
 		move.w	#1,d1
-	.mountainLoop:		
+	.mountainLoop:
 		move.w	d0,(a1)+
 		dbf	d1,.mountainLoop
 
 		move.w	(v_bg2screenposx).w,d0
 		neg.w	d0
 		move.w	#8,d1
-	.bushLoop:		
+	.bushLoop:
 		move.w	d0,(a1)+
 		dbf	d1,.bushLoop
 
 		move.w	(v_bgscreenposx).w,d0
 		neg.w	d0
 		move.w	#$F,d1
-	.interiorLoop:		
+	.interiorLoop:
 		move.w	d0,(a1)+
 		dbf	d1,.interiorLoop
 
@@ -370,7 +370,7 @@ Deform_SLZ:
 		moveq	#0,d3
 		move.w	d2,d3
 		move.w	#$1B,d1
-	.starLoop:		
+	.starLoop:
 		move.w	d3,(a1)+
 		swap	d3
 		add.l	d0,d3
@@ -419,10 +419,8 @@ Bg_Scroll_X:
 		add.w	d2,d2
 		move.w	(a2)+,d0
 		jmp	.pixelJump(pc,d2.w)		; skip pixels for first row
-	.blockLoop:
-		move.w	(a2)+,d0
-	.pixelJump:		
-		move.l	d0,(a1)+
+.blockLoop:	move.w	(a2)+,d0
+.pixelJump:	move.l	d0,(a1)+
 		move.l	d0,(a1)+
 		move.l	d0,(a1)+
 		move.l	d0,(a1)+
@@ -475,7 +473,7 @@ Deform_SYZ:
 		move.w	d2,d3
 		asr.w	#1,d3
 		move.w	#7,d1
-	.cloudLoop:		
+	.cloudLoop:
 		move.w	d3,(a1)+
 		swap	d3
 		add.l	d0,d3
@@ -485,14 +483,14 @@ Deform_SYZ:
 		move.w	d2,d0
 		asr.w	#3,d0
 		move.w	#4,d1
-	.mountainLoop:		
+	.mountainLoop:
 		move.w	d0,(a1)+
 		dbf	d1,.mountainLoop
 
 		move.w	d2,d0
 		asr.w	#2,d0
 		move.w	#5,d1
-	.buildingLoop:		
+	.buildingLoop:
 		move.w	d0,(a1)+
 		dbf	d1,.buildingLoop
 
@@ -510,7 +508,7 @@ Deform_SYZ:
 		move.w	d2,d3
 		asr.w	#1,d3
 		move.w	#$D,d1
-	.bushLoop:		
+	.bushLoop:
 		move.w	d3,(a1)+
 		swap	d3
 		add.l	d0,d3
@@ -590,7 +588,7 @@ Deform_SBZ:
 		moveq	#0,d3
 		move.w	d2,d3
 		move.w	#3,d1
-	.cloudLoop:		
+	.cloudLoop:
 		move.w	d3,(a1)+
 		swap	d3
 		add.l	d0,d3
@@ -628,7 +626,7 @@ Deform_SBZ:
 Deform_SBZ2:;loc_68A2:
 	; plain background deformation
 		move.w	(v_scrshiftx).w,d4
-		ext.l	d4		
+		ext.l	d4
 		asl.l	#6,d4
 		move.w	(v_scrshifty).w,d5
 		ext.l	d5
@@ -643,7 +641,7 @@ Deform_SBZ2:;loc_68A2:
 		swap	d0
 		move.w	(v_bgscreenposx).w,d0
 		neg.w	d0
-	.loop:		
+	.loop:
 		move.l	d0,(a1)+
 		dbf	d1,.loop
 		rts
@@ -670,13 +668,13 @@ ScrollHoriz:
 		bpl.s	.scrollRight
 
 		bset	#2,(v_fg_scroll_flags).w ; screen moves backward
-		rts	
+		rts
 
 	.scrollRight:
 		bset	#3,(v_fg_scroll_flags).w ; screen moves forward
 
 	.return:
-		rts	
+		rts
 ; End of function ScrollHoriz
 
 
@@ -691,7 +689,7 @@ MoveScreenHoriz:
 		subi.w	#16,d0		; is distance more than 160px?
 		bpl.s	SH_AheadOfMid	; if yes, branch
 		clr.w	(v_scrshiftx).w
-		rts	
+		rts
 ; ===========================================================================
 
 SH_AheadOfMid:
@@ -711,7 +709,7 @@ SH_SetScreen:
 		asl.w	#8,d1
 		move.w	d0,(v_screenposx).w ; set new screen position
 		move.w	d1,(v_scrshiftx).w ; set distance for screen movement
-		rts	
+		rts
 ; ===========================================================================
 
 SH_BehindMid:
@@ -765,7 +763,7 @@ loc_664A:
 
 loc_6656:
 		clr.w	(v_scrshifty).w
-		rts	
+		rts
 ; ===========================================================================
 
 loc_665C:
@@ -879,14 +877,14 @@ loc_6724:
 		sub.w	d4,d0
 		bpl.s	.scrollBottom
 		bset	#0,(v_fg_scroll_flags).w
-		rts	
+		rts
 ; ===========================================================================
 
 	.scrollBottom:
 		bset	#1,(v_fg_scroll_flags).w
 
 	.return:
-		rts	
+		rts
 ; End of function ScrollVertical
 
 
