@@ -612,7 +612,7 @@ DLE_SBZ2boss:
 		blo.s	locret_727A
 		bsr.w	FindFreeObj
 		bne.s	locret_727A
-		move.b	#id_FalseFloor,obID(a1) ; load collapsing block object
+		_move.b	#id_FalseFloor,obID(a1) ; load collapsing block object
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_EggmanSBZ2,d0
 		jmp	(AddPLC).l		; load SBZ2 Eggman patterns
@@ -623,7 +623,7 @@ DLE_SBZ2boss2:
 		blo.s	loc_72C2
 		bsr.w	FindFreeObj
 		bne.s	loc_72B0
-		move.b	#id_ScrapEggman,obID(a1) ; load SBZ2 Eggman object
+		_move.b	#id_ScrapEggman,obID(a1) ; load SBZ2 Eggman object
 		addq.b	#2,(v_dle_routine).w
 
 loc_72B0:
