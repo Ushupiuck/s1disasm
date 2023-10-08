@@ -302,7 +302,8 @@ GameInit:
 MainGameLoop:
 		move.b	(v_gamemode).w,d0 ; load Game Mode
 		andi.w	#$1C,d0	; limit Game Mode value to $1C max (change to a maximum of 7C to add more game modes)
-		jsr	GameModeArray(pc,d0.w) ; jump to apt location in ROM
+		movea.l	GameModeArray(pc,d0.w),a0 ; jump to apt location in ROM
+		jsr	(a0)
 		bra.s	MainGameLoop	; loop indefinitely
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -310,14 +311,14 @@ MainGameLoop:
 ; ---------------------------------------------------------------------------
 
 GameModeArray:
-ptr_GM_Sega:	bra.w	GM_Sega		; Sega Screen ($00)
-ptr_GM_Title:	bra.w	GM_Title	; Title	Screen ($04)
-ptr_GM_Demo:	bra.w	GM_Level	; Demo Mode ($08)
-ptr_GM_Level:	bra.w	GM_Level	; Normal Level ($0C)
-ptr_GM_Special:	bra.w	GM_Special	; Special Stage	($10)
-ptr_GM_Cont:	bra.w	GM_Continue	; Continue Screen ($14)
-ptr_GM_Ending:	bra.w	GM_Ending	; End of game sequence ($18)
-ptr_GM_Credits:	bra.w	GM_Credits	; Credits ($1C)
+ptr_GM_Sega:	dc.l	GM_Sega		; Sega Screen ($00)
+ptr_GM_Title:	dc.l	GM_Title	; Title	Screen ($04)
+ptr_GM_Demo:	dc.l	GM_Level	; Demo Mode ($08)
+ptr_GM_Level:	dc.l	GM_Level	; Normal Level ($0C)
+ptr_GM_Special:	dc.l	GM_Special	; Special Stage	($10)
+ptr_GM_Cont:	dc.l	GM_Continue	; Continue Screen ($14)
+ptr_GM_Ending:	dc.l	GM_Ending	; End of game sequence ($18)
+ptr_GM_Credits:	dc.l	GM_Credits	; Credits ($1C)
 ; ===========================================================================
 
 CheckSumError:
@@ -512,18 +513,19 @@ VBlank:
 		movem.l	d0-a6,-(sp)
 		tst.b	(v_vbla_routine).w
 		beq.s	VBla_00
-		move.w	(vdp_control_port).l,d0
+
+-		move.w	(vdp_control_port).l,d0
+		andi.w	#8,d0
+		beq.s	-
+
 		move.l	#$40000010,(vdp_control_port).l
 		move.l	(v_scrposy_vdp).w,(vdp_data_port).l ; send screen y-axis pos. to VSRAM
 		btst	#6,(v_megadrive).w ; is Megadrive PAL?
-		beq.s	.notPAL		; if not, branch
+		beq.s	+	; if not, branch
 
 		move.w	#$700,d0
-.waitPAL:
-		dbf	d0,.waitPAL ; wait here in a loop doing nothing for a while...
-
-.notPAL:
-		move.b	(v_vbla_routine).w,d0
+-		dbf	d0,-	; wait here in a loop doing nothing for a while...
++		move.b	(v_vbla_routine).w,d0
 		move.b	#0,(v_vbla_routine).w
 		move.w	#1,(f_hbla_pal).w
 		andi.w	#$3E,d0
@@ -539,7 +541,7 @@ VBla_Exit:
 		rte
 ; ===========================================================================
 VBla_Index:	dc.w VBla_00-VBla_Index, VBla_02-VBla_Index
-		dc.w VBla_04-VBla_Index, VBla_06-VBla_Index
+		dc.w VBla_04-VBla_Index, Do_ControllerPal-VBla_Index
 		dc.w VBla_08-VBla_Index, VBla_0A-VBla_Index
 		dc.w VBla_0C-VBla_Index, VBla_0E-VBla_Index
 		dc.w VBla_10-VBla_Index, VBla_12-VBla_Index
@@ -548,10 +550,15 @@ VBla_Index:	dc.w VBla_00-VBla_Index, VBla_02-VBla_Index
 ; ===========================================================================
 
 VBla_00:
+		cmpi.b	#$80+id_Demo,(v_gamemode).w
+		beq.s	.islevel
 		cmpi.b	#$80+id_Level,(v_gamemode).w
 		beq.s	.islevel
+		cmpi.b	#id_Demo,(v_gamemode).w
+		beq.s	.islevel
 		cmpi.b	#id_Level,(v_gamemode).w ; is game on a level?
-		bne.w	VBla_Music	; if not, branch
+		beq.s	.islevel
+		bra.w	VBla_Music
 
 .islevel:
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ ?
@@ -559,13 +566,11 @@ VBla_00:
 
 		move.w	(vdp_control_port).l,d0
 		btst	#6,(v_megadrive).w ; is Megadrive PAL?
-		beq.s	.notPAL		; if not, branch
+		beq.s	+		; if not, branch
 
 		move.w	#$700,d0
-.waitPAL:
-		dbf	d0,.waitPAL
-
-.notPAL:
+-		dbf	d0,-
++
 		move.w	#1,(f_hbla_pal).w ; set HBlank flag
 		stopZ80
 		waitZ80
@@ -599,17 +604,13 @@ VBla_14:
 VBla_04:
 		bsr.w	Do_ControllerPal
 		bsr.w	LoadTilesAsYouMove_BGOnly
-		bsr.w	sub_1642
+		bsr.w	ProcessDPLC
 		tst.w	(v_demolength).w
 		beq.w	.end
 		subq.w	#1,(v_demolength).w
 
 .end:
 		rts
-; ===========================================================================
-
-VBla_06:
-		bra.w	Do_ControllerPal
 ; ===========================================================================
 
 VBla_10:
@@ -729,21 +730,21 @@ VBla_0C:
 		bsr.w	LoadTilesAsYouMove
 		jsr	(AnimateLevelGfx).l
 		jsr	(HUD_Update).l
-		bsr.w	sub_1642
+		bsr.w	ProcessDPLC
 		rts
 ; ===========================================================================
 
 VBla_0E:
-		bsr.w	Do_ControllerPal
-		addq.b	#1,(v_vbla_0e_counter).w ; Unused besides this one write...
-		move.b	#$E,(v_vbla_routine).w
+;		bsr.w	Do_ControllerPal
+;		addq.b	#1,(v_vbla_0e_counter).w ; Unused besides this one write...
+;		move.b	#$E,(v_vbla_routine).w
 		rts
 ; ===========================================================================
 
 VBla_12:
 		bsr.w	Do_ControllerPal
 		move.w	(v_hbla_hreg).w,(a5)
-		bra.w	sub_1642
+		bra.w	ProcessDPLC
 ; ===========================================================================
 
 VBla_16:
@@ -1196,15 +1197,15 @@ Rplc_Exit:
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-sub_1642:
+ProcessDPLC:
 		tst.w	(v_plc_patternsleft).w
-		beq.w	locret_16DA
+		beq.s	Rplc_Exit
 		move.w	#9,(v_plc_framepatternsleft).w
 		moveq	#0,d0
 		move.w	(v_plc_buffer+4).w,d0
 		addi.w	#$120,(v_plc_buffer+4).w
-		bra.s	loc_1676
-; End of function sub_1642
+		bra.s	ProcessDPLC_Main
+; End of function ProcessDPLC
 
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -1219,7 +1220,7 @@ ProcessDPLC2:
 		move.w	(v_plc_buffer+4).w,d0
 		addi.w	#$60,(v_plc_buffer+4).w
 
-loc_1676:
+ProcessDPLC_Main:
 		lea	(vdp_control_port).l,a4
 		lsl.l	#2,d0
 		lsr.w	#2,d0
@@ -1341,7 +1342,7 @@ Pal_SBZCyc10:	binclude	"palette/Cycle - SBZ 10.bin"
 
 
 PaletteFadeIn:
-		move.w	#$003F,(v_pfade_start).w ; set start position = 0; size = $40
+		move.w	#$3F,(v_pfade_start).w ; set start position = 0; size = $40
 
 PalFadeIn_Alt:				; start position and size are already set
 		moveq	#0,d0
@@ -1982,11 +1983,9 @@ GM_Sega:
 		copyTilemap	v_256x256&$FFFFFF,$E510,$17,7
 		copyTilemap	(v_256x256+$180)&$FFFFFF,$C000,$27,$1B
 
-		if Revision<>0
-			tst.b   (v_megadrive).w	; is console Japanese?
-			bmi.s   .loadpal
-			copyTilemap	(v_256x256+$A40)&$FFFFFF,$C53A,2,1 ; hide "TM" with a white rectangle
-		endif
+		tst.b   (v_megadrive).w	; is console Japanese?
+		bmi.s   .loadpal
+		copyTilemap	(v_256x256+$A40)&$FFFFFF,$C53A,2,1 ; hide "TM" with a white rectangle
 
 .loadpal:
 		moveq	#palid_SegaBG,d0
@@ -2044,6 +2043,7 @@ GM_Title:
 		move.w	#$8B03,(a6)
 		move.w	#$8720,(a6)	; set background colour (palette line 2, entry 0)
 		clr.b	(f_wtr_state).w
+		move.w	#$8C81,(a6)		; H res 40 cells, no interlace, S/H disabled
 		bsr.w	ClearScreen
 
 		clearRAM v_objspace,v_objend
@@ -2121,18 +2121,10 @@ Tit_LoadText:
 		move.b	#0,(f_debugmode).w ; disable debug mode
 		move.w	#$178,(v_demolength).w ; run title screen for $178 frames
 
-	if FixBugs
 		clearRAM v_sonicteam,v_sonicteam+object_size
-	else
-		; Bug: this only clears half of the "SONIC TEAM PRESENTS" slot.
-		; This is responsible for why the "PRESS START BUTTON" text doesn't
-		; show up, as the routine ID isn't reset.
-		clearRAM v_sonicteam,v_sonicteam+object_size/2
-	endif
 
 		move.b	#id_TitleSonic,(v_titlesonic).w ; load big Sonic object
 		move.b	#id_PSBTM,(v_pressstart).w ; load "PRESS START BUTTON" object
-		;clr.b	(v_pressstart+obRoutine).w ; The 'Mega Games 10' version of Sonic 1 added this line, to fix the 'PRESS START BUTTON' object not appearing
 
 		if Revision<>0
 			tst.b   (v_megadrive).w	; is console Japanese?
@@ -2331,29 +2323,7 @@ PlayLevel:
 ; ---------------------------------------------------------------------------
 ; Level	select - level pointers
 ; ---------------------------------------------------------------------------
-LevSel_Ptrs:	if Revision=0
-		; old level order
-		dc.b id_GHZ, 0
-		dc.b id_GHZ, 1
-		dc.b id_GHZ, 2
-		dc.b id_LZ, 0
-		dc.b id_LZ, 1
-		dc.b id_LZ, 2
-		dc.b id_MZ, 0
-		dc.b id_MZ, 1
-		dc.b id_MZ, 2
-		dc.b id_SLZ, 0
-		dc.b id_SLZ, 1
-		dc.b id_SLZ, 2
-		dc.b id_SYZ, 0
-		dc.b id_SYZ, 1
-		dc.b id_SYZ, 2
-		dc.b id_SBZ, 0
-		dc.b id_SBZ, 1
-		dc.b id_LZ, 3		; Scrap Brain Zone 3
-		dc.b id_SBZ, 2		; Final Zone
-		else
-		; correct level order
+LevSel_Ptrs:	; correct level order
 		dc.b id_GHZ, 0
 		dc.b id_GHZ, 1
 		dc.b id_GHZ, 2
@@ -2373,7 +2343,6 @@ LevSel_Ptrs:	if Revision=0
 		dc.b id_SBZ, 1
 		dc.b id_LZ, 3
 		dc.b id_SBZ, 2
-		endif
 		dc.b id_SS, 0		; Special Stage
 		dc.w $8000		; Sound Test
 		even
@@ -2618,11 +2587,7 @@ LevSel_CharOk:
 ; ---------------------------------------------------------------------------
 ; Level	select menu text
 ; ---------------------------------------------------------------------------
-LevelMenuText:	if Revision=0
-		binclude	"misc/Level Select Text.bin"
-		else
-		binclude	"misc/Level Select Text (JP1).bin"
-		endif
+LevelMenuText:	binclude	"misc/Level Select Text (JP1).bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Music	playlist
@@ -4763,16 +4728,10 @@ DrawFlipXY:
 ; a1 = Address of block
 ; DrawBlocks:
 GetBlockData:
-		if Revision=0
-		lea	(v_16x16).w,a1
-		add.w	4(a3),d4	; Add camera Y coordinate to relative coordinate
 		add.w	(a3),d5		; Add camera X coordinate to relative coordinate
-		else
-			add.w	(a3),d5
 GetBlockData_2:
-			add.w	4(a3),d4
-			lea	(v_16x16).w,a1
-		endif
+		add.w	4(a3),d4	; Add camera Y coordinate to relative coordinate
+		lea	(v_16x16).w,a1
 		; Turn Y coordinate into index into level layout
 		move.w	d4,d3
 		lsr.w	#1,d3
@@ -4819,14 +4778,9 @@ locret_6C1E:
 ; d5 = Relative X coordinate
 ; Returns VDP command in d0
 Calc_VRAM_Pos:
-		if Revision=0
-		add.w	4(a3),d4	; Add camera Y coordinate
 		add.w	(a3),d5		; Add camera X coordinate
-		else
-			add.w	(a3),d5
 Calc_VRAM_Pos_2:
-			add.w	4(a3),d4
-		endif
+		add.w	4(a3),d4	; Add camera Y coordinate
 		; Floor the coordinates to the nearest pair of tiles (the size of a block).
 		; Also note that this wraps the value to the size of the plane:
 		; The plane is 64*8 wide, so wrap at $100, and it's 32*8 tall, so wrap at $200
@@ -4860,16 +4814,14 @@ LoadTilesFromStart:
 		lea	(v_bgscreenposx).w,a3
 		lea	(v_lvllayout+$40).w,a4
 		move.w	#$6000,d2
-		if Revision<>0
-			tst.b	(v_zone).w
-			beq.w	Draw_GHz_Bg
-			cmpi.b	#id_MZ,(v_zone).w
-			beq.w	Draw_Mz_Bg
-			cmpi.w	#(id_SBZ<<8)+0,(v_zone).w
-			beq.w	Draw_SBz_Bg
-			cmpi.b	#id_EndZ,(v_zone).w
-			beq.w	Draw_GHz_Bg
-		endif
+		tst.b	(v_zone).w
+		beq.w	Draw_GHz_Bg
+		cmpi.b	#id_MZ,(v_zone).w
+		beq.w	Draw_Mz_Bg
+		cmpi.w	#(id_SBZ<<8)+0,(v_zone).w
+		beq.w	Draw_SBz_Bg
+		cmpi.b	#id_EndZ,(v_zone).w
+		beq.w	Draw_GHz_Bg
 ; End of function LoadTilesFromStart
 
 
@@ -5028,14 +4980,7 @@ LevelDataLoad:
 
 LevelLayoutLoad:
 		lea	(v_lvllayout).w,a3
-	if FixBugs
 		move.w	#(v_lvllayout_end-v_lvllayout)/4-1,d1
-	else
-		; ; v_lvllayout is only $400 bytes, but this clears $800...
-		; In Sonic 2, this function was corrected to only clear the
-		; layout buffer.
-		move.w	#(v_lvllayout_end-v_lvllayout)/2-1,d1
-	endif
 		moveq	#0,d0
 
 LevLoad_ClrRam:
@@ -6286,234 +6231,7 @@ BuildSpr_FlipXY:
 		rts
 
 		include	"_incObj/sub ChkObjectVisible.asm"
-
-; ---------------------------------------------------------------------------
-; Subroutine to	load a level's objects
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-ObjPosLoad:
-		moveq	#0,d0
-		move.b	(v_opl_routine).w,d0
-		move.w	OPL_Index(pc,d0.w),d0
-		jmp	OPL_Index(pc,d0.w)
-; End of function ObjPosLoad
-
-; ===========================================================================
-OPL_Index:	dc.w OPL_Main-OPL_Index
-		dc.w OPL_Next-OPL_Index
-; ===========================================================================
-
-OPL_Main:
-		addq.b	#2,(v_opl_routine).w
-		move.w	(v_zone).w,d0
-		lsl.b	#6,d0
-		lsr.w	#4,d0
-		lea	(ObjPos_Index).l,a0
-		movea.l	a0,a1
-		adda.w	(a0,d0.w),a0
-		move.l	a0,(v_opl_data).w
-		move.l	a0,(v_opl_data+4).w
-		adda.w	2(a1,d0.w),a1
-		move.l	a1,(v_opl_data+8).w
-		move.l	a1,(v_opl_data+$C).w
-		lea	(v_objstate).w,a2
-		move.w	#$101,(a2)+
-		move.w	#(v_objstate_end-v_objstate-2)/4-1,d0
-
-OPL_ClrList:
-		clr.l	(a2)+
-		dbf	d0,OPL_ClrList	; clear	pre-destroyed object list
-
-		; Clear the last word, since the above loop only does longwords.
-	if (v_objstate_end-v_objstate-2)&2
-		clr.w	(a2)+
-	endif
-
-		lea	(v_objstate).w,a2
-		moveq	#0,d2
-		move.w	(v_screenposx).w,d6
-		subi.w	#$80,d6
-		bhs.s	loc_D93C
-		moveq	#0,d6
-
-loc_D93C:
-		andi.w	#$FF80,d6
-		movea.l	(v_opl_data).w,a0
-
-loc_D944:
-		cmp.w	(a0),d6
-		bls.s	loc_D956
-		tst.b	4(a0)
-		bpl.s	loc_D952
-		move.b	(a2),d2
-		addq.b	#1,(a2)
-
-loc_D952:
-		addq.w	#6,a0
-		bra.s	loc_D944
-; ===========================================================================
-
-loc_D956:
-		move.l	a0,(v_opl_data).w
-		movea.l	(v_opl_data+4).w,a0
-		subi.w	#$80,d6
-		blo.s	loc_D976
-
-loc_D964:
-		cmp.w	(a0),d6
-		bls.s	loc_D976
-		tst.b	4(a0)
-		bpl.s	loc_D972
-		addq.b	#1,1(a2)
-
-loc_D972:
-		addq.w	#6,a0
-		bra.s	loc_D964
-; ===========================================================================
-
-loc_D976:
-		move.l	a0,(v_opl_data+4).w
-		move.w	#-1,(v_opl_screen).w
-
-OPL_Next:
-		lea	(v_objstate).w,a2
-		moveq	#0,d2
-		move.w	(v_screenposx).w,d6
-		andi.w	#$FF80,d6
-		cmp.w	(v_opl_screen).w,d6
-		beq.w	locret_DA3A
-		bge.s	loc_D9F6
-		move.w	d6,(v_opl_screen).w
-		movea.l	(v_opl_data+4).w,a0
-		subi.w	#$80,d6
-		blo.s	loc_D9D2
-
-loc_D9A6:
-		cmp.w	-6(a0),d6
-		bge.s	loc_D9D2
-		subq.w	#6,a0
-		tst.b	4(a0)
-		bpl.s	loc_D9BC
-		subq.b	#1,1(a2)
-		move.b	1(a2),d2
-
-loc_D9BC:
-		bsr.w	loc_DA3C
-		bne.s	loc_D9C6
-		subq.w	#6,a0
-		bra.s	loc_D9A6
-; ===========================================================================
-
-loc_D9C6:
-		tst.b	4(a0)
-		bpl.s	loc_D9D0
-		addq.b	#1,1(a2)
-
-loc_D9D0:
-		addq.w	#6,a0
-
-loc_D9D2:
-		move.l	a0,(v_opl_data+4).w
-		movea.l	(v_opl_data).w,a0
-		addi.w	#$300,d6
-
-loc_D9DE:
-		cmp.w	-6(a0),d6
-		bgt.s	loc_D9F0
-		tst.b	-2(a0)
-		bpl.s	loc_D9EC
-		subq.b	#1,(a2)
-
-loc_D9EC:
-		subq.w	#6,a0
-		bra.s	loc_D9DE
-; ===========================================================================
-
-loc_D9F0:
-		move.l	a0,(v_opl_data).w
-		rts
-; ===========================================================================
-
-loc_D9F6:
-		move.w	d6,(v_opl_screen).w
-		movea.l	(v_opl_data).w,a0
-		addi.w	#$280,d6
-
-loc_DA02:
-		cmp.w	(a0),d6
-		bls.s	loc_DA16
-		tst.b	4(a0)
-		bpl.s	loc_DA10
-		move.b	(a2),d2
-		addq.b	#1,(a2)
-
-loc_DA10:
-		bsr.w	loc_DA3C
-		beq.s	loc_DA02
-
-loc_DA16:
-		move.l	a0,(v_opl_data).w
-		movea.l	(v_opl_data+4).w,a0
-		subi.w	#$300,d6
-		blo.s	loc_DA36
-
-loc_DA24:
-		cmp.w	(a0),d6
-		bls.s	loc_DA36
-		tst.b	4(a0)
-		bpl.s	loc_DA32
-		addq.b	#1,1(a2)
-
-loc_DA32:
-		addq.w	#6,a0
-		bra.s	loc_DA24
-; ===========================================================================
-
-loc_DA36:
-		move.l	a0,(v_opl_data+4).w
-
-locret_DA3A:
-		rts
-; ===========================================================================
-
-loc_DA3C:
-		tst.b	4(a0)
-		bpl.s	OPL_MakeItem
-		bset	#7,2(a2,d2.w)
-		beq.s	OPL_MakeItem
-		addq.w	#6,a0
-		moveq	#0,d0
-		rts
-; ===========================================================================
-
-OPL_MakeItem:
-		bsr.w	FindFreeObj
-		bne.s	locret_DA8A
-		move.w	(a0)+,obX(a1)
-		move.w	(a0)+,d0
-		move.w	d0,d1
-		andi.w	#$FFF,d0
-		move.w	d0,obY(a1)
-		rol.w	#2,d1
-		andi.b	#3,d1
-		move.b	d1,obRender(a1)
-		move.b	d1,obStatus(a1)
-		move.b	(a0)+,d0
-		bpl.s	loc_DA80
-		andi.b	#$7F,d0
-		move.b	d2,obRespawnNo(a1)
-
-loc_DA80:
-		_move.b	d0,obID(a1)
-		move.b	(a0)+,obSubtype(a1)
-		moveq	#0,d0
-
-locret_DA8A:
-		rts
-
+		include	"_inc/New Object manager.asm"
 		include	"_incObj/sub FindFreeObj.asm"
 		include	"_incObj/41 Springs.asm"
 		include	"_anim/Springs.asm"
@@ -8732,13 +8450,13 @@ ObjPos_GHZ1:	binclude	"objpos/ghz1.bin"
 		even
 ObjPos_GHZ2:	binclude	"objpos/ghz2.bin"
 		even
-ObjPos_GHZ3:	binclude	"objpos/ghz3 (JP1).bin"
+ObjPos_GHZ3:	binclude	"objpos/ghz3.bin"
 		even
-ObjPos_LZ1:	binclude	"objpos/lz1 (JP1).bin"
+ObjPos_LZ1:	binclude	"objpos/lz1.bin"
 		even
 ObjPos_LZ2:	binclude	"objpos/lz2.bin"
 		even
-ObjPos_LZ3:	binclude	"objpos/lz3 (JP1).bin"
+ObjPos_LZ3:	binclude	"objpos/lz3.bin"
 		even
 ObjPos_SBZ3:	binclude	"objpos/sbz3.bin"
 		even
@@ -8754,7 +8472,7 @@ ObjPos_LZ3pf1:	binclude	"objpos/lz3pf1.bin"
 		even
 ObjPos_LZ3pf2:	binclude	"objpos/lz3pf2.bin"
 		even
-ObjPos_MZ1:	binclude	"objpos/mz1 (JP1).bin"
+ObjPos_MZ1:	binclude	"objpos/mz1.bin"
 		even
 ObjPos_MZ2:	binclude	"objpos/mz2.bin"
 		even
@@ -8770,9 +8488,9 @@ ObjPos_SYZ1:	binclude	"objpos/syz1.bin"
 		even
 ObjPos_SYZ2:	binclude	"objpos/syz2.bin"
 		even
-ObjPos_SYZ3:	binclude	"objpos/syz3 (JP1).bin"
+ObjPos_SYZ3:	binclude	"objpos/syz3.bin"
 		even
-ObjPos_SBZ1:	binclude	"objpos/sbz1 (JP1).bin"
+ObjPos_SBZ1:	binclude	"objpos/sbz1.bin"
 		even
 ObjPos_SBZ2:	binclude	"objpos/sbz2.bin"
 		even
