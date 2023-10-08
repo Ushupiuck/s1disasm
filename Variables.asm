@@ -337,7 +337,8 @@ f_endactbonus:		ds.b	1		; time/ring bonus update flag at the end of an act
 v_sonicend:		ds.b	1		; routine counter for Sonic in the ending sequence
 v_lz_deform:		ds.w	1		; LZ deformation offset, in units of $80
 f_switch:		ds.b	$10		; flags set when Sonic stands on a switch
-			ds.b	$38		; unused
+v_screenposx_coarse:	ds.w	$1
+			ds.b	$36		; unused
 v_levelvariables_end:
 
 v_spritetablebuffer:	ds.b	$280		; sprite table (last $80 bytes are overwritten by v_pal_water_dup)

@@ -29,8 +29,6 @@ Invis_Main:	; Routine 0
 		move.b	d1,obHeight(a0) ; set object height
 
 Invis_Solid:	; Routine 2
-		bsr.w	ChkObjectVisible
-		bne.s	.chkdel
 		moveq	#0,d1
 		move.b	obActWid(a0),d1
 		addi.w	#$B,d1
@@ -40,15 +38,10 @@ Invis_Solid:	; Routine 2
 		addq.w	#1,d3
 		move.w	obX(a0),d4
 		bsr.w	SolidObject71
-
-.chkdel:
-		out_of_range.s	.delete
+		out_of_range.w	DeleteObject
 		tst.w	(v_debuguse).w	; are you using	debug mode?
 		beq.s	.nodisplay	; if not, branch
 		jmp	(DisplaySprite).l	; if yes, display the object
 
 .nodisplay:
-		rts	
-
-.delete:
-		jmp	(DeleteObject).l
+		rts
