@@ -79,14 +79,12 @@ loc_19934:
 
 SEgg_PreLeap:
 		subq.w	#1,objoff_3C(a0)	; subtract 1 from time delay
-		bne.s	loc_19954	; if time remains, branch
+		bne.s	loc_19934		; if time remains, branch
 		addq.b	#2,ob2ndRout(a0)
 		move.b	#2,obAnim(a0)
 		addq.w	#4,obY(a0)
 		move.w	#15,objoff_3C(a0)
-
-loc_19954:
-		bra.s	loc_19934
+		jmp	(SpeedToPos).l
 ; ===========================================================================
 
 SEgg_Leap:
@@ -118,8 +116,8 @@ SEgg_FindBlocks:
 		or.w	obVelY(a0),d0
 		bne.s	loc_199D0
 
-		lea	(v_objspace).w,a1 ; Nonsensical starting point, since dynamic object allocations begin at v_lvlobjspace.
-		moveq	#(v_objend-(v_objspace+object_size*1))/object_size/2-1,d0	; Nonsensical length, it only covers the first half of object RAM.
+		lea	(v_lvlobjspace-object_size).w,a1
+		moveq	#(v_lvlobjend-v_lvlobjspace)/object_size-1,d0
 		moveq	#object_size,d1
 
 SEgg_FindLoop:
@@ -133,7 +131,7 @@ SEgg_FindLoop:
 		move.b	#1,obAnim(a0)
 
 loc_199D0:
-		bra.w	loc_19934
+		jmp	(SpeedToPos).l
 ; ===========================================================================
 
 SEgg_Switch:	; Routine 4
