@@ -17,7 +17,6 @@ TwizVRAM	= ramaddr (TwizHuffCopy+(TwizHuffCopyMax*$02))	; $4 bytes
 TwizSize	= ramaddr (TwizVRAM+$04)			; $2 bytes
 ; ---------------------------------------------------------------------------
 TwizBufferSize	=	$1000
-TwizBufferPre	= ramaddr ($FFFF8400)				; $1000 bytes
 TwizBuffer	= ramaddr ($FFFF9400)				; $1000 bytes
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
