@@ -1,3 +1,22 @@
+; >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; simplifying macros and functions
+
+; makes a VDP address difference
+vdpCommDelta function addr,((addr&$3FFF)<<16)|((addr&vram_fg)>>14)
+
+; makes a VDP command
+vdpComm function addr,type,rwd,(((type&rwd)&3)<<30)|((addr&$3FFF)<<16)|(((type&rwd)&$FC)<<2)|((addr&vram_fg)>>14)
+
+; values for the type argument
+VRAM = %100001
+CRAM = %101011
+VSRAM = %100101
+
+; values for the rwd argument
+READ = %001100
+WRITE = %000111
+DMA = %100111
+
 ; ---------------------------------------------------------------------------
 ; Set a VRAM address via the VDP control port.
 ; input: 16-bit VRAM address, control port (default is (vdp_control_port).l)
@@ -5,9 +24,9 @@
 
 locVRAM:	macro loc,controlport
 		if ("controlport"=="")
-		move.l	#($40000000+(((loc)&$3FFF)<<16)+(((loc)&$C000)>>14)),(vdp_control_port).l
+		move.l	#($40000000+(((loc)&$3FFF)<<16)+(((loc)&vram_fg)>>14)),(vdp_control_port).l
 		else
-		move.l	#($40000000+(((loc)&$3FFF)<<16)+(((loc)&$C000)>>14)),controlport
+		move.l	#($40000000+(((loc)&$3FFF)<<16)+(((loc)&vram_fg)>>14)),controlport
 		endif
 		endm
 
@@ -18,11 +37,11 @@ locVRAM:	macro loc,controlport
 
 writeVRAM:	macro source,length,destination
 		lea	(vdp_control_port).l,a5
-		move.l	#$94000000+(((length>>1)&$FF00)<<8)+$9300+((length>>1)&$FF),(a5)
-		move.l	#$96000000+(((source>>1)&$FF00)<<8)+$9500+((source>>1)&$FF),(a5)
-		move.w	#$9700+((((source>>1)&$FF0000)>>16)&$7F),(a5)
+		move.l	#(($9400|((((length)>>1)&$FF00)>>8))<<16)|($9300|(((length)>>1)&$FF)),(a5)
+		move.l	#(($9600|((((source)>>1)&$FF00)>>8))<<16)|($9500|(((source)>>1)&$FF)),(a5)
+		move.w	#$9700|(((((source)>>1)&$FF0000)>>16)&$7F),(a5)
 		move.w	#$4000+((destination)&$3FFF),(a5)
-		move.w	#$80+(((destination)&$C000)>>14),(v_vdp_buffer2).w
+		move.w	#$80+(((destination)&vram_fg)>>14),(v_vdp_buffer2).w
 		move.w	(v_vdp_buffer2).w,(a5)
 		endm
 
@@ -37,7 +56,7 @@ writeCRAM:	macro source,length,destination
 		move.l	#$96000000+(((source>>1)&$FF00)<<8)+$9500+((source>>1)&$FF),(a5)
 		move.w	#$9700+((((source>>1)&$FF0000)>>16)&$7F),(a5)
 		move.w	#$C000+(destination&$3FFF),(a5)
-		move.w	#$80+((destination&$C000)>>14),(v_vdp_buffer2).w
+		move.w	#$80+((destination&vram_fg)>>14),(v_vdp_buffer2).w
 		move.w	(v_vdp_buffer2).w,(a5)
 		endm
 
@@ -51,7 +70,7 @@ fillVRAM:	macro value,length,loc
 		move.w	#$8F01,(a5)
 		move.l	#$94000000+((length&$FF00)<<8)+$9300+(length&$FF),(a5)
 		move.w	#$9780,(a5)
-		move.l	#$40000080+((loc&$3FFF)<<16)+((loc&$C000)>>14),(a5)
+		move.l	#$40000080+((loc&$3FFF)<<16)+((loc&vram_fg)>>14),(a5)
 		move.w	#value,(vdp_data_port).l
 		endm
 
