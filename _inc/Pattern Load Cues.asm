@@ -256,10 +256,8 @@ PLC_Signpostend:
 ; Pattern load cues - beta special stage warp effect
 ; ---------------------------------------------------------------------------
 PLC_Warp:
-	if Revision=0
 		dc.w ((PLC_Warpend-PLC_Warp-2)/6)-1
 		plcm	Nem_Warp, ArtTile_Warp
-	endif
 PLC_Warpend:
 ; ---------------------------------------------------------------------------
 ; Pattern load cues - special stage
@@ -280,14 +278,7 @@ PLC_SpecialStage:	dc.w ((PLC_SpeStageend-PLC_SpecialStage-2)/6)-1
 		plcm	Nem_SSGlass,    ArtTile_SS_Glass             ; glass block
 		plcm	Nem_SSEmerald,  ArtTile_SS_Emerald           ; emeralds
 		plcm	Nem_Ring,       ArtTile_Ring                 ; rings
-		plcm	Nem_SSZone1,    ArtTile_SS_Zone_1            ; ZONE 1 block
-		plcm	Nem_SSZone2,    ArtTile_SS_Zone_2            ; ZONE 2 block
-		plcm	Nem_SSZone3,    ArtTile_SS_Zone_3            ; ZONE 3 block
 PLC_SpeStageend:
-		; Unused
-		plcm	Nem_SSZone4,    ArtTile_SS_Zone_4            ; ZONE 4 block
-		plcm	Nem_SSZone5,    ArtTile_SS_Zone_5            ; ZONE 5 block
-		plcm	Nem_SSZone6,    ArtTile_SS_Zone_6            ; ZONE 6 block
 ; ---------------------------------------------------------------------------
 ; Pattern load cues - GHZ animals
 ; ---------------------------------------------------------------------------
