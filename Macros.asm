@@ -310,3 +310,34 @@ SonicDplcVer = 1
 
 pcmLoopCounter function sampleRate,baseCycles, 1+(53693175/15/(sampleRate)-(baseCycles)+(13/2))/13
 dpcmLoopCounter function sampleRate, pcmLoopCounter(sampleRate,301/2) ; 301 is the number of cycles zPlayPCMLoop takes.
+
+; macro to replace the destination with its absolute value
+abs macro destination
+	tst.ATTRIBUTE	destination
+	bpl.s	.skip
+	neg.ATTRIBUTE	destination
+.skip:
+    endm
+
+    if 0|allOptimizations
+absw macro destination	; use a short branch instead
+	abs.ATTRIBUTE	destination
+    endm
+    else
+; macro to replace the destination with its absolute value using a word-sized branch
+absw macro destination
+	tst.ATTRIBUTE	destination
+	bpl.w	.skip
+	neg.ATTRIBUTE	destination
+.skip:
+    endm
+    endif
+
+; macro to move the absolute value of the source in the destination
+mvabs macro source,destination
+	move.ATTRIBUTE	source,destination
+	bpl.s	.skip
+	neg.ATTRIBUTE	destination
+.skip:
+    endm
+
