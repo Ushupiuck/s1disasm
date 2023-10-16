@@ -319,19 +319,9 @@ abs macro destination
 .skip:
     endm
 
-    if 0|allOptimizations
 absw macro destination	; use a short branch instead
 	abs.ATTRIBUTE	destination
     endm
-    else
-; macro to replace the destination with its absolute value using a word-sized branch
-absw macro destination
-	tst.ATTRIBUTE	destination
-	bpl.w	.skip
-	neg.ATTRIBUTE	destination
-.skip:
-    endm
-    endif
 
 ; macro to move the absolute value of the source in the destination
 mvabs macro source,destination
