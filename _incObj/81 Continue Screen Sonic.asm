@@ -23,7 +23,7 @@ CSon_Main:	; Routine 0
 		move.w	#make_art_tile(ArtTile_Sonic,0,0),obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#2,obPriority(a0)
-		move.b	#id_Float3,obAnim(a0) ; use "floating" animation
+		move.b	#id_Lying,obAnim(a0) ; use "floating" animation
 		move.w	#$400,obVelY(a0) ; make Sonic fall from above
 
 CSon_ChkLand:	; Routine 2
@@ -53,7 +53,7 @@ CSon_GetUp:
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Sonic,obMap(a0)
 		move.w	#make_art_tile(ArtTile_Sonic,0,0),obGfx(a0)
-		move.b	#id_Float4,obAnim(a0) ; use "getting up" animation
+		move.b	#id_LieDown,obAnim(a0) ; use "getting up" animation
 		clr.w	obInertia(a0)
 		subq.w	#8,obY(a0)
 		move.b	#bgm_Fade,d0
