@@ -41,7 +41,7 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.l ChkInstr			; CHK exception
 		dc.l TrapvInstr			; TRAPV exception (8)
 		dc.l PrivilegeViol		; Privilege violation
-		dc.l Trace				; TRACE exception
+		dc.l Trace			; TRACE exception
 		dc.l Line1010Emu		; Line-A emulator
 		dc.l Line1111Emu		; Line-F emulator (12)
 		dc.l ErrorExcept		; Unused (reserved)
@@ -60,9 +60,9 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.l ErrorTrap			; IRQ level 1
 		dc.l ErrorTrap			; IRQ level 2
 		dc.l ErrorTrap			; IRQ level 3 (28)
-		dc.l HBlank				; IRQ level 4 (horizontal retrace interrupt)
+		dc.l HBlank			; IRQ level 4 (horizontal retrace interrupt)
 		dc.l ErrorTrap			; IRQ level 5
-		dc.l VBlank				; IRQ level 6 (vertical retrace interrupt)
+		dc.l VBlank			; IRQ level 6 (vertical retrace interrupt)
 		dc.l ErrorTrap			; IRQ level 7 (32)
 		dc.l ErrorTrap			; TRAP #00 exception
 		dc.l ErrorTrap			; TRAP #01 exception
@@ -217,10 +217,10 @@ SetupValues:	dc.w $8000		; VDP register start number
 
 		dc.b 4			; VDP $80 - 8-colour mode
 		dc.b $14		; VDP $81 - Megadrive mode, DMA enable
-		dc.b ($C000>>10)	; VDP $82 - foreground nametable address
+		dc.b (vram_fg>>10)	; VDP $82 - foreground nametable address
 		dc.b ($F000>>10)	; VDP $83 - window nametable address
-		dc.b ($E000>>13)	; VDP $84 - background nametable address
-		dc.b ($D800>>9)		; VDP $85 - sprite table address
+		dc.b (vram_bg>>13)	; VDP $84 - background nametable address
+		dc.b (vram_sprites>>9)	; VDP $85 - sprite table address
 		dc.b 0			; VDP $86 - unused
 		dc.b 0			; VDP $87 - background colour
 		dc.b 0			; VDP $88 - unused
@@ -228,7 +228,7 @@ SetupValues:	dc.w $8000		; VDP register start number
 		dc.b 255		; VDP $8A - HBlank register
 		dc.b 0			; VDP $8B - full screen scroll
 		dc.b $81		; VDP $8C - 40 cell display
-		dc.b ($DC00>>10)	; VDP $8D - hscroll table address
+		dc.b (vram_hscroll>>10)	; VDP $8D - hscroll table address
 		dc.b 0			; VDP $8E - unused
 		dc.b 1			; VDP $8F - VDP increment
 		dc.b 1			; VDP $90 - 64 cell hscroll size
@@ -414,7 +414,7 @@ loc_478:
 
 ShowErrorMessage:
 		lea	(vdp_data_port).l,a6
-		locVRAM	$F800
+		locVRAM	vram_sprites
 		lea	(Art_Text).l,a0
 		move.w	#$27F,d1
 .loadgfx:
@@ -947,10 +947,11 @@ VDPSetupGame:
 ; End of function VDPSetupGame
 
 ; ===========================================================================
-VDPSetupArray:	dc.w $8004		; 8-colour mode
+VDPSetupArray:
+		dc.w $8004		; 8-colour mode
 		dc.w $8134		; enable V.interrupts, enable DMA
 		dc.w $8200+(vram_fg>>10) ; set foreground nametable address
-		dc.w $8300+($A000>>10)	; set window nametable address
+		dc.w $8320	; set window nametable address
 		dc.w $8400+(vram_bg>>13) ; set background nametable address
 		dc.w $8500+(vram_sprites>>9) ; set sprite table address
 		dc.w $8600		; unused
@@ -1980,12 +1981,12 @@ GM_Sega:
 		move.w	#0,d0
 		bsr.w	EniDec
 
-		copyTilemap	v_256x256&$FFFFFF,$E510,$17,7
-		copyTilemap	(v_256x256+$180)&$FFFFFF,$C000,$27,$1B
+		copyTilemap	v_256x256&$FFFFFF,vram_bg+$510,$17,7
+		copyTilemap	(v_256x256+$180)&$FFFFFF,vram_fg,$27,$1B
 
 		tst.b   (v_megadrive).w	; is console Japanese?
 		bmi.s   .loadpal
-		copyTilemap	(v_256x256+$A40)&$FFFFFF,$C53A,2,1 ; hide "TM" with a white rectangle
+		copyTilemap	(v_256x256+$A40)&$FFFFFF,vram_fg+$53A,2,1 ; hide "TM" with a white rectangle
 
 .loadpal:
 		moveq	#palid_SegaBG,d0
@@ -2109,7 +2110,7 @@ Tit_LoadText:
 		move.w	#0,d0
 		bsr.w	EniDec
 
-		copyTilemap	v_256x256&$FFFFFF,$C208,$21,$15
+		copyTilemap	v_256x256&$FFFFFF,vram_fg+$208,$21,$15
 
 		locVRAM	ArtTile_Level*$20
 		lea	(Nem_GHZ_1st).l,a0 ; load GHZ patterns
@@ -2407,9 +2408,7 @@ Demo_Level:
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
-		if Revision<>0
-			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		endif
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -2454,8 +2453,7 @@ LevSel_Down:
 
 LevSel_Refresh:
 		move.w	d0,(v_levselitem).w ; set new selection
-		bsr.w	LevSelTextLoad	; refresh text
-		rts	
+		bra.w	LevSelTextLoad	; refresh text
 ; ===========================================================================
 
 LevSel_SndTest:
@@ -2481,7 +2479,7 @@ LevSel_Right:
 
 LevSel_Refresh2:
 		move.w	d0,(v_levselsound).w ; set sound test number
-		bsr.w	LevSelTextLoad	; refresh text
+		bra.w	LevSelTextLoad	; refresh text
 
 LevSel_NoMove:
 		rts
@@ -2524,24 +2522,23 @@ LevSel_DrawAll:
 		add.w	d1,d1
 		add.w	d0,d1
 		adda.w	d1,a1
-		move.w	#$C680,d3	; VRAM setting (3rd palette, $680th tile)
+		move.w	#vram_fg+$680,d3	; VRAM setting (3rd palette, $680th tile)
 		move.l	d4,4(a6)
 		bsr.w	LevSel_ChgLine	; recolour selected line
-		move.w	#$E680,d3
+		move.w	#vram_bg+$680,d3
 		cmpi.w	#$14,(v_levselitem).w
 		bne.s	LevSel_DrawSnd
-		move.w	#$C680,d3
+		move.w	#vram_fg+$680,d3
 
 LevSel_DrawSnd:
-		locVRAM	$EC30		; sound test position on screen
+		locVRAM	vram_bg+$C30		; sound test position on screen
 		move.w	(v_levselsound).w,d0
 		addi.w	#$80,d0
 		move.b	d0,d2
 		lsr.b	#4,d0
 		bsr.w	LevSel_ChgSnd	; draw 1st digit
 		move.b	d2,d0
-		bsr.w	LevSel_ChgSnd	; draw 2nd digit
-		rts
+		bra.w	LevSel_ChgSnd	; draw 2nd digit
 ; End of function LevSelTextLoad
 
 
@@ -3286,8 +3283,8 @@ loc_491C:
 		lea	(Eni_SSBg2).l,a0 ; load	mappings for the clouds
 		move.w	#$4000,d0
 		bsr.w	EniDec
-		copyTilemap	v_ssbuffer1&$FFFFFF,$C000,$3F,$1F
-		copyTilemap	v_ssbuffer1&$FFFFFF,$D000,$3F,$3F
+		copyTilemap	v_ssbuffer1&$FFFFFF,vram_fg,$3F,$1F
+		copyTilemap	v_ssbuffer1&$FFFFFF,vram_fg+$1000,$3F,$3F
 		rts
 ; End of function SS_BGLoad
 
@@ -4018,14 +4015,8 @@ Demo_EndSBZ2:	binclude	"demodata/Ending - SBZ2.bin"
 Demo_EndGHZ2:	binclude	"demodata/Ending - GHZ2.bin"
 		even
 
-		if Revision=0
-		include	"_inc/LevelSizeLoad & BgScrollSpeed.asm"
-		include	"_inc/DeformLayers.asm"
-		else
 		include	"_inc/LevelSizeLoad & BgScrollSpeed (JP1).asm"
 		include	"_inc/DeformLayers (JP1).asm"
-		endif
-
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -5417,7 +5408,6 @@ loc_8A92:
 loc_8AA8:
 		btst	#5,obStatus(a0)
 		beq.s	locret_8AC2
-		move.w	#id_Run,obAnim(a1)
 
 loc_8AB6:
 		bclr	#5,obStatus(a0)
@@ -6030,8 +6020,9 @@ BuildSprites:
 		btst	#5,d4		; is static mappings flag on?
 		bne.s	.drawFrame	; if yes, branch
 		move.b	obFrame(a0),d1
-		add.b	d1,d1
+		add.w	d1,d1
 		adda.w	(a1,d1.w),a1	; get mappings frame address
+		moveq	#0,d1
 		move.b	(a1)+,d1	; number of sprite pieces
 		subq.b	#1,d1
 		bmi.s	.setVisible
@@ -6040,7 +6031,8 @@ BuildSprites:
 		bsr.w	BuildSpr_Draw	; write data from sprite pieces to buffer
 
 	.setVisible:
-		bset	#7,obRender(a0)		; set object as visible
+		ori.b	#$80,obRender(a0)	; set on-screen flag
+;		bset	#7,obRender(a0)		; set object as visible
 
 	.skipObject:
 		addq.w	#2,d6
@@ -6360,7 +6352,7 @@ Map_WFall:	include	"_maps/Waterfalls.asm"
 ; ---------------------------------------------------------------------------
 ; Object 01 - Sonic
 ; ---------------------------------------------------------------------------
-
+; Obj01:
 SonicPlayer:
 		tst.w	(v_debuguse).w	; is debug mode	being used?
 		beq.s	Sonic_Normal	; if not, branch
@@ -6530,7 +6522,7 @@ loc_12EA6:
 		include	"_incObj/Sonic (part 2).asm"
 		include	"_incObj/Sonic Loops.asm"
 		include	"_incObj/Sonic Animate.asm"
-		include	"_anim/Sonic (without frame IDs).asm"
+		include	"_anim/Sonic.asm"
 		include	"_incObj/Sonic LoadGfx.asm"
 
 		include	"_incObj/0A Drowning Countdown.asm"
@@ -7860,10 +7852,13 @@ Nem_TitleTM:	binclude	"artnem/Title Screen TM.nem"
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics	- Sonic
 ; ---------------------------------------------------------------------------
-Art_Sonic:	binclude	"artunc/Sonic.bin"	; Sonic
+		align $20
+Art_Sonic:	binclude	"To Port/Sonic.bin"	; Sonic
 		even
-Map_Sonic:	include	"_maps/Sonic.asm"
-SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
+Map_Sonic:	binclude	"To Port/Sonic mappings.bin"
+		even
+SonicDynPLC:	binclude	"To port/Sonic DPLC's.bin"
+		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - special stage
 ; ---------------------------------------------------------------------------
@@ -7887,18 +7882,6 @@ Nem_SS1UpBlock:	binclude	"artnem/Special 1UP.nem" ; special stage 1UP block
 Nem_SSEmStars:	binclude	"artnem/Special Emerald Twinkle.nem" ; special stage stars from a collected emerald
 		even
 Nem_SSRedWhite:	binclude	"artnem/Special Red-White.nem" ; special stage red/white block
-		even
-Nem_SSZone1:	binclude	"artnem/Special ZONE1.nem" ; special stage ZONE1 block
-		even
-Nem_SSZone2:	binclude	"artnem/Special ZONE2.nem" ; ZONE2 block
-		even
-Nem_SSZone3:	binclude	"artnem/Special ZONE3.nem" ; ZONE3 block
-		even
-Nem_SSZone4:	binclude	"artnem/Special ZONE4.nem" ; ZONE4 block
-		even
-Nem_SSZone5:	binclude	"artnem/Special ZONE5.nem" ; ZONE5 block
-		even
-Nem_SSZone6:	binclude	"artnem/Special ZONE6.nem" ; ZONE6 block
 		even
 Nem_SSUpDown:	binclude	"artnem/Special UP-DOWN.nem" ; special stage UP/DOWN block
 		even
@@ -8365,11 +8348,7 @@ byte_69B84:	dc.b 0,	0, 0, 0
 
 Level_SYZ1:	binclude	"levels/syz1.bin"
 		even
-Level_SYZbg:	if Revision=0
-		binclude	"levels/syzbg.bin"
-		else
-		binclude	"levels/syzbg (JP1).bin"
-		endif
+Level_SYZbg:	binclude	"levels/syzbg.bin"
 		even
 byte_69C7E:	dc.b 0,	0, 0, 0
 Level_SYZ2:	binclude	"levels/syz2.bin"
