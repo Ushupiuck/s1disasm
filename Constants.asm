@@ -519,8 +519,9 @@ ArtTile_Spring_Horizontal:	equ $523
 ArtTile_Spring_Vertical:	equ $533
 ArtTile_Shield:			equ $541
 ArtTile_Invincibility:		equ $55C
-ArtTile_Game_Over:		equ $55E
+ArtTile_Game_Over:		equ ArtTile_Shield
 ArtTile_Title_Card:		equ $580
+
 ArtTile_Animal_1:		equ $580
 ArtTile_Animal_2:		equ $592
 ArtTile_Explosion:		equ $5A0
@@ -592,12 +593,6 @@ ArtTile_SS_Ghost_Block:		equ $4F0
 ArtTile_SS_W_Block:		equ $570
 ArtTile_SS_Glass:		equ $5F0
 ArtTile_SS_Emerald:		equ $770
-ArtTile_SS_Zone_1:		equ $797
-ArtTile_SS_Zone_2:		equ $7A0
-ArtTile_SS_Zone_3:		equ $7A9
-ArtTile_SS_Zone_4:		equ $797
-ArtTile_SS_Zone_5:		equ $7A0
-ArtTile_SS_Zone_6:		equ $7A9
 
 ; Special Stage Results
 ArtTile_SS_Results_Emeralds:	equ $541
