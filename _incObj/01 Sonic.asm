@@ -24,16 +24,19 @@ Sonic_Index:	dc.w Sonic_Main-Sonic_Index
 
 Sonic_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
-		move.b	#$13,obHeight(a0)
+		move.b	#$13,obHeight(a0) ; this sets Sonic's collision height (2*pixels)
 		move.b	#9,obWidth(a0)
 		move.l	#Map_Sonic,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Sonic,0,0),obGfx(a0)
 		move.b	#2,obPriority(a0)
 		move.b	#$18,obActWid(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$600,(v_sonspeedmax).w ; Sonic's top speed
 		move.w	#$C,(v_sonspeedacc).w ; Sonic's acceleration
 		move.w	#$80,(v_sonspeeddec).w ; Sonic's deceleration
+;		tst.b	(v_lastlamp).w
+;		bne.s	Obj01_Init_Continued
+
+		move.w	#make_art_tile(ArtTile_Sonic,0,0),obGfx(a0)
 
 Sonic_Control:	; Routine 2
 		tst.w	(f_debugmode).w	; is debug cheat enabled?
@@ -290,7 +293,7 @@ Sonic_Move:
 		move.w	(v_sonspeeddec).w,d4
 		tst.b	(f_slidemode).w
 		bne.w	loc_12FEE
-		tst.w	objoff_3E(a0)
+		tst.w	objoff_3E(a0) ; move_lock in Sonic 2
 		bne.w	Sonic_ResetScr
 		btst	#bitL,(v_jpadhold2).w ; is left being pressed?
 		beq.s	.notleft	; if not, branch
@@ -1159,11 +1162,8 @@ Sonic_Floor:
 		move.w	obVelX(a0),d1
 		move.w	obVelY(a0),d2
 		jsr	(CalcAngle).l
-		move.b	d0,(v_unused3).w
 		subi.b	#$20,d0
-		move.b	d0,(v_unused4).w
 		andi.b	#$C0,d0
-		move.b	d0,(v_unused5).w
 		cmpi.b	#$40,d0
 		beq.w	loc_13680
 		cmpi.b	#$80,d0
@@ -1185,7 +1185,6 @@ loc_135F0:
 
 loc_13602:
 		bsr.w	Sonic_HitFloor
-		move.b	d1,(v_unused6).w
 		tst.w	d1
 		bpl.s	locret_1367E
 		move.b	obVelY(a0),d2

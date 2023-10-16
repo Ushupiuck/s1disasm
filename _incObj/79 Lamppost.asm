@@ -29,6 +29,12 @@ Lamp_Main:	; Routine 0
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
+		; If you spawn a checkpoint in Debug Mode and activate it, then
+		; every checkpoint that is spawned with Debug Mode afterwards will be
+		; activated too. The cause of the bug is that the spawned checkpoint
+		; does not have a respawn entry, but this object fails to check for
+		; that before accessing the respawn table.
+		beq.s	Lamp_Blue
 		bclr	#7,2(a2,d0.w)
 		btst	#0,2(a2,d0.w)
 		bne.s	.red
@@ -43,7 +49,7 @@ Lamp_Main:	; Routine 0
 		bset	#0,2(a2,d0.w)
 		move.b	#4,obRoutine(a0) ; goto Lamp_Finish next
 		move.b	#3,obFrame(a0)	; use red lamppost frame
-		rts	
+		rts
 ; ===========================================================================
 
 Lamp_Blue:	; Routine 2
@@ -102,14 +108,20 @@ Lamp_Blue:	; Routine 2
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
+		; If you spawn a checkpoint in Debug Mode and activate it, then
+		; every checkpoint that is spawned with Debug Mode afterwards will be
+		; activated too. The cause of the bug is that the spawned checkpoint
+		; does not have a respawn entry, but this object fails to check for
+		; that before accessing the respawn table.
+		beq.s	.donothing
 		bset	#0,2(a2,d0.w)
 
 .donothing:
-		rts	
+		rts
 ; ===========================================================================
 
 Lamp_Finish:	; Routine 4
-		rts	
+		rts
 ; ===========================================================================
 
 Lamp_Twirl:	; Routine 6
@@ -130,7 +142,7 @@ Lamp_Twirl:	; Routine 6
 		swap	d0
 		add.w	lamp_origY(a0),d0
 		move.w	d0,obY(a0)
-		rts	
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Subroutine to	store information when you hit a lamppost
@@ -138,7 +150,7 @@ Lamp_Twirl:	; Routine 6
 
 Lamp_StoreInfo:
 		move.b	obSubtype(a0),(v_lastlamp).w 		; lamppost number
-		move.b	(v_lastlamp).w,(v_lastlamp+1).w
+		move.b	(v_lastlamp).w,(v_savedlastlamp).w
 		move.w	obX(a0),(v_lamp_xpos).w			; x-position
 		move.w	obY(a0),(v_lamp_ypos).w			; y-position
 		move.w	(v_rings).w,(v_lamp_rings).w 		; rings
@@ -157,7 +169,7 @@ Lamp_StoreInfo:
 		move.w	(v_waterpos2).w,(v_lamp_wtrpos).w 	; water height
 		move.b	(v_wtr_routine).w,(v_lamp_wtrrout).w	; rountine counter for water
 		move.b	(f_wtr_state).w,(v_lamp_wtrstat).w 	; water direction
-		rts	
+		rts
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	load stored info when you start	a level	from a lamppost
@@ -167,7 +179,7 @@ Lamp_StoreInfo:
 
 
 Lamp_LoadInfo:
-		move.b	(v_lastlamp+1).w,(v_lastlamp).w
+		move.b	(v_savedlastlamp).w,(v_lastlamp).w
 		move.w	(v_lamp_xpos).w,(v_player+obX).w
 		move.w	(v_lamp_ypos).w,(v_player+obY).w
 		move.w	(v_lamp_rings).w,(v_rings).w
@@ -204,4 +216,4 @@ Lamp_LoadInfo:
 		move.w	d0,(v_limitleft2).w
 
 locret_170F6:
-		rts	
+		rts

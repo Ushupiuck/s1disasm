@@ -352,7 +352,7 @@ v_objstate_end:
 			ds.b	$140		; stack
 v_systemstack:
 v_crossresetram:				; RAM beyond this point is only cleared on a cold-boot
-			ds.b	2		; unused
+			ds.b	8		; unused
 f_restart:		ds.w	1		; restart level flag
 v_framecount:		ds.w	1		; frame counter (adds 1 every frame)
 v_framebyte = v_framecount+1			; low byte for frame counter
@@ -371,9 +371,7 @@ v_lives:		ds.b	1		; number of lives
 v_air:			ds.w	1		; air remaining while underwater
 v_airbyte = v_air+1				; low byte for air
 v_lastspecial:		ds.b	1		; last special stage number
-			ds.b	1		; unused
 v_continues:		ds.b	1		; number of continues
-			ds.b	1		; unused
 f_timeover:		ds.b	1		; time over flag
 v_lifecount:		ds.b	1		; lives counter value (for actual number, see "v_lives")
 f_lifecount:		ds.b	1		; lives counter update flag
@@ -387,13 +385,13 @@ v_timemin = v_time+1				; time - minutes
 v_timesec = v_time+2				; time - seconds
 v_timecent = v_time+3				; time - centiseconds
 v_score:		ds.l	1		; score
-			ds.b	2		; unused
 v_shield:		ds.b	1		; shield status (00 = no; 01 = yes)
 v_invinc:		ds.b	1		; invinciblity status (00 = no; 01 = yes)
 v_shoes:		ds.b	1		; speed shoes status (00 = no; 01 = yes)
-v_unused1:		ds.b	1		; an unused fourth player status (Goggles?)
+			ds.b	1
 
-v_lastlamp:		ds.b	2		; number of the last lamppost you hit
+v_lastlamp:		ds.b	1		; number of the last lamppost you hit
+v_savedlastlamp:	ds.b	1
 v_lamp_xpos:		ds.w	1		; x-axis for Sonic to respawn at lamppost
 v_lamp_ypos:		ds.w	1		; y-axis for Sonic to respawn at lamppost
 v_lamp_rings:		ds.w	1		; rings stored at lamppost
@@ -413,7 +411,6 @@ v_lamp_wtrpos:		ds.w	1		; water position at lamppost
 v_lamp_wtrrout:		ds.b	1		; water routine at lamppost
 v_lamp_wtrstat:		ds.b	1		; water state at lamppost
 v_lamp_lives:		ds.b	1		; lives counter at lamppost
-			ds.b	2		; unused
 v_emeralds:		ds.b	1		; number of chaos emeralds
 v_emldlist:		ds.b	6		; which individual emeralds you have (00 = no; 01 = yes)
 v_oscillate:		ds.w	1		; oscillation bitfield
@@ -457,33 +454,24 @@ v_timingandscreenvariables_end:
 v_levseldelay:		ds.w	1		; level select - time until change when up/down is held
 v_levselitem:		ds.w	1		; level select - item selected
 v_levselsound:		ds.w	1		; level select - sound selected
-			ds.b	$3A		; unused
 	if Revision=0
 v_scorecopy:		ds.l	1		; score, duplicate
 	else
 v_scorelife:		ds.l	1		; points required for an extra life (JP1 only)
 	endif
-			ds.b	$1C		; unused
 f_levselcheat:		ds.b	1		; level select cheat flag
 f_slomocheat:		ds.b	1		; slow motion & frame advance cheat flag
 f_debugcheat:		ds.b	1		; debug mode cheat flag
 f_creditscheat:		ds.b	1		; hidden credits & press start cheat flag
 v_title_dcount:		ds.w	1		; number of times the d-pad is pressed on title screen
 v_title_ccount:		ds.w	1		; number of times C is pressed on title screen
-			ds.b	2		; unused
-v_unused2:		ds.w	1		; unused
-v_unused3:		ds.b	1		; unused
-v_unused4:		ds.b	1		; unused
-v_unused5:		ds.b	1		; unused
-v_unused6:		ds.b	1		; unused
+			ds.b	$64		; unused
 f_demo:			ds.w	1		; demo mode flag (0 = no; 1 = yes; $8001 = ending)
 v_demonum:		ds.w	1		; demo level number (not the same as the level number)
 v_creditsnum:		ds.w	1		; credits index number
-			ds.b	2		; unused
 v_megadrive:		ds.b	1		; Megadrive machine type
 			ds.b	1		; unused
 f_debugmode:		ds.w	1		; debug mode flag
-			ds.l	1		; 'init' text string
 v_ram_end:
     if * > 0	; Don't declare more space than the RAM can contain!
 	fatal "The RAM variable declarations are too large by $\{*} bytes."
