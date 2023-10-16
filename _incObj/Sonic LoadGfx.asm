@@ -29,7 +29,8 @@ Sonic_LoadGfx:
 		lsr.b	#4,d0
 		lsl.w	#8,d2
 		move.b	(a2)+,d2
-		lsl.w	#5,d2
+		andi.w	#$FFF,d2	; MJ: clear the counter
+		lsl.l	#5,d2		; MJ: shifting long-word instead of word (more than FFFF bytes)
 		lea	(Art_Sonic).l,a1
 		adda.l	d2,a1
 
@@ -38,10 +39,9 @@ Sonic_LoadGfx:
 		movem.l	d2-d6/a4-a6,(a3)
 		lea	$20(a3),a3	; next tile
 		dbf	d0,.loadtile	; repeat for number of tiles
-
 		dbf	d1,.readentry	; repeat for number of entries
 
 .nochange:
-		rts	
+		rts
 
 ; End of function Sonic_LoadGfx
