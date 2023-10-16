@@ -97,7 +97,7 @@ Obj87_Animate:	; Rountine 4, $A, $E, $12
 
 Obj87_Leap:	; Routine $10
 		subq.w	#1,eson_time(a0)
-		bne.s	ESon_Wait4
+		bne.s	ESon_Wait3
 		addq.b	#2,ob2ndRout(a0)
 		move.l	#Map_ESon,obMap(a0)
 		move.w	#make_art_tile(ArtTile_Ending_Sonic,0,0),obGfx(a0)
@@ -109,6 +109,3 @@ Obj87_Leap:	; Routine $10
 		move.b	#id_EndSTH,(v_endlogo).w ; load "SONIC THE HEDGEHOG" object
 		bra.s	Obj87_Animate
 ; ===========================================================================
-
-ESon_Wait4:
-		rts
