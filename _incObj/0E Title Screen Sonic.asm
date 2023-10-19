@@ -32,7 +32,7 @@ TSon_Delay:	;Routine 2
 		bra.w	DisplaySprite
 
 .wait:
-		rts	
+		rts
 ; ===========================================================================
 
 TSon_Move:	; Routine 4
@@ -43,8 +43,6 @@ TSon_Move:	; Routine 4
 
 .display:
 		bra.w	DisplaySprite
-
-		rts	
 ; ===========================================================================
 
 TSon_Animate:	; Routine 6
