@@ -294,6 +294,7 @@ GameInit:
 		move.l	d7,(a6)+
 		dbf	d6,.clearRAM	; clear RAM ($0000-$FDFF)
 
+		jsr	(InitDMAQueue).l
 		bsr.w	VDPSetupGame
 		bsr.w	DACDriverLoad
 		bsr.w	JoypadInit
@@ -635,11 +636,7 @@ VBla_08:
 
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
-		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
-		beq.s	.nochg		; if not, branch
-
-		writeVRAM	v_sgfx_buffer,$2E0,ArtTile_Sonic*$20 ; load new Sonic gfx
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 .nochg:
 		startZ80
@@ -684,11 +681,7 @@ VBla_0A:
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
 		bsr.w	PalCycle_SS
-		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
-		beq.s	.nochg		; if not, branch
-
-		writeVRAM	v_sgfx_buffer,$2E0,ArtTile_Sonic*$20 ; load new Sonic gfx
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 .nochg:
 		tst.w	(v_demolength).w	; is there time left on the demo?
@@ -716,10 +709,7 @@ VBla_0C:
 		move.w	(v_hbla_hreg).w,(a5)
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
-		tst.b	(f_sonframechg).w
-		beq.s	.nochg
-		writeVRAM	v_sgfx_buffer,$2E0,ArtTile_Sonic*$20
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 .nochg:
 		startZ80
@@ -755,10 +745,7 @@ VBla_16:
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
-		tst.b	(f_sonframechg).w
-		beq.s	.nochg
-		writeVRAM	v_sgfx_buffer,$2E0,ArtTile_Sonic*$20
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 .nochg:
 		tst.w	(v_demolength).w
@@ -996,7 +983,7 @@ ClearScreen:
 		clr.l	(v_scrposx_vdp).w
 
 		clearRAM v_spritetablebuffer,v_spritetablebuffer_end
-		clearRAM v_hscrolltablebuffer,v_hscrolltablebuffer_end_padded
+		clearRAM v_hscrolltablebuffer,v_hscrolltablebuffer_end
 
 		rts
 ; End of function ClearScreen
@@ -1027,7 +1014,6 @@ DACDriverLoad:
 
 		include	"_incObj/sub PlaySound.asm"
 		include	"_inc/PauseGame.asm"
-
 ; ---------------------------------------------------------------------------
 ; Subroutine to	copy a tile map from RAM to VRAM namespace
 
@@ -1057,6 +1043,7 @@ Tilemap_Cell:
 		rts
 ; End of function TilemapToVRAM
 
+		include	"_inc/UltraDMAQueue.asm"
 		include	"_inc/Nemesis Decompression.asm"
 
 
@@ -2291,9 +2278,7 @@ LevSel_Level_SS:
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
-		if Revision<>0
-			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		endif
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		rts
 ; ===========================================================================
 
@@ -2313,12 +2298,9 @@ PlayLevel:
 		move.l	d0,(v_emldlist).w ; clear emeralds
 		move.l	d0,(v_emldlist+4).w ; clear emeralds
 		move.b	d0,(v_continues).w ; clear continues
-		if Revision<>0
-			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		endif
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		move.b	#bgm_Fade,d0
-		bsr.w	PlaySound_Special ; fade out music
-		rts	
+		bra.w	PlaySound_Special ; fade out music
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Level	select - level pointers
@@ -2653,6 +2635,7 @@ Level_ClrRam:
 		move.w	#$8720,(a6)		; set background colour (line 3; colour 0)
 		move.w	#$8A00+223,(v_hbla_hreg).w ; set palette change position (for water)
 		move.w	(v_hbla_hreg).w,(a6)
+		ResetDMAQueue
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ?
 		bne.s	Level_LoadPal	; if not, branch
 
@@ -2720,6 +2703,7 @@ Level_TtlCardLoop:
 		tst.l	(v_plc_buffer).w ; are there any items in the pattern load cue?
 		bne.s	Level_TtlCardLoop ; if yes, branch
 		jsr	(Hud_Base).l	; load basic HUD gfx
+		ResetDMAQueue
 
 Level_SkipTtlCard:
 		moveq	#palid_Sonic,d0
@@ -3062,6 +3046,7 @@ GM_Special:
 		andi.b	#$BF,d0
 		move.w	d0,(vdp_control_port).l
 		bsr.w	ClearScreen
+		ResetDMAQueue
 		enable_ints
 ;		fillVRAM	0,$6FFF,$5000
 		fillVRAM	0,$FFFF,0
