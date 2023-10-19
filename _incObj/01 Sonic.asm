@@ -925,6 +925,8 @@ loc_1341C:
 		bne.s	loc_13490
 		move.b	#$E,obHeight(a0)
 		move.b	#7,obWidth(a0)
+		btst	#2,status(a0)
+		bne.s	locret_1348E
 		move.b	#id_Roll,obAnim(a0) ; use "jumping" animation
 		bset	#2,obStatus(a0)
 		addq.w	#5,obY(a0)
@@ -1772,36 +1774,33 @@ Sonic_LoadGfx:
 		move.b	obFrame(a0),d0	; load frame number
 		cmp.b	(v_sonframenum).w,d0 ; has frame changed?
 		beq.s	.nochange	; if not, branch
-
 		move.b	d0,(v_sonframenum).w
 		lea	(SonicDynPLC).l,a2 ; load PLC script
 		add.w	d0,d0
 		adda.w	(a2,d0.w),a2
-		moveq	#0,d1
-		move.b	(a2)+,d1	; read "number of entries" value
-		subq.b	#1,d1
+		moveq	#0,d5
+		move.b	(a2)+,d5	; read "number of entries" value
+		subq.w	#1,d5
 		bmi.s	.nochange	; if zero, branch
-		lea	(v_sgfx_buffer).w,a3
-		move.b	#1,(f_sonframechg).w ; set flag for Sonic graphics DMA
+		move.w	#tiles_to_bytes(ArtTile_Sonic),d4
 
 .readentry:
-		moveq	#0,d2
-		move.b	(a2)+,d2
-		move.w	d2,d0
-		lsr.b	#4,d0
-		lsl.w	#8,d2
-		move.b	(a2)+,d2
-		andi.w	#$FFF,d2	; MJ: clear the counter
-		lsl.l	#5,d2		; MJ: shifting long-word instead of word (more than FFFF bytes)
-		lea	(Art_Sonic).l,a1
-		adda.l	d2,a1
-
-.loadtile:
-		movem.l	(a1)+,d2-d6/a4-a6
-		movem.l	d2-d6/a4-a6,(a3)
-		lea	$20(a3),a3	; next tile
-		dbf	d0,.loadtile	; repeat for number of tiles
-		dbf	d1,.readentry	; repeat for number of entries
+		moveq	#0,d1
+		move.b	(a2)+,d1
+		lsl.w	#8,d1
+		move.b	(a2)+,d1
+		move.w	d1,d3
+		lsr.w	#8,d3
+		andi.w	#$F0,d3
+		addi.w	#$10,d3
+		andi.w	#$FFF,d1	; MJ: clear the counter
+		lsl.l	#5,d1		; MJ: shifting long-word instead of word (more than FFFF bytes)
+		addi.l	#Art_Sonic,d1
+		move.w	d4,d2
+		add.w	d3,d4
+		add.w	d3,d4
+		jsr	(QueueDMATransfer).l
+		dbf	d5,.readentry	; repeat for number of entries
 
 .nochange:
 		rts
