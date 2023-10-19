@@ -17,14 +17,13 @@ v_ngfx_buffer:		ds.b	$200		; Nemesis graphics decompression buffer
 v_ngfx_buffer_end:
 v_spritequeue:		ds.b	$400		; sprite display queue, in order of priority
 v_16x16:		ds.b	$1800		; 16x16 tile mappings
+VDP_Command_Buffer:	ds.w	7*$12		; stores 18 ($12) VDP commands to issue the next time ProcessDMAQueue is called
+VDP_Command_Buffer_Slot:ds.l	1		; stores the address of the next open slot for a queued VDP command
 
-v_sgfx_buffer:		ds.b	$2E0		; buffered Sonic graphics ($17 cells)
-			ds.b	$20		; unused
 v_tracksonic:		ds.b	$100		; position tracking data for Sonic
 v_hscrolltablebuffer:	ds.b	$380		; scrolling table data
 v_hscrolltablebuffer_end:
-			ds.b	$80		; unused
-v_hscrolltablebuffer_end_padded:
+			ds.b	$280		; unused
 
 v_objspace:		ds.b	object_size*$80	; object variable space ($40 bytes per object)
 
