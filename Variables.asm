@@ -23,7 +23,8 @@ VDP_Command_Buffer_Slot:ds.l	1		; stores the address of the next open slot for a
 v_tracksonic:		ds.b	$100		; position tracking data for Sonic
 v_hscrolltablebuffer:	ds.b	$380		; scrolling table data
 v_hscrolltablebuffer_end:
-			ds.b	$280		; unused
+			ds.b	$280		; would be unused, but data from v_hscrolltablebuffer can spill into here
+v_hscrolltablebuffer_end_padded:
 
 v_objspace:		ds.b	object_size*$80	; object variable space ($40 bytes per object)
 
