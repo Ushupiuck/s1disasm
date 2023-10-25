@@ -29,11 +29,6 @@ Lamp_Main:	; Routine 0
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
-		; If you spawn a checkpoint in Debug Mode and activate it, then
-		; every checkpoint that is spawned with Debug Mode afterwards will be
-		; activated too. The cause of the bug is that the spawned checkpoint
-		; does not have a respawn entry, but this object fails to check for
-		; that before accessing the respawn table.
 		beq.s	Lamp_Blue
 		bclr	#7,2(a2,d0.w)
 		btst	#0,2(a2,d0.w)
