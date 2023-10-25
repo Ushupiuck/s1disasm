@@ -142,32 +142,29 @@ Spik_Wait:
 		tst.w	objoff_38(a0)		; is time delay	= zero?
 		beq.s	loc_CFA4	; if yes, branch
 		subq.w	#1,objoff_38(a0)	; subtract 1 from time delay
-		bne.s	locret_CFE6
+		bne.s	+
 		tst.b	obRender(a0)
-		bpl.s	locret_CFE6
+		bpl.s	+
 		move.w	#sfx_SpikesMove,d0
-		jsr	(PlaySound_Special).l	; play "spikes moving" sound
-		bra.s	locret_CFE6
+		jmp	(PlaySound_Special).l	; play "spikes moving" sound
 ; ===========================================================================
 
 loc_CFA4:
 		tst.w	objoff_36(a0)
 		beq.s	loc_CFC6
 		subi.w	#$800,objoff_34(a0)
-		bcc.s	locret_CFE6
+		bcc.s	+
 		move.w	#0,objoff_34(a0)
 		move.w	#0,objoff_36(a0)
 		move.w	#60,objoff_38(a0)	; set time delay to 1 second
-		bra.s	locret_CFE6
+		rts
 ; ===========================================================================
 
 loc_CFC6:
 		addi.w	#$800,objoff_34(a0)
 		cmpi.w	#$2000,objoff_34(a0)
-		blo.s	locret_CFE6
+		blo.s	+
 		move.w	#$2000,objoff_34(a0)
 		move.w	#1,objoff_36(a0)
 		move.w	#60,objoff_38(a0)	; set time delay to 1 second
-
-locret_CFE6:
-		rts
++		rts
