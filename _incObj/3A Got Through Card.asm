@@ -27,7 +27,6 @@ Got_ChkPLC:	; Routine 0
 		beq.s	Got_Main	; if yes, branch
 		rts	
 ; ===========================================================================
-
 Got_Main:
 		movea.l	a0,a1
 		lea	(Got_Config).l,a2
