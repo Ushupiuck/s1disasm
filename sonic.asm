@@ -301,16 +301,15 @@ GameInit:
 		move.b	#id_Sega,(v_gamemode).w ; set Game Mode to Sega Screen
 
 MainGameLoop:
-		move.b	(v_gamemode).w,d0 ; load Game Mode
-		andi.w	#$1C,d0	; limit Game Mode value to $1C max (change to a maximum of 7C to add more game modes)
-		movea.l	GameModeArray(pc,d0.w),a0 ; jump to apt location in ROM
+		move.b	(v_gamemode).w,d0; load Game Mode
+		andi.w	#$3C,d0	; limit Game Mode value to $3C max (change to a maximum of 7C to add more game modes)
+		movea.l	GameModeArray(pc,d0.w),a0; jump to apt location in ROM
 		jsr	(a0)
 		bra.s	MainGameLoop	; loop indefinitely
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Main game mode array
 ; ---------------------------------------------------------------------------
-
 GameModeArray:
 ptr_GM_Sega:	dc.l	GM_Sega		; Sega Screen ($00)
 ptr_GM_Title:	dc.l	GM_Title	; Title	Screen ($04)
@@ -320,6 +319,9 @@ ptr_GM_Special:	dc.l	GM_Special	; Special Stage	($10)
 ptr_GM_Cont:	dc.l	GM_Continue	; Continue Screen ($14)
 ptr_GM_Ending:	dc.l	GM_Ending	; End of game sequence ($18)
 ptr_GM_Credits:	dc.l	GM_Credits	; Credits ($1C)
+		dc.l	GM_Level	; Filler
+		dc.l	GM_Level	; Filler
+		dc.l	GM_Level	; Filler
 ; ===========================================================================
 
 CheckSumError:
@@ -495,7 +497,7 @@ ShowErrorValue:
 
 ErrorWaitForC:
 		bsr.w	ReadJoypads
-		cmpi.b	#btnC,(v_jpadpress1).w ; is button C pressed?
+		cmpi.b	#btnC,(v_jpadhold1).w ; is button C pressed?
 		bne.w	ErrorWaitForC	; if not, branch
 		rts
 ; End of function ErrorWaitForC
@@ -549,7 +551,10 @@ VBla_Index:	dc.w VBla_00-VBla_Index, VBla_02-VBla_Index
 		dc.w VBla_14-VBla_Index, VBla_16-VBla_Index
 		dc.w VBla_0C-VBla_Index
 ; ===========================================================================
-
+		nop
+		nop
+		nop
+		nop
 VBla_00:
 		cmpi.b	#$80+id_Demo,(v_gamemode).w
 		beq.s	.islevel
@@ -560,11 +565,10 @@ VBla_00:
 		cmpi.b	#id_Level,(v_gamemode).w ; is game on a level?
 		beq.s	.islevel
 		bra.w	VBla_Music
-
+	align $B88
 .islevel:
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ ?
 		bne.w	VBla_Music	; if not, branch
-
 		move.w	(vdp_control_port).l,d0
 		btst	#6,(v_megadrive).w ; is Megadrive PAL?
 		beq.s	+		; if not, branch
@@ -577,7 +581,6 @@ VBla_00:
 		waitZ80
 		tst.b	(f_wtr_state).w	; is water above top of screen?
 		bne.s	.waterabove 	; if yes, branch
-
 		writeCRAM	v_pal_dry,$80,0
 		bra.s	.waterbelow
 
@@ -589,10 +592,10 @@ VBla_00:
 		startZ80
 		bra.w	VBla_Music
 ; ===========================================================================
-
 VBla_02:
 		bsr.w	Do_ControllerPal
-
+		bra.w	VBla_14
+	align $C5C
 VBla_14:
 		tst.w	(v_demolength).w
 		beq.w	.end
@@ -601,10 +604,10 @@ VBla_14:
 .end:
 		rts
 ; ===========================================================================
-
+	align $C92
 VBla_04:
 		bsr.w	Do_ControllerPal
-		bsr.w	LoadTilesAsYouMove_BGOnly
+		jsr	(LoadTilesAsYouMove_BGOnly).l
 		bsr.w	ProcessDPLC
 		tst.w	(v_demolength).w
 		beq.w	.end
@@ -613,7 +616,7 @@ VBla_04:
 .end:
 		rts
 ; ===========================================================================
-
+	align $CA8
 VBla_10:
 		cmpi.b	#id_Special,(v_gamemode).w ; is game on special stage?
 		beq.w	VBla_0A		; if yes, branch
@@ -728,7 +731,7 @@ VBla_0E:
 ;		bsr.w	Do_ControllerPal
 ;		addq.b	#1,(v_vbla_0e_counter).w ; Unused besides this one write...
 ;		move.b	#$E,(v_vbla_routine).w
-		rts
+;		rts
 ; ===========================================================================
 
 VBla_12:
@@ -1042,6 +1045,26 @@ Tilemap_Cell:
 		dbf	d2,Tilemap_Line	; next line
 		rts
 ; End of function TilemapToVRAM
+
+; ---------------------------------------------------------------------------
+; Alternate subroutine to transfer a plane map to VRAM
+; (used for Special Stage background & SEGA screen)
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; sub_142E: ShowVDPGraphics2: PlaneMapToVRAM2:
+PlaneMapToVRAM_H80:
+	lea	(vdp_data_port).l,a6
+	move.l	#$1000000,d4
+-	move.l	d0,vdp_control_port-vdp_data_port(a6)
+	move.w	d1,d3
+-	move.w	(a1)+,(a6)
+	dbf	d3,-
+	add.l	d4,d0
+	dbf	d2,--
+	rts
+; End of function PlaneMapToVRAM_H80
 
 		include	"_inc/UltraDMAQueue.asm"
 		include	"_inc/Nemesis Decompression.asm"
