@@ -16,7 +16,7 @@ Over_Index:	dc.w Over_ChkPLC-Over_Index
 Over_ChkPLC:	; Routine 0
 		tst.l	(v_plc_buffer).w ; are the pattern load cues empty?
 		beq.s	Over_Main	; if yes, branch
-		rts	
+		rts
 ; ===========================================================================
 
 Over_Main:
@@ -48,15 +48,15 @@ Over_UpdatePos:
 Over_SetWait:
 		move.w	#720,obTimeFrame(a0) ; set time delay to 12 seconds
 		addq.b	#2,obRoutine(a0)
-		rts	
+		rts
 ; ===========================================================================
 
 Over_Wait:	; Routine 4
+		btst	#0,obFrame(a0)
+		bne.s	Over_Display
 		move.b	(v_jpadpress1).w,d0
 		andi.b	#btnABC,d0	; is button A, B or C pressed?
 		bne.s	Over_ChgMode	; if yes, branch
-		btst	#0,obFrame(a0)
-		bne.s	Over_Display
 		tst.w	obTimeFrame(a0)	; has time delay reached zero?
 		beq.s	Over_ChgMode	; if yes, branch
 		subq.w	#1,obTimeFrame(a0) ; subtract 1 from time delay
