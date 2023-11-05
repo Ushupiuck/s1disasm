@@ -632,8 +632,10 @@ Deform_SBZ2:;loc_68A2:
 		ext.l	d5
 		asl.l	#5,d5
 		bsr.w	BGScroll_XY
+
 		move.w	(v_bgscreenposy).w,(v_bgscrposy_vdp).w
 	; copy fg & bg x-position to hscroll table
+
 		lea	(v_hscrolltablebuffer).w,a1
 		move.w	#223,d1
 		move.w	(v_screenposx).w,d0
@@ -641,8 +643,8 @@ Deform_SBZ2:;loc_68A2:
 		swap	d0
 		move.w	(v_bgscreenposx).w,d0
 		neg.w	d0
-	.loop:
-		move.l	d0,(a1)+
+
+.loop:		move.l	d0,(a1)+
 		dbf	d1,.loop
 		rts
 ; End of function Deform_SBZ
