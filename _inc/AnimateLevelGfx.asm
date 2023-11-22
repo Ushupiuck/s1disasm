@@ -23,7 +23,7 @@ AnimateLevelGfx:
 AniArt_Index:	dc.w AniArt_GHZ-AniArt_Index, AniArt_none-AniArt_Index
 		dc.w AniArt_MZ-AniArt_Index, AniArt_none-AniArt_Index
 		dc.w AniArt_none-AniArt_Index, AniArt_SBZ-AniArt_Index
-		zonewarning AniArt_Index,2
+;		zonewarning AniArt_Index,2
 		dc.w AniArt_Ending-AniArt_Index
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -371,7 +371,7 @@ AniArt_Ending_Flower4:
 ; ===========================================================================
 
 .end:
-		rts	
+		rts
 ; ===========================================================================
 
 AniArt_none:
@@ -399,7 +399,7 @@ LoadTiles:
 		move.l	(a1)+,(a6)
 		move.l	(a1)+,(a6)
 		dbf	d1,LoadTiles
-		rts	
+		rts
 ; End of function LoadTiles
 
 ; ===========================================================================
@@ -565,7 +565,7 @@ AniArt_GiantRing:
 
 		tst.w	(v_gfxbigring).w	; Is there any of the art left to load?
 		bne.s	.loadTiles		; If so, get to work
-		rts	
+		rts
 ; ===========================================================================
 ; loc_1C518:
 .loadTiles:
