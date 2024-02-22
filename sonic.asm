@@ -924,14 +924,7 @@ VDPSetupGame:
 		clr.l	(v_scrposy_vdp).w
 		clr.l	(v_scrposx_vdp).w
 		move.l	d1,-(sp)
-		fillVRAM	0,$FFFF,0
-
-.waitforDMA:
-		move.w	(a5),d1
-		btst	#1,d1		; is DMA (fillVRAM) still running?
-		bne.s	.waitforDMA	; if yes, branch
-
-		move.w	#$8F02,(a5)	; set VDP increment size
+		fillVRAM	0,$10000,0
 		move.l	(sp)+,d1
 		rts
 ; End of function VDPSetupGame
@@ -966,22 +959,8 @@ VDPSetupArray:
 
 
 ClearScreen:
-		fillVRAM	0,$FFF,vram_fg ; clear foreground namespace
-
-.wait1:
-		move.w	(a5),d1
-		btst	#1,d1
-		bne.s	.wait1
-
-		move.w	#$8F02,(a5)
-		fillVRAM	0,$FFF,vram_bg ; clear background namespace
-
-.wait2:
-		move.w	(a5),d1
-		btst	#1,d1
-		bne.s	.wait2
-
-		move.w	#$8F02,(a5)
+		fillVRAM	0,$1000,vram_fg ; clear foreground namespace
+		fillVRAM	0,$1000,vram_bg ; clear background namespace
 		clr.l	(v_scrposy_vdp).w
 		clr.l	(v_scrposx_vdp).w
 
@@ -3072,8 +3051,7 @@ GM_Special:
 		bsr.w	ClearScreen
 		ResetDMAQueue
 		enable_ints
-;		fillVRAM	0,$6FFF,$5000
-		fillVRAM	0,$FFFF,0
+		fillVRAM	0,$6FFF,$5000
 
 SS_WaitForDMA:
 		move.w	(a5),d1		; read control port ($C00004)
