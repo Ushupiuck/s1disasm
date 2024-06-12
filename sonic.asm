@@ -417,9 +417,9 @@ loc_478:
 
 ShowErrorMessage:
 		lea	(vdp_data_port).l,a6
-		locVRAM	ArtTile_Error_Handler_Font*$20
+		locVRAM	ArtTile_Error_Handler_Font*tile_size
 		lea	(Art_Text).l,a0
-		move.w	#(Art_Text_End-Art_Text-$20)/2-1,d1 ; strangely, this does not load the final tile
+		move.w	#(Art_Text_End-Art_Text-tile_size)/2-1,d1 ; strangely, this does not load the final tile
 .loadgfx:
 		move.w	(a0)+,(a6)
 		dbf	d1,.loadgfx
@@ -924,7 +924,7 @@ VDPSetupGame:
 		clr.l	(v_scrposy_vdp).w
 		clr.l	(v_scrposx_vdp).w
 		move.l	d1,-(sp)
-		fillVRAM	0,$10000,0
+		fillVRAM	0,0,$10000	; clear the entirety of VRAM
 		move.l	(sp)+,d1
 		rts
 ; End of function VDPSetupGame
@@ -959,8 +959,9 @@ VDPSetupArray:
 
 
 ClearScreen:
-		fillVRAM	0,$1000,vram_fg ; clear foreground namespace
-		fillVRAM	0,$1000,vram_bg ; clear background namespace
+		fillVRAM	0, vram_fg, vram_fg+plane_size_64x32 ; clear foreground namespace
+		fillVRAM	0, vram_bg, vram_bg+plane_size_64x32 ; clear background namespace
+
 		clr.l	(v_scrposy_vdp).w
 		clr.l	(v_scrposx_vdp).w
 
@@ -1963,12 +1964,12 @@ GM_Sega:
 		andi.b	#$BF,d0
 		move.w	d0,(vdp_control_port).l
 		bsr.w	ClearScreen
-		locVRAM	0
+		locVRAM	ArtTile_Sega_Tiles*tile_size
 		lea	(Nem_SegaLogo).l,a0 ; load Sega	logo patterns
 		bsr.w	NemDec
 		lea	(v_256x256&$FFFFFF).l,a1
 		lea	(Eni_SegaLogo).l,a0 ; load Sega	logo mappings
-		move.w	#0,d0
+		move.w	#make_art_tile(ArtTile_Sega_Tiles,0,FALSE),d0
 		bsr.w	EniDec
 
 		copyTilemap	v_256x256&$FFFFFF,vram_bg+$510,24,8
@@ -2039,7 +2040,7 @@ GM_Title:
 
 		clearRAM v_objspace,v_objend
 
-		locVRAM	ArtTile_Sonic_Team_Font*$20
+		locVRAM	ArtTile_Sonic_Team_Font*tile_size
 		lea	(Nem_CreditText).l,a0 ;	load alphabet
 		bsr.w	NemDec
 
@@ -2052,17 +2053,17 @@ GM_Title:
 		jsr	(BuildSprites).l
 		bsr.w	PaletteFadeIn
 		disable_ints
-		locVRAM	ArtTile_Title_Foreground*$20
+		locVRAM	ArtTile_Title_Foreground*tile_size
 		lea	(Nem_TitleFg).l,a0 ; load title	screen patterns
 		bsr.w	NemDec
-		locVRAM	ArtTile_Title_Sonic*$20
+		locVRAM	ArtTile_Title_Sonic*tile_size
 		lea	(Nem_TitleSonic).l,a0 ;	load Sonic title screen	patterns
 		bsr.w	NemDec
-		locVRAM	ArtTile_Title_Trademark*$20
+		locVRAM	ArtTile_Title_Trademark*tile_size
 		lea	(Nem_TitleTM).l,a0 ; load "TM" patterns
 		bsr.w	NemDec
 		lea	(vdp_data_port).l,a6
-		locVRAM	ArtTile_Level_Select_Font*$20,4(a6)
+		locVRAM	ArtTile_Level_Select_Font*tile_size,4(a6)
 		lea	(Art_Text).l,a5	; load level select font
 		move.w	#(Art_Text_End-Art_Text)/2-1,d1
 
@@ -2079,7 +2080,7 @@ Tit_LoadText:
 		bsr.w	DeformLayers
 		lea	(v_16x16).w,a1
 		lea	(Blk16_GHZ).l,a0 ; load	GHZ 16x16 mappings
-		move.w	#0,d0
+		move.w	#make_art_tile(ArtTile_Level,0,FALSE),d0
 		bsr.w	EniDec
 		lea	(Blk256_GHZ).l,a0 ; load GHZ 256x256 mappings
 		lea	(v_256x256&$FFFFFF).l,a1
@@ -2101,7 +2102,7 @@ Tit_LoadText:
 
 		copyTilemap	v_256x256&$FFFFFF,vram_fg+$206,34,22
 
-		locVRAM	ArtTile_Level*$20
+		locVRAM	ArtTile_Level*tile_size
 		lea	(Nem_GHZ_1st).l,a0 ; load GHZ patterns
 		bsr.w	NemDec
 		moveq	#palid_Title,d0	; load title screen palette
@@ -2218,7 +2219,7 @@ Tit_ChkLevSel:
 		disable_ints
 		lea	(vdp_data_port).l,a6
 		locVRAM	vram_bg
-		move.w	#$1000/4-1,d1
+		move.w	#plane_size_64x32/4-1,d1
 
 Tit_ClrScroll2:
 		move.l	d0,(a6)
@@ -2602,7 +2603,7 @@ Level_NoMusicFade:
 		tst.w	(f_demo).w	; is an ending sequence demo running?
 		bmi.s	Level_ClrRam	; if yes, branch
 		disable_ints
-		locVRAM	ArtTile_Title_Card*$20
+		locVRAM	ArtTile_Title_Card*tile_size
 		lea	(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
 		enable_ints
@@ -3051,13 +3052,7 @@ GM_Special:
 		bsr.w	ClearScreen
 		ResetDMAQueue
 		enable_ints
-		fillVRAM	0,$6FFF,$5000
-
-SS_WaitForDMA:
-		move.w	(a5),d1		; read control port ($C00004)
-		btst	#1,d1		; is DMA running?
-		bne.s	SS_WaitForDMA	; if yes, branch
-		move.w	#$8F02,(a5)	; set VDP increment to 2 bytes
+		fillVRAM	0, ArtTile_SS_Plane_1*tile_size+plane_size_64x32, ArtTile_SS_Plane_5*tile_size
 		bsr.w	SS_BGLoad
 		moveq	#plcid_SpecialStage,d0
 		bsr.w	QuickPLC	; load special stage patterns
@@ -3160,7 +3155,7 @@ loc_47D4:
 		move.w	#$8400+(vram_bg>>13),(a6) ; set background nametable address
 		move.w	#$9001,(a6)		; 64-cell hscroll size
 		bsr.w	ClearScreen
-		locVRAM	ArtTile_Title_Card*$20
+		locVRAM	ArtTile_Title_Card*tile_size
 		lea	(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
 		jsr	(Hud_Base).l
@@ -3219,7 +3214,7 @@ SS_BGLoad:
 		lea	(Eni_SSBg1).l,a0 ; load	mappings for the birds and fish
 		move.w	#make_art_tile(ArtTile_SS_Background_Fish,2,0),d0
 		bsr.w	EniDec
-		locVRAM	ArtTile_SS_Plane_1*$20+$1000,d3
+		locVRAM	ArtTile_SS_Plane_1*tile_size+plane_size_64x32,d3
 		lea	((v_ssbuffer1+$80)&$FFFFFF).l,a2
 		moveq	#7-1,d7 ; $5000, $6000, $7000, $8000, $9000, $A000, $B000.
 
@@ -3272,8 +3267,8 @@ loc_491C:
 		lea	(Eni_SSBg2).l,a0 ; load	mappings for the clouds
 		move.w	#make_art_tile(ArtTile_SS_Background_Clouds,2,0),d0
 		bsr.w	EniDec
-		copyTilemap	v_ssbuffer1&$FFFFFF,ArtTile_SS_Plane_5*$20,64,32
-		copyTilemap	v_ssbuffer1&$FFFFFF,ArtTile_SS_Plane_5*$20+$1000,64,64
+		copyTilemap	v_ssbuffer1&$FFFFFF,ArtTile_SS_Plane_5*tile_size,64,32
+		copyTilemap	v_ssbuffer1&$FFFFFF,ArtTile_SS_Plane_5*tile_size+plane_size_64x32,64,64
 		rts	
 ; End of function SS_BGLoad
 
@@ -3380,7 +3375,7 @@ loc_4A2E:
 
 ; ===========================================================================
 SSBGData:	macro time,anim,vram,index,flag1,flag2
-		dc.b	(time), (anim), ((vram)*$20)>>13
+		dc.b	(time), (anim), ((vram)*tile_size)>>13
 	if flag1
 		dc.b	(index)|$80|(flag2)
 	else
@@ -3430,7 +3425,7 @@ byte_4A3C:
 		even
 
 SSFGData:	macro vram,y
-		dc.b ((vram)*$20)>>10, (y)>>8
+		dc.b ((vram)*tile_size)>>10, (y)>>8
 		endm
 
 byte_4ABC:
@@ -3571,13 +3566,13 @@ GM_Continue:
 
 		clearRAM v_objspace,v_objend
 
-		locVRAM	ArtTile_Title_Card*$20
+		locVRAM	ArtTile_Title_Card*tile_size
 		lea	(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
-		locVRAM	ArtTile_Continue_Sonic*$20
+		locVRAM	ArtTile_Continue_Sonic*tile_size
 		lea	(Nem_ContSonic).l,a0 ; load Sonic patterns
 		bsr.w	NemDec
-		locVRAM	ArtTile_Mini_Sonic*$20
+		locVRAM	ArtTile_Mini_Sonic*tile_size
 		lea	(Nem_MiniSonic).l,a0 ; load continue screen patterns
 		bsr.w	NemDec
 		moveq	#10,d1
@@ -3887,7 +3882,7 @@ GM_Credits:
 
 		clearRAM v_objspace,v_objend
 
-		locVRAM	ArtTile_Credits_Font*$20
+		locVRAM	ArtTile_Credits_Font*tile_size
 		lea	(Nem_CreditText).l,a0 ;	load credits alphabet patterns
 		bsr.w	NemDec
 
@@ -4979,7 +4974,7 @@ LevelDataLoad:
 		addq.l	#4,a2
 		movea.l	(a2)+,a0
 		lea	(v_16x16).w,a1	; RAM address for 16x16 mappings
-		clr.w	d0
+		move.w	#make_art_tile(ArtTile_Level,0,FALSE),d0
 		bsr.w	EniDec
 		movea.l	(a2)+,a0
 		lea	(v_256x256&$FFFFFF).l,a1 ; RAM address for 256x256 mappings
@@ -7579,8 +7574,9 @@ SS_LoadData:
 		; Load layout data
 		movea.l	SS_LayoutIndex(pc,d0.w),a0
 		lea	(v_ssbuffer2&$FFFFFF).l,a1
-		move.w	#0,d0
+		move.w	#make_art_tile(ArtTile_SS_Background_Clouds,0,FALSE),d0
 		jsr	(TwizDec).l
+
 		; Clear everything from v_ssbuffer1 to v_ssbuffer2
 		lea	(v_ssbuffer1&$FFFFFF).l,a1
 		move.w	#(v_ssbuffer2-v_ssbuffer1)/4-1,d0
@@ -7709,7 +7705,7 @@ AddPoints:
 
 
 ContScrCounter:
-		locVRAM	ArtTile_Continue_Number*$20
+		locVRAM	ArtTile_Continue_Number*tile_size
 		lea	(vdp_data_port).l,a6
 		lea	(Hud_10).l,a2
 		moveq	#2-1,d6
