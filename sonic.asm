@@ -581,11 +581,12 @@ VBla_00:
 		waitZ80
 		tst.b	(f_wtr_state).w	; is water above top of screen?
 		bne.s	.waterabove 	; if yes, branch
-		writeCRAM	v_pal_dry,$80,0
+
+		writeCRAM	v_pal_dry,0
 		bra.s	.waterbelow
 
 .waterabove:
-		writeCRAM	v_pal_water,$80,0
+		writeCRAM	v_pal_water,0
 
 .waterbelow:
 		move.w	(v_hbla_hreg).w,(a5)
@@ -628,11 +629,11 @@ VBla_08:
 		tst.b	(f_wtr_state).w
 		bne.s	.waterabove
 
-		writeCRAM	v_pal_dry,$80,0
+		writeCRAM	v_pal_dry,0
 		bra.s	.waterbelow
 
 .waterabove:
-		writeCRAM	v_pal_water,$80,0
+		writeCRAM	v_pal_water,0
 
 .waterbelow:
 		move.w	(v_hbla_hreg).w,(a5)
@@ -679,7 +680,7 @@ VBla_0A:
 		stopZ80
 		waitZ80
 		bsr.w	ReadJoypads
-		writeCRAM	v_pal_dry,$80,0
+		writeCRAM	v_pal_dry,0
 		writeVRAM	v_spritetablebuffer,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,vram_hscroll
 		startZ80
@@ -702,11 +703,11 @@ VBla_0C:
 		tst.b	(f_wtr_state).w
 		bne.s	.waterabove
 
-		writeCRAM	v_pal_dry,$80,0
+		writeCRAM	v_pal_dry,0
 		bra.s	.waterbelow
 
 .waterabove:
-		writeCRAM	v_pal_water,$80,0
+		writeCRAM	v_pal_water,0
 
 .waterbelow:
 		move.w	(v_hbla_hreg).w,(a5)
@@ -744,7 +745,7 @@ VBla_16:
 		stopZ80
 		waitZ80
 		bsr.w	ReadJoypads
-		writeCRAM	v_pal_dry,$80,0
+		writeCRAM	v_pal_dry,0
 		writeVRAM	v_spritetablebuffer,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,vram_hscroll
 		startZ80
@@ -767,11 +768,11 @@ Do_ControllerPal:
 		bsr.w	ReadJoypads
 		tst.b	(f_wtr_state).w ; is water above top of screen?
 		bne.s	.waterabove	; if yes, branch
-		writeCRAM	v_pal_dry,$80,0
+		writeCRAM	v_pal_dry,0
 		bra.s	.waterbelow
 
 .waterabove:
-		writeCRAM	v_pal_water,$80,0
+		writeCRAM	v_pal_water,0
 
 .waterbelow:
 		writeVRAM	v_spritetablebuffer,vram_sprites
