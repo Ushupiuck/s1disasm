@@ -737,7 +737,7 @@ Sound_PlayBGM:
 		_clr.b	v_sndprio(a6)		; Clear priority
 		movea.l	a6,a0
 		lea	v_1up_ram_copy(a6),a1
-		move.w	#((v_music_track_ram_end-v_startofvariables)/4)-1,d0	; Backup $220 bytes: all variables and music track data
+		move.w	#((v_1up_ram_end-v_1up_ram)/4)-1,d0	; Backup $220 bytes: all variables and music track data
 ; loc_72012:
 .backupramloop:
 		move.l	(a0)+,(a1)+
@@ -1389,7 +1389,7 @@ StopAllSound:
 		moveq	#0,d1		; FM3/FM6 normal mode, disable timers
 		jsr	WriteFMI(pc)
 		movea.l	a6,a0
-		move.w	#((v_spcsfx_track_ram_end-v_startofvariables)/4)-1,d0	; Clear $400 bytes: all variables and track data
+		move.w	#(v_1up_ram_copy/4)-1,d0	; Clear $400 bytes: all variables and track data
 ; loc_725B6:
 .clearramloop:
 		clr.l	(a0)+
@@ -1411,7 +1411,7 @@ InitMusicPlayback:
 		move.b	v_fadein_counter(a6),d4
 		move.w	v_soundqueue0(a6),d5
 		move.b	v_soundqueue2(a6),d6
-		move.w	#((v_music_track_ram_end-v_startofvariables)/4)-1,d0	; Clear $220 bytes: all variables and music track data
+		move.w	#((v_1up_ram_end-v_1up_ram)/4)-1,d0	; Clear $220 bytes: all variables and music track data
 ; loc_725E4:
 .clearramloop:
 		clr.l	(a0)+
@@ -2043,7 +2043,7 @@ cfJumpReturn:
 cfFadeInToPrevious:
 		movea.l	a6,a0
 		lea	v_1up_ram_copy(a6),a1
-		move.w	#((v_music_track_ram_end-v_startofvariables)/4)-1,d0	; $220 bytes to restore: all variables and music track data
+		move.w	#((v_1up_ram_end-v_1up_ram)/4)-1,d0	; $220 bytes to restore: all variables and music track data
 ; loc_72B1E:
 .restoreramloop:
 		move.l	(a1)+,(a0)+
