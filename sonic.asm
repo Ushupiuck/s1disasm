@@ -2045,7 +2045,7 @@ GM_Title:
 		lea	(Nem_CreditText).l,a0 ;	load alphabet
 		bsr.w	NemDec
 
-		clearRAM v_palette_fading,v_palette_fading+16*4*2
+		clearRAM v_palette_fading,v_palette_fading_end
 
 		moveq	#palid_Sonic,d0	; load Sonic's palette
 		bsr.w	PalLoad_Fade
@@ -3887,7 +3887,7 @@ GM_Credits:
 		lea	(Nem_CreditText).l,a0 ;	load credits alphabet patterns
 		bsr.w	NemDec
 
-		clearRAM v_palette_fading,v_palette_fading+16*4*2
+		clearRAM v_palette_fading,v_palette_fading_end
 
 		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad_Fade	; load Sonic's palette
@@ -4005,7 +4005,7 @@ TryAgainEnd:
 		moveq	#plcid_TryAgain,d0
 		bsr.w	QuickPLC	; load "TRY AGAIN" or "END" patterns
 
-		clearRAM v_palette_fading,v_palette_fading+16*4*2
+		clearRAM v_palette_fading,v_palette_fading_end
 
 		moveq	#palid_Ending,d0
 		bsr.w	PalLoad_Fade	; load ending palette
