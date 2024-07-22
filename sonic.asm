@@ -982,16 +982,16 @@ ClearScreen:
 DACDriverLoad:
 		nop
 		stopZ80
-		resetZ80
+		deassertZ80Reset
 		lea	(DACDriver).l,a0	; load DAC driver
 		lea	(z80_ram).l,a1		; target Z80 RAM
 		bsr.w	KosDec			; decompress
-		resetZ80a
-		nop
-		nop
-		nop
-		nop
-		resetZ80
+		assertZ80Reset
+		nop	
+		nop	
+		nop	
+		nop	
+		deassertZ80Reset
 		startZ80
 		rts
 ; End of function DACDriverLoad
