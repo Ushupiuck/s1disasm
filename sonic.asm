@@ -355,28 +355,28 @@ ZeroDivide:
 		bra.s	loc_462
 
 ChkInstr:
-		move.b	#$A,(v_errortype).w
+		move.b	#10,(v_errortype).w
 		bra.s	loc_462
 
 TrapvInstr:
-		move.b	#$C,(v_errortype).w
+		move.b	#12,(v_errortype).w
 		bra.s	loc_462
 
 PrivilegeViol:
-		move.b	#$E,(v_errortype).w
+		move.b	#14,(v_errortype).w
 		bra.s	loc_462
 
 Trace:
-		move.b	#$10,(v_errortype).w
+		move.b	#16,(v_errortype).w
 		bra.s	loc_462
 
 Line1010Emu:
-		move.b	#$12,(v_errortype).w
+		move.b	#18,(v_errortype).w
 		addq.l	#2,2(sp)
 		bra.s	loc_462
 
 Line1111Emu:
-		move.b	#$14,(v_errortype).w
+		move.b	#20,(v_errortype).w
 		addq.l	#2,2(sp)
 		bra.s	loc_462
 
@@ -465,7 +465,7 @@ ErrorText:	dc.w .exception-ErrorText, .bus-ErrorText
 
 ShowErrorValue:
 		move.w	#ArtTile_Error_Handler_Font+10,(a6)	; display "$" symbol
-		moveq	#7,d2
+		moveq	#8-1,d2
 
 .loop:
 		rol.l	#4,d0
@@ -486,7 +486,7 @@ ShowErrorValue:
 		addq.w	#7,d1		; add 7 for characters A-F
 
 .chars0to9:
-		addi.w	#$7C0,d1
+		addi.w	#ArtTile_Error_Handler_Font,d1
 		move.w	d1,(a6)
 		rts
 ; End of function sub_5CA

@@ -1225,7 +1225,7 @@ StopSFX:
 		lea	SMPS_RAM.v_spcsfx_psg3_track(a6),a0
 		tst.b	SMPS_Track.PlaybackControl(a0)	; Is track playing?
 		bpl.s	.getchannelptr			; Branch if not
-		cmpi.b	#$E0,d3			; Is this a noise channel:
+		cmpi.b	#$E0,d3			; Is this a noise channel?
 		beq.s	.gotpsgpointer		; Branch if yes
 		cmpi.b	#$C0,d3			; Is this PSG 3?
 		beq.s	.gotpsgpointer		; Branch if yes
