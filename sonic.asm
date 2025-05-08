@@ -1178,6 +1178,7 @@ RunPLC:
 		bne.s	Rplc_Exit
 		movea.l	(v_plc_buffer).w,a0
 		lea	(NemPCD_WriteRowToVDP).l,a3
+		nop
 		lea	(v_ngfx_buffer).w,a1
 		move.w	(a0)+,d2
 		bpl.s	loc_160E
