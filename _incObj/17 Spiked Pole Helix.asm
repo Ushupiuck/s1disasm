@@ -8,11 +8,9 @@ Helix:
 		move.w	Hel_Index(pc,d0.w),d1
 		jmp	Hel_Index(pc,d1.w)
 ; ===========================================================================
-Hel_Index:	dc.w Hel_Main-Hel_Index
-		dc.w Hel_Action-Hel_Index
-		dc.w Hel_Action-Hel_Index
-		dc.w Hel_Delete-Hel_Index
-		dc.w Hel_Display-Hel_Index
+Hel_Index:	dc.w Hel_Main-Hel_Index		; 0
+		dc.w Hel_Action-Hel_Index	; 2
+		dc.w Hel_Display-Hel_Index	; 4
 
 hel_frame = objoff_3E		; start frame (different for each spike)
 
@@ -23,6 +21,7 @@ Hel_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Hel,obMap(a0)
 		move.w	#make_art_tile(ArtTile_GHZ_Spike_Pole,2,0),obGfx(a0)
+
 		move.b	#7,obStatus(a0)
 		move.b	#4,obRender(a0)
 		move.b	#3,obPriority(a0)
@@ -51,12 +50,13 @@ Hel_Build:
 		lsr.w	#object_size_bits,d5
 		andi.w	#$7F,d5
 		move.b	d5,(a2)+	; copy child address to parent RAM
-		move.b	#8,obRoutine(a1)
+		move.b	#4,obRoutine(a1)
 		_move.b	d4,obID(a1)
 		move.w	d2,obY(a1)
 		move.w	d3,obX(a1)
 		move.l	obMap(a0),obMap(a1)
 		move.w	#make_art_tile(ArtTile_GHZ_Spike_Pole,2,0),obGfx(a1)
+
 		move.b	#4,obRender(a1)
 		move.b	#3,obPriority(a1)
 		move.b	#8,obActWid(a1)
@@ -78,8 +78,8 @@ Hel_NotCentre:
 
 Hel_Action:	; Routine 2, 4
 		bsr.w	Hel_RotateSpikes
-		bsr.w	DisplaySprite
-		bra.w	Hel_ChkDel
+		out_of_range.w	Hel_DelAll
+		bra.w	DisplaySprite
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -94,14 +94,9 @@ Hel_RotateSpikes:
 		move.b	#$84,obColType(a0) ; make object harmful
 
 locret_7DA6:
-		rts	
+		rts
 ; End of function Hel_RotateSpikes
 
-; ===========================================================================
-
-Hel_ChkDel:
-		out_of_range.w	Hel_DelAll
-		rts	
 ; ===========================================================================
 
 Hel_DelAll:
@@ -121,8 +116,7 @@ Hel_DelLoop:
 		dbf	d2,Hel_DelLoop ; repeat d2 times (helix length)
 
 Hel_Delete:	; Routine 6
-		bsr.w	DeleteObject
-		rts	
+		bra.w	DeleteObject
 ; ===========================================================================
 
 Hel_Display:	; Routine 8
