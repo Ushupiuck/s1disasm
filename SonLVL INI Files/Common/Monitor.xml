@@ -15,6 +15,7 @@
     </ImageFromMappings>
     <ImageFromMappings id="sonic">
       <ArtFile filename="../artnem/Monitors.nem" />
+      <ArtFile filename="../artnem/HUD - Life Counter Icon.nem" offset="10880" />
       <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="4" startpal="0" />
     </ImageFromMappings>
     <ImageFromMappings id="shoes">
