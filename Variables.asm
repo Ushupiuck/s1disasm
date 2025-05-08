@@ -16,7 +16,7 @@ v_bgscroll_buffer:	ds.b	$200		; background scroll buffer
 v_ngfx_buffer:		ds.b	$200		; Nemesis graphics decompression buffer
 v_ngfx_buffer_end:
 v_spritequeue:		ds.b	$400		; sprite display queue, in order of priority
-v_16x16:		ds.b	$1800		; 16x16 tile mappings
+v_16x16:		ds.w	$C00		; 16x16 tile mappings
 VDP_Command_Buffer:	ds.w	7*$12		; stores 18 ($12) VDP commands to issue the next time ProcessDMAQueue is called
 VDP_Command_Buffer_Slot:ds.l	1		; stores the address of the next open slot for a queued VDP command
 
@@ -39,7 +39,7 @@ v_player	= v_objspace+object_size*0	; object variable space for Sonic ($40 bytes
 v_hud		= v_objspace+object_size*1	; object variable space for the HUD ($40 bytes)
 
 v_titlecard	= v_objspace+object_size*2	; object variable space for the title card ($100 bytes)
-v_ttlcardname	= v_titlecard+object_size*0		; object variable space for the title card zone name text ($40 bytes)
+v_ttlcardname	= v_titlecard+object_size*0	; object variable space for the title card zone name text ($40 bytes)
 v_ttlcardzone	= v_titlecard+object_size*1	; object variable space for the title card "ZONE" text ($40 bytes)
 v_ttlcardact	= v_titlecard+object_size*2	; object variable space for the title card act text ($40 bytes)
 v_ttlcardoval	= v_titlecard+object_size*3	; object variable space for the title card oval ($40 bytes)
@@ -427,14 +427,9 @@ v_ani3_frame:		ds.b	1		; synchronised sprite animation 3 - current frame
 v_ani3_buf:		ds.w	1		; synchronised sprite animation 3 - info buffer
 v_limittopdb:		ds.w	1		; level upper boundary, buffered for debug mode
 v_limitbtmdb:		ds.w	1		; level bottom boundary, buffered for debug mode
-			ds.b	$52		; unused
 v_timingvariables_end:
 
 v_chunk0collision:	ds.w	1		; very subtly (and perhaps unintentionally) used by FindNearestTile when encountering chunk 0
-	if v_chunk0collision<>ramaddr($FFFFFF00)
-		fatal "v_chunk0collision needs to be at address $FFFFFF00 so that FindNearestTile works correctly."
-	endif
-			ds.b	$E		; unused
 v_screenposx_dup:	ds.l	1		; screen position x (duplicate)
 v_screenposy_dup:	ds.l	1		; screen position y (duplicate)
 v_bgscreenposx_dup:	ds.l	1		; background screen position x (duplicate)
@@ -447,30 +442,25 @@ v_fg_scroll_flags_dup:	ds.w	1
 v_bg1_scroll_flags_dup:	ds.w	1
 v_bg2_scroll_flags_dup:	ds.w	1
 v_bg3_scroll_flags_dup:	ds.w	1
-			ds.b	$48		; unused
 v_timingandscreenvariables_end:
 
 v_levseldelay:		ds.w	1		; level select - time until change when up/down is held
 v_levselitem:		ds.w	1		; level select - item selected
 v_levselsound:		ds.w	1		; level select - sound selected
-	if Revision=0
-v_scorecopy:		ds.l	1		; score, duplicate
-	else
 v_scorelife:		ds.l	1		; points required for an extra life (JP1 only)
-	endif
 f_levselcheat:		ds.b	1		; level select cheat flag
 f_slomocheat:		ds.b	1		; slow motion & frame advance cheat flag
 f_debugcheat:		ds.b	1		; debug mode cheat flag
 f_creditscheat:		ds.b	1		; hidden credits & press start cheat flag
 v_title_dcount:		ds.w	1		; number of times the d-pad is pressed on title screen
 v_title_ccount:		ds.w	1		; number of times C is pressed on title screen
-			ds.b	$64		; unused
 f_demo:			ds.w	1		; demo mode flag (0 = no; 1 = yes; $8001 = ending)
 v_demonum:		ds.w	1		; demo level number (not the same as the level number)
 v_creditsnum:		ds.w	1		; credits index number
 v_megadrive:		ds.b	1		; Megadrive machine type
 			ds.b	1		; unused
 f_debugmode:		ds.w	1		; debug mode flag
+			ds.b	$10C		; unused
 v_ram_end:
     if * > 0	; Don't declare more space than the RAM can contain!
 	fatal "The RAM variable declarations are too large by $\{*} bytes."
