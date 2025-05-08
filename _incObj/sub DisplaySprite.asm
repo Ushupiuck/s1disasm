@@ -43,6 +43,6 @@ DisplaySprite1:
 		move.w	a1,(a2)
 
 DSpr1_Full:
-		rts	
+		rts
 
 ; End of function DisplaySprite1
