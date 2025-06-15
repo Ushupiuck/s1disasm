@@ -44,7 +44,7 @@ Delete_Sprite_If_Not_In_Range:
 		sub.w	(Camera_X_pos_coarse_back).w,d0
 		cmpi.w	#$280,d0
 		bhi.w	+
-		rts	; changes to	bra.w	Draw_Sprite in Sprite_OnScreen_Test
+		rts	; changes to "bra.w	Draw_Sprite" in Sprite_OnScreen_Test
 
 +
 		move.w	respawn_addr(a0),d0
