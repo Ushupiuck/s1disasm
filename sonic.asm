@@ -8126,7 +8126,6 @@ Nem_CreditText:	binclude	"artnem/Ending - Credits.nem"
 		even
 Nem_EndStH:	binclude	"artnem/Ending - StH Logo.nem"
 		even
-
 ; ---------------------------------------------------------------------------
 ; Collision data
 ; ---------------------------------------------------------------------------
