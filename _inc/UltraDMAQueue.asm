@@ -300,10 +300,10 @@ QueueDMATransfer:
 .doubletransfer:
 		; We need to split the DMA into two parts, since it crosses a 128kB block
 		add.w	d3,d0						; Set d0 to the number of words until end of current 128kB block
-		movep.w	d0,DMAEntry.Size(a1)				; Write DMA length of first part, overwriting useless top byte of source addres
+		movep.w	d0,DMAEntry.Size(a1)				; Write DMA length of first part, overwriting useless top byte of source address
 
 		cmpa.w	#VDP_Command_Buffer_Slot-DMAEntry.len,a1	; Does the queue have enough space for both parts?
-		beq.s	.finishxfer									; Branch if not
+		beq.s	.finishxfer					; Branch if not
 
 		; Get second transfer's source, destination, and length
 		sub.w	d0,d3						; Set d3 to the number of words remaining
