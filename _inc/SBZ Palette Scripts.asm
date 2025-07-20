@@ -15,15 +15,15 @@ mSBZp:	macro duration,colours,sourceAddress,destinationPaletteIndex
 ; duration in frames, number of colours, palette address, RAM address
 
 Pal_SBZCycList1: mSBZh
-	mSBZp	 7, 8,Pal_SBZCyc1,$28
-	mSBZp	13, 8,Pal_SBZCyc2,$29
+	mSBZp	 7, 8,Pal_SBZCyc1,$28	; <---
+	mSBZp	13, 8,Pal_SBZCyc2,$29	; <---
 	mSBZp	14, 8,Pal_SBZCyc3,$37
-	mSBZp	11, 8,Pal_SBZCyc5,$38
-	mSBZp	 7, 8,Pal_SBZCyc6,$39
+	mSBZp	11, 8,Pal_SBZCyc5,$38	; <--- ; becomes 9 in act 2; and switches to 9, 8
+	mSBZp	 7, 8,Pal_SBZCyc6,$39	; <---
 	mSBZp	28,16,Pal_SBZCyc7,$3F
-	mSBZp	 3, 3,Pal_SBZCyc8,$3C
-	mSBZp	 3, 3,Pal_SBZCyc8+2,$3D
-	mSBZp	 3, 3,Pal_SBZCyc8+4,$3E
+	mSBZp	 3, 3,Pal_SBZCyc8,$3C	; <---
+	mSBZp	 3, 3,Pal_SBZCyc8+2,$3D	; <---
+	mSBZp	 3, 3,Pal_SBZCyc8+4,$3E	; <---
 Pal_SBZCycList1_end:
 	even
 
