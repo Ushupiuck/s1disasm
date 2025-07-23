@@ -18,6 +18,11 @@ WRITE = %000111
 DMA = %100111
 
 ; ---------------------------------------------------------------------------
+; macros to convert from tile index to art tiles, block mapping or VRAM address.
+make_block_tile function addr,flx,fly,pal,pri,((pri&1)<<15)|((pal&3)<<13)|((fly&1)<<12)|((flx&1)<<11)|(addr&tile_mask)
+tiles_to_bytes function addr,((addr&$7FF)<<5)
+make_block_tile_pair function addr,flx,fly,pal,pri,((make_block_tile(addr,flx,fly,pal,pri)<<16)|make_block_tile(addr,flx,fly,pal,pri))
+; ---------------------------------------------------------------------------
 ; Set a VRAM address via the VDP control port.
 ; input: 16-bit VRAM address, control port (default is (vdp_control_port).l)
 ; ---------------------------------------------------------------------------
@@ -256,6 +261,26 @@ jmi:		macro loc
 .nojump:
 		endm
 
+; macro to replace the destination with its absolute value
+abs macro destination
+	tst.ATTRIBUTE	destination
+	bpl.s	.skip
+	neg.ATTRIBUTE	destination
+.skip:
+    endm
+
+; macro to replace the destination with its absolute value using a word-sized branch
+absw macro destination	; use a short branch instead
+	abs.ATTRIBUTE	destination
+    endm
+
+; macro to move the absolute value of the source in the destination
+mvabs macro source,destination
+	move.ATTRIBUTE	source,destination
+	bpl.s	.skip
+	neg.ATTRIBUTE	destination
+.skip:
+    endm
 ; ---------------------------------------------------------------------------
 ; check if object moves out of range
 ; input: location to jump to if out of range, x-axis pos (obX(a0) by default)
