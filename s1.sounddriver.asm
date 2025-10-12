@@ -2753,7 +2753,7 @@ SoundD0:	include "sound/sfx/SndD0 - Waterfall.asm"
 			align $8000
 		endif
 SegaPCM:	include "sound/dac/pcm/generated/sega.inc"
-		even
+SegaPCM_End:	even
 
 		if SegaPCM.size>$8000
 			fatal "Sega sound must fit within $8000 bytes, but you have a $\{SegaPCM.size} byte Sega sound."

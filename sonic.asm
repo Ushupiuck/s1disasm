@@ -2114,7 +2114,6 @@ Tit_LoadText:
 		move.b	#0,(f_debugmode).w ; disable debug mode
 		move.w	#376,(v_demolength).w ; run title screen for 376 frames
 		
-	if FixBugs
 		clearRAM v_sonicteam,v_sonicteam+object_size
 
 		move.b	#id_TitleSonic,(v_titlesonic).w ; load big Sonic object
