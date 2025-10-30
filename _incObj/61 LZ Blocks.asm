@@ -198,11 +198,9 @@ loc_1219A:
 loc_121A6:
 		move.b	objoff_3E(a0),d0
 		jsr	(CalcSine).l
-		move.w	#$400,d1
-		muls.w	d1,d0
-		swap	d0
+		asr.w	#6,d0
 		add.w	lblk_origY(a0),d0
 		move.w	d0,obY(a0)
 
 locret_121C0:
-		rts	
+		rts

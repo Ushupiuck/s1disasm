@@ -2,12 +2,12 @@
 ; Object pointers
 ; ---------------------------------------------------------------------------
 ptr_SonicPlayer:	dc.l SonicPlayer	; $01
-ptr_Obj02:		dc.l DeleteObject
-ptr_Obj03:		dc.l DeleteObject
-ptr_Obj04:		dc.l DeleteObject
-ptr_Obj05:		dc.l DeleteObject
-ptr_Obj06:		dc.l DeleteObject
-ptr_Obj07:		dc.l DeleteObject
+ptr_Obj02:		dc.l DeleteObject	; $02
+ptr_Obj03:		dc.l DeleteObject	; $03
+ptr_Obj04:		dc.l DeleteObject	; $04
+ptr_Obj05:		dc.l DeleteObject	; $05
+ptr_Obj06:		dc.l DeleteObject	; $06
+ptr_Obj07:		dc.l DeleteObject	; $07
 ptr_Splash:		dc.l Splash		; $08
 ptr_SonicSpecial:	dc.l SonicSpecial
 ptr_DrownCount:		dc.l DrownCount

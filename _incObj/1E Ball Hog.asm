@@ -28,7 +28,7 @@ Hog_Main:	; Routine 0
 		tst.w	d1
 		bpl.s	.floornotfound
 		add.w	d1,obY(a0)
-		move.w	#0,obVelY(a0)
+		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 
 .floornotfound:
@@ -42,25 +42,23 @@ Hog_Action:	; Routine 2
 		bne.s	.setlaunchflag	; if not, branch
 		tst.b	hog_launchflag(a0)	; is it	set to launch cannonball?
 		beq.s	.makeball	; if yes, branch
-		bra.s	.remember
+		bra.w	RememberState
 ; ===========================================================================
 
 .setlaunchflag:
-		clr.b	hog_launchflag(a0)	; set to launch	cannonball
-
-.remember:
+		sf	hog_launchflag(a0)	; set to launch	cannonball
 		bra.w	RememberState
 ; ===========================================================================
 
 .makeball:
-		move.b	#1,hog_launchflag(a0)
+		st	hog_launchflag(a0)
 		bsr.w	FindFreeObj
 		bne.s	.fail
 		_move.b	#id_Cannonball,obID(a1) ; load cannonball object ($20)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.w	#-$100,obVelX(a1) ; cannonball bounces to the left
-		move.w	#0,obVelY(a1)
+		clr.w	obVelY(a1)
 		moveq	#-4,d0
 		btst	#0,obStatus(a0)	; is Ball Hog facing right?
 		beq.s	.noflip		; if not, branch
@@ -73,4 +71,4 @@ Hog_Action:	; Routine 2
 		move.b	obSubtype(a0),obSubtype(a1) ; copy object type from Ball Hog
 
 .fail:
-		bra.s	.remember
+		bra.w	RememberState

@@ -30,7 +30,6 @@ Bub_Main:	; Routine 0
 		move.b	#1,obPriority(a0)
 		move.b	obSubtype(a0),d0 ; get bubble type
 		bpl.s	.bubble		; if type is $0-$7F, branch
-
 		addq.b	#8,obRoutine(a0) ; goto Bub_BblMaker next
 		andi.w	#$7F,d0		; read only last 7 bits	(deduct	$80)
 		move.b	d0,bub_time(a0)
@@ -51,7 +50,6 @@ Bub_Animate:	; Routine 2
 		jsr	(AnimateSprite).l
 		cmpi.b	#6,obFrame(a0)	; is bubble full-size?
 		bne.s	Bub_ChkWater	; if not, branch
-
 		move.b	#1,bub_inhalable(a0) ; set "inhalable" flag
 
 Bub_ChkWater:	; Routine 4
@@ -78,7 +76,6 @@ Bub_ChkWater:	; Routine 4
 		beq.s	.display
 		bsr.w	Bub_ChkSonic	; has Sonic touched the	bubble?
 		beq.s	.display	; if not, branch
-
 		bsr.w	ResumeMusic	; cancel countdown music
 		move.w	#sfx_Bubble,d0
 		jsr	(PlaySound_Special).l	; play collecting bubble sound
@@ -143,7 +140,6 @@ Bub_BblMaker:	; Routine $A
 		andi.w	#7,d0
 		cmpi.w	#6,d0		; random number over 6?
 		bhs.s	.tryagain	; if yes, branch
-
 		move.b	d0,objoff_34(a0)
 		andi.w	#$C,d1
 		lea	(Bub_BblTypes).l,a1
