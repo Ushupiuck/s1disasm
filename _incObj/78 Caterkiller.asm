@@ -14,9 +14,13 @@ Cat_Index:	dc.w Cat_Main-Cat_Index
 		dc.w Cat_BodySeg2-Cat_Index
 		dc.w Cat_BodySeg1-Cat_Index
 		dc.w Cat_Delete-Cat_Index
-		dc.w loc_16CC0-Cat_Index
+		dc.w Cat_Scatter-Cat_Index
 
-cat_parent = objoff_3C		; address of parent object
+cat_wait_time	= objoff_2A		; 1 byte; time to wait between actions
+cat_mode	= objoff_2B		; 1 byte; bit 4 (+$10) = mouth is open/segment moving up; bit 7 (+$80) = update animation
+cat_floormap	= objoff_2C		; $10 bytes; height map of floor beneath caterkiller
+cat_parent	= objoff_3C		; 4 bytes; address of parent object (high/first byte is cat_segment_pos, read below)
+cat_segment_pos	= cat_parent		; high/first byte of cat_parent; segment position - starts as 0/4/8/$A, increments as it moves
 ; ===========================================================================
 
 locret_16950:
@@ -53,7 +57,7 @@ Cat_Main:	; Routine 0
 		neg.w	d5
 
 .noflip:
-		move.b	#4,d6
+		moveq	#4,d6
 		moveq	#0,d3
 		moveq	#4,d4
 		movea.l	a0,a2
@@ -61,11 +65,7 @@ Cat_Main:	; Routine 0
 
 Cat_Loop:
 		jsr	(FindNextFreeObj).l
-	if Revision=0
-		bne.s	.fail
-	else
 		bne.w	Cat_ChkGone
-	endif
 		_move.b	#id_Caterkiller,obID(a1) ; load body segment object
 		move.b	d6,obRoutine(a1) ; goto Cat_BodySeg1 or Cat_BodySeg2 next
 		addq.b	#2,d6		; alternate between the two
@@ -81,15 +81,13 @@ Cat_Loop:
 		move.b	obStatus(a0),obRender(a1)
 		move.b	#8,obFrame(a1)
 		move.l	a2,cat_parent(a1)
-		move.b	d4,cat_parent(a1)
+		move.b	d4,cat_segment_pos(a1)
 		addq.b	#4,d4
 		movea.l	a1,a2
-
-.fail:
 		dbf	d1,Cat_Loop	; repeat sequence 2 more times
 
-		move.b	#7,objoff_2A(a0)
-		clr.b	cat_parent(a0)
+		move.b	#7,cat_wait_time(a0)
+		clr.b	cat_segment_pos(a0)
 
 Cat_Head:	; Routine 2
 		tst.b	obStatus(a0)
@@ -98,7 +96,7 @@ Cat_Head:	; Routine 2
 		move.b	ob2ndRout(a0),d0
 		move.w	Cat_Index2(pc,d0.w),d1
 		jsr	Cat_Index2(pc,d1.w)
-		move.b	objoff_2B(a0),d1
+		move.b	cat_mode(a0),d1
 		bpl.s	.display
 		lea	(Ani_Cat).l,a1
 		move.b	obAngle(a0),d0
@@ -106,7 +104,7 @@ Cat_Head:	; Routine 2
 		addq.b	#4,obAngle(a0)
 		move.b	(a1,d0.w),d0
 		bpl.s	.animate
-		bclr	#7,objoff_2B(a0)
+		bclr	#7,cat_mode(a0)
 		bra.s	.display
 
 .animate:
@@ -138,37 +136,35 @@ Cat_Index2:	dc.w .wait-Cat_Index2
 ; ===========================================================================
 
 .wait:
-		subq.b	#1,objoff_2A(a0)
+		subq.b	#1,cat_wait_time(a0)
 		bmi.s	.move
 		rts
 ; ===========================================================================
 
 .move:
 		addq.b	#2,ob2ndRout(a0)
-		move.b	#$10,objoff_2A(a0)
+		move.b	#$10,cat_wait_time(a0)
 		move.w	#-$C0,obVelX(a0)
 		move.w	#$40,obInertia(a0)
-		bchg	#4,objoff_2B(a0)
+		bchg	#4,cat_mode(a0)
 		bne.s	loc_16AFC
 		clr.w	obVelX(a0)
 		neg.w	obInertia(a0)
 
 loc_16AFC:
-		bset	#7,objoff_2B(a0)
+		bset	#7,cat_mode(a0)
 
 loc_16B02:
-		subq.b	#1,objoff_2A(a0)
+		subq.b	#1,cat_wait_time(a0)
 		bmi.s	.loc_16B5E
-	if Revision=0
-		move.l	obX(a0),-(sp)
-		move.l	obX(a0),d2
-	else
-		tst.w	obVelX(a0)
+	;	tst.w	obVelX(a0)
+	;	beq.s	.notmoving
+	;	move.l	obX(a0),d2
+	;	move.l	d2,d3
+		move.w	obVelX(a0),d0
 		beq.s	.notmoving
 		move.l	obX(a0),d2
 		move.l	d2,d3
-	endif
-		move.w	obVelX(a0),d0
 		btst	#0,obStatus(a0)
 		beq.s	.noflip
 		neg.w	d0
@@ -178,33 +174,24 @@ loc_16B02:
 		asl.l	#8,d0
 		add.l	d0,d2
 		move.l	d2,obX(a0)
-	if Revision=0
-		jsr	(ObjFloorDist).l
-		move.l	(sp)+,d2
-		cmpi.w	#-8,d1
-		blt.s	.loc_16B70
-		cmpi.w	#$C,d1
-		bge.s	.loc_16B70
-		add.w	d1,obY(a0)
-		swap	d2
-		cmp.w	obX(a0),d2
-		beq.s	.notmoving
-	else
 		swap	d3
 		cmp.w	obX(a0),d3
 		beq.s	.notmoving
 		jsr	(ObjFloorDist).l
 		cmpi.w	#-8,d1
-		blt.s	.loc_16B70
+		blt.s	.turn
 		cmpi.w	#$C,d1
-		bge.s	.loc_16B70
+		bge.s	.turn
 		add.w	d1,obY(a0)
-	endif
 		moveq	#0,d0
-		move.b	cat_parent(a0),d0
-		addq.b	#1,cat_parent(a0)
-		andi.b	#$F,cat_parent(a0)
-		move.b	d1,objoff_2C(a0,d0.w)
+		move.b	cat_segment_pos(a0),d0
+		move.b	d1,cat_floormap(a0,d0.w)
+	;	addq.b	#1,cat_segment_pos(a0)
+	;	andi.b	#$F,cat_segment_pos(a0)
+		addq.w	#1,d0
+		andi.w	#$F,d0
+	;	move.b	d1,cat_floormap(a0,d0.w)
+		move.b	d0,cat_segment_pos(a0)
 
 .notmoving:
 		rts
@@ -212,49 +199,41 @@ loc_16B02:
 
 .loc_16B5E:
 		subq.b	#2,ob2ndRout(a0)
-		move.b	#7,objoff_2A(a0)
-	if Revision=0
-		move.w	#0,obVelX(a0)
-	else
+		move.b	#7,cat_wait_time(a0)
 		clr.w	obVelX(a0)
 		clr.w	obInertia(a0)
-	endif
 		rts
 ; ===========================================================================
 
-.loc_16B70:
-	if Revision=0
-		move.l	d2,obX(a0)
-		bchg	#0,obStatus(a0)
-		move.b	obStatus(a0),obRender(a0)
+.turn:
 		moveq	#0,d0
-		move.b	cat_parent(a0),d0
-		move.b	#$80,objoff_2C(a0,d0.w)
-	else
-		moveq	#0,d0
-		move.b	cat_parent(a0),d0
-		move.b	#$80,objoff_2C(a0,d0.w)
+		move.b	cat_segment_pos(a0),d0
+		move.b	#$80,cat_floormap(a0,d0.w)
 		neg.w	obX+2(a0)
-		beq.s	.loc_1730A
+		beq.s	.flip
 		btst	#0,obStatus(a0)
-		beq.s	.loc_1730A
+		beq.s	.flip
 		subq.w	#1,obX(a0)
-		addq.b	#1,cat_parent(a0)
-		moveq	#0,d0
-		move.b	cat_parent(a0),d0
-		clr.b	objoff_2C(a0,d0.w)
-.loc_1730A:
+	;	addq.b	#1,cat_segment_pos(a0)
+		addq.w	#1,d0
+		andi.w	#$F,d0
+	;	moveq	#0,d0
+	;	move.b	cat_segment_pos(a0),d0
+		clr.b	cat_floormap(a0,d0.w)
+.flip:
 		bchg	#0,obStatus(a0)
 		move.b	obStatus(a0),obRender(a0)
-	endif
-		addq.b	#1,cat_parent(a0)
-		andi.b	#$F,cat_parent(a0)
+	;	addq.b	#1,cat_segment_pos(a0)
+	;	andi.b	#$F,cat_segment_pos(a0)
+		addq.w	#1,d0
+		andi.w	#$F,d0
+		move.b	d0,cat_segment_pos(a0)
 		rts
 ; ===========================================================================
 
 Cat_BodySeg2:	; Routine 6
 		movea.l	cat_parent(a0),a1
-		move.b	objoff_2B(a1),objoff_2B(a0)
+		move.b	cat_mode(a1),cat_mode(a0)
 		bpl.s	Cat_BodySeg1
 		lea	(Ani_Cat).l,a1
 		move.b	obAngle(a0),d0
@@ -273,25 +252,24 @@ Cat_BodySeg1:	; Routine 4, 8
 		movea.l	cat_parent(a0),a1
 		tst.b	obStatus(a0)
 		bmi.w	loc_16C90
-		move.b	objoff_2B(a1),objoff_2B(a0)
+		move.b	cat_mode(a1),cat_mode(a0)
 		move.b	ob2ndRout(a1),ob2ndRout(a0)
 		beq.w	loc_16C64
-		move.w	obInertia(a1),obInertia(a0)
+	;	move.w	obInertia(a1),obInertia(a0)
+		move.w	obInertia(a1),d1
+		move.w	d1,obInertia(a0)
 		move.w	obVelX(a1),d0
-	if Revision=0
-		add.w	obInertia(a1),d0
-	else
-		add.w	obInertia(a0),d0
-	endif
+	;	add.w	obInertia(a0),d0
+		add.w	d1,d0
 		move.w	d0,obVelX(a0)
 		move.l	obX(a0),d2
 		move.l	d2,d3
-		move.w	obVelX(a0),d0
+	;	move.w	obVelX(a0),d0
 		btst	#0,obStatus(a0)
-		beq.s	loc_16C0C
+		beq.s	.noflip
 		neg.w	d0
 
-loc_16C0C:
+.noflip:
 		ext.l	d0
 		asl.l	#8,d0
 		add.l	d0,d2
@@ -300,42 +278,44 @@ loc_16C0C:
 		cmp.w	obX(a0),d3
 		beq.s	loc_16C64
 		moveq	#0,d0
-		move.b	cat_parent(a0),d0
-		move.b	objoff_2C(a1,d0.w),d1
+		move.b	cat_segment_pos(a0),d0
+		move.b	cat_floormap(a1,d0.w),d1
+		move.b	d1,cat_floormap(a0,d0.w)
 		cmpi.b	#$80,d1
-		bne.s	loc_16C50
-	if Revision=0
-		swap	d3
-		move.l	d3,obX(a0)
-		move.b	d1,objoff_2C(a0,d0.w)
-	else
-		move.b	d1,objoff_2C(a0,d0.w)
-		neg.w	obX+2(a0)
-		beq.s	locj_173E4
-		btst	#0,obStatus(a0)
-		beq.s	locj_173E4
-		cmpi.w	#-$C0,obVelX(a0)
-		bne.s	locj_173E4
-		subq.w	#1,obX(a0)
-		addq.b	#1,cat_parent(a0)
-		moveq	#0,d0
-		move.b	cat_parent(a0),d0
-		clr.b	objoff_2C(a0,d0.w)
-locj_173E4:
-	endif
-		bchg	#0,obStatus(a0)
-		move.b	obStatus(a0),obRender(a0)
-		addq.b	#1,cat_parent(a0)
-		andi.b	#$F,cat_parent(a0)
-		bra.s	loc_16C64
-; ===========================================================================
-
-loc_16C50:
+	;	bne.s	loc_16C50
+		beq.s	.turn
 		ext.w	d1
 		add.w	d1,obY(a0)
-		addq.b	#1,cat_parent(a0)
-		andi.b	#$F,cat_parent(a0)
-		move.b	d1,objoff_2C(a0,d0.w)
+		addq.w	#1,d0
+		andi.w	#$F,d0
+		move.b	d0,cat_segment_pos(a0)
+		bra.s	loc_16C64
+
+.turn:
+	;	move.b	d1,cat_floormap(a0,d0.w)
+		neg.w	obX+2(a0)
+		beq.s	.flip
+		btst	#0,obStatus(a0)
+		beq.s	.flip
+		cmpi.w	#-$C0,obVelX(a0)
+		bne.s	.flip
+		subq.w	#1,obX(a0)
+	;	addq.b	#1,cat_segment_pos(a0)
+	;	moveq	#0,d0
+	;	move.b	cat_segment_pos(a0),d0
+		addq.w	#1,d0
+		andi.w	#$F,d0
+		clr.b	cat_floormap(a0,d0.w)
+.flip:
+		bchg	#0,obStatus(a0)
+		move.b	obStatus(a0),obRender(a0)
+;		addq.b	#1,cat_segment_pos(a0)
+;		andi.b	#$F,cat_segment_pos(a0)
+		addq.w	#1,d0
+		andi.w	#$F,d0
+		move.b	d0,cat_segment_pos(a0)
+		; fall through to loc_16C64
+; ===========================================================================
 
 loc_16C64:
 		cmpi.b	#$C,obRoutine(a1)
@@ -353,27 +333,24 @@ loc_16C64:
 		; Is the parent going to delete itself?
 		cmpi.b	#$A,obRoutine(a1)
 		bne.s	.display
-
-	if FixBugs
 		; Delete the parent.
 		jsr	(DeleteChild).l ; Don't mind this misnomer.
-	endif
 
-.delete:
-		; Mark self for deletion.
+.delete:	; Mark self for deletion.
+		clr.b	obColType(a1)	; immediately remove all touch response values when destroying the head to avoid taking damage
 		move.b	#$A,obRoutine(a0)
-
-	if FixBugs
 		; Do not queue self for display, since it will be deleted by
 		; its child later.
 		rts
-	endif
 
 .display:
 		jmp	(DisplaySprite).l
-
 ; ===========================================================================
-Cat_FragSpeed:	dc.w -$200, -$180, $180, $200
+Cat_FragSpeed:
+		dc.w -$200				; head x speed
+		dc.w -$180				; body x speed
+		dc.w $180				; body x speed
+		dc.w $200				; body x speed
 ; ===========================================================================
 
 loc_16C90:
@@ -393,7 +370,7 @@ loc_16CAA:
 		move.b	#$C,obRoutine(a0)
 		andi.b	#$F8,obFrame(a0)
 
-loc_16CC0:	; Routine $C
+Cat_Scatter:	; Routine $C
 		jsr	(ObjectFall).l
 		tst.w	obVelY(a0)
 		bmi.s	loc_16CE0
