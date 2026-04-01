@@ -57,11 +57,7 @@ dbug:	macro map,object,subtype,frame,vram
 		dbug	Map_LBlock,	id_LabyrinthBlock, 1,	0,	make_art_tile(ArtTile_LZ_Blocks,2,0)
 		dbug	Map_LBlock,	id_LabyrinthBlock, $13,	1,	make_art_tile(ArtTile_LZ_Blocks,2,0)
 		dbug	Map_LBlock,	id_LabyrinthBlock, 5,	0,	make_art_tile(ArtTile_LZ_Blocks,2,0)
-	if FixBugs
 		dbug	Map_Gar,	id_Gargoyle,	0,	0,	make_art_tile(ArtTile_LZ_Gargoyle,2,0)
-	else
-		dbug	Map_Gar,	id_Gargoyle,	0,	0,	make_art_tile(ArtTile_LZ_Sonic_Drowning-2,2,0) ; Incorrect VRAM address.
-	endif
 		dbug	Map_LBlock,	id_LabyrinthBlock, $27,	2,	make_art_tile(ArtTile_LZ_Blocks,2,0)
 		dbug	Map_LBlock,	id_LabyrinthBlock, $30,	3,	make_art_tile(ArtTile_LZ_Blocks,2,0)
 		dbug	Map_LConv,	id_LabyrinthConvey, $7F, 0,	make_art_tile(ArtTile_LZ_Conveyor_Belt,0,0)
@@ -90,13 +86,8 @@ dbug:	macro map,object,subtype,frame,vram
 		dbug	Map_Push,	id_PushBlock,	0,	0,	make_art_tile(ArtTile_MZ_Block,2,0)
 		dbug	Map_Yad,	id_Yadrin,	0,	0,	make_art_tile(ArtTile_Yadrin,1,0)
 		dbug	Map_Smab,	id_SmashBlock,	0,	0,	make_art_tile(ArtTile_MZ_Block,2,0)
-	if FixBugs
 		dbug	Map_MBlock,	id_MovingBlock,	0,	0,	make_art_tile(ArtTile_MZ_Block,2,0)
 		dbug	Map_CFlo,	id_CollapseFloor, 0,	0,	make_art_tile(ArtTile_MZ_Block,2,0)
-	else
-		dbug	Map_MBlock,	id_MovingBlock,	0,	0,	make_art_tile(ArtTile_MZ_Block,0,0) ; Incorrect palette line.
-		dbug	Map_CFlo,	id_CollapseFloor, 0,	0,	make_art_tile(ArtTile_MZ_Block,3,0) ; Incorrect palette line.
-	endif
 		dbug	Map_LTag,	id_LavaTag,	0,	0,	make_art_tile(ArtTile_Monitor,0,1)
 		dbug	Map_Bas,	id_Basaran,	0,	0,	make_art_tile(ArtTile_Basaran,0,0)
 		dbug	Map_Cat,	id_Caterkiller,	0,	0,	make_art_tile(ArtTile_MZ_SYZ_Caterkiller,1,0)
@@ -185,17 +176,10 @@ dbug:	macro map,object,subtype,frame,vram
 
 ;			mappings	object		subtype	frame	VRAM setting
 		dbug 	Map_Ring,	id_Rings,	0,	0,	make_art_tile(ArtTile_Ring,1,0)
-	if Revision=0
 		dbug	Map_Bump,	id_Bumper,	0,	0,	make_art_tile(ArtTile_SYZ_Bumper,0,0)
-		if FixBugs
-			dbug	Map_Animal2,	id_Animals,	$A,	0,	make_art_tile(ArtTile_Ending_Flicky,0,0)
-			dbug	Map_Animal2,	id_Animals,	$B,	0,	make_art_tile(ArtTile_Ending_Flicky,0,0)
-			dbug	Map_Animal2,	id_Animals,	$C,	0,	make_art_tile(ArtTile_Ending_Flicky,0,0)
-		else
-			dbug	Map_Animal2,	id_Animals,	$A,	0,	make_art_tile(ArtTile_Ending_Flicky-5,0,0)
-			dbug	Map_Animal2,	id_Animals,	$B,	0,	make_art_tile(ArtTile_Ending_Flicky-5,0,0)
-			dbug	Map_Animal2,	id_Animals,	$C,	0,	make_art_tile(ArtTile_Ending_Flicky-5,0,0)
-		endif
+		dbug	Map_Animal2,	id_Animals,	$A,	0,	make_art_tile(ArtTile_Ending_Flicky,0,0)
+		dbug	Map_Animal2,	id_Animals,	$B,	0,	make_art_tile(ArtTile_Ending_Flicky,0,0)
+		dbug	Map_Animal2,	id_Animals,	$C,	0,	make_art_tile(ArtTile_Ending_Flicky,0,0)
 		dbug	Map_Animal1,	id_Animals,	$D,	0,	make_art_tile(ArtTile_Ending_Rabbit,0,0)
 		dbug	Map_Animal1,	id_Animals,	$E,	0,	make_art_tile(ArtTile_Ending_Rabbit,0,0)
 		dbug	Map_Animal1,	id_Animals,	$F,	0,	make_art_tile(ArtTile_Ending_Penguin,0,0)
@@ -204,9 +188,6 @@ dbug:	macro map,object,subtype,frame,vram
 		dbug	Map_Animal3,	id_Animals,	$12,	0,	make_art_tile(ArtTile_Ending_Pig,0,0)
 		dbug	Map_Animal2,	id_Animals,	$13,	0,	make_art_tile(ArtTile_Ending_Chicken,0,0)
 		dbug	Map_Animal3,	id_Animals,	$14,	0,	make_art_tile(ArtTile_Ending_Squirrel,0,0)
-	else
-		dbug 	Map_Ring,	id_Rings,	0,	8,	make_art_tile(ArtTile_Ring,1,0)
-	endif
 .Endingend:
 
 		even
