@@ -74,7 +74,7 @@ Cat_Loop:
 		_move.b	#id_Caterkiller,obID(a1)
 		move.b	d6,obRoutine(a1)	; goto Cat_BodySeg1 or Cat_BodySeg2
 		addq.b	#2,d6			; alternate between the two
-		move.l	obMap(a0),obMap(a1)
+		move.l	#Map_Cat,obMap(a1)
 		move.w	obGfx(a0),obGfx(a1)
 		move.b	#5,obPriority(a1)
 		move.b	#8,obActWid(a1)
@@ -450,7 +450,8 @@ Cat_ReadFloor:
 		moveq	#0,d1
 		move.b	(a2),d1
 		andi.w	#$F,d1
-		lsl.w	#2,d1
+		add.w	d1,d1
+		add.w	d1,d1
 		moveq	#0,d3
 		move.b	1(a2),d3
 		lsr.b	#6,d3
@@ -506,27 +507,24 @@ Cat_WriteFloor:
 		moveq	#0,d3
 		move.b	(a2),d3
 		andi.w	#3,d3
-		lsl.w	#2,d4
+		add.w	d4,d4
+		add.w	d4,d4
 		or.w	d4,d3
 		move.b	d3,(a2)
 		rts
 ; ===========================================================================
 ; case 1: a2 -> byte 0 of group
 .write1:
-		moveq	#0,d3
 		move.b	(a2),d3
-		andi.w	#$FC,d3
+		andi.b	#$FC,d3
 		move.w	d4,d2
 		lsr.w	#4,d2
-		or.w	d2,d3
+		or.b	d2,d3
 		move.b	d3,(a2)
-		moveq	#0,d3
 		move.b	1(a2),d3
-		andi.w	#$0F,d3
-		move.w	d4,d2
-		lsl.w	#4,d2
-		andi.w	#$F0,d2
-		or.w	d2,d3
+		andi.b	#$F,d3
+		lsl.b	#4,d4
+		or.b	d4,d3
 		move.b	d3,1(a2)
 		rts
 ; ===========================================================================
