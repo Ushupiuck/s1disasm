@@ -6818,7 +6818,6 @@ Map_Gird:	include	"_maps/Girder Block.asm"
 		include	"_incObj/72 Teleporter.asm"
 
 		include	"_incObj/78 Caterkiller.asm"
-		include	"_anim/Caterkiller.asm"
 Map_Cat:	include	"_maps/Caterkiller.asm"
 
 		include	"_incObj/79 Lamppost.asm"

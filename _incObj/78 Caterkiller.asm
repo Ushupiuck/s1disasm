@@ -16,11 +16,16 @@ Cat_Index:	dc.w Cat_Main-Cat_Index
 		dc.w Cat_Delete-Cat_Index
 		dc.w Cat_Scatter-Cat_Index
 
-cat_wait_time	= objoff_2A		; 1 byte; time to wait between actions
-cat_mode	= objoff_2B		; 1 byte; bit 4 (+$10) = mouth is open/segment moving up; bit 7 (+$80) = update animation
-cat_floormap	= objoff_2C		; $10 bytes; height map of floor beneath caterkiller
-cat_parent	= objoff_3C		; 4 bytes; address of parent object (high/first byte is cat_segment_pos, read below)
-cat_segment_pos	= cat_parent		; high/first byte of cat_parent; segment position - starts as 0/4/8/$A, increments as it moves
+cat_wait_time	= obAniFrame		; 1 byte; delay between moves
+cat_mode	= obAnim		; 1 byte; bit 4 = segment up/down, bit 7 = animate
+cat_floormap	= objoff_2A		; $C bytes; 16 packed 6-bit floor entries
+cat_parent	= objoff_36		; 4 bytes; parent object (high byte = segment index)
+cat_segment_pos	= cat_parent		; high byte; current position in floor buffer
+
+cat_floor_bias	= 8			; -8..+11 -> 0..19
+cat_floor_flat	= cat_floor_bias	; encoded 0-height delta
+cat_floor_turn	= 20			; turn marker
+; packed flat entries for 4 slots: $20,$82,$08
 ; ===========================================================================
 
 locret_16950:
@@ -39,9 +44,9 @@ Cat_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Cat,obMap(a0)
 		move.w	#make_art_tile(ArtTile_SBZ_Caterkiller,1,0),obGfx(a0)
-		cmpi.b	#id_SBZ,(v_zone).w ; if level is SBZ, branch
+		cmpi.b	#id_SBZ,(v_zone).w	; if level is SBZ, branch
 		beq.s	.isscrapbrain
-		move.w	#make_art_tile(ArtTile_MZ_SYZ_Caterkiller,1,0),obGfx(a0) ; MZ/SYZ specific code
+		move.w	#make_art_tile(ArtTile_MZ_SYZ_Caterkiller,1,0),obGfx(a0)
 
 .isscrapbrain:
 		andi.b	#3,obRender(a0)
@@ -57,18 +62,18 @@ Cat_Main:	; Routine 0
 		neg.w	d5
 
 .noflip:
-		moveq	#4,d6
+		moveq	#4,d6			; starting routine (Cat_BodySeg1)
 		moveq	#0,d3
 		moveq	#4,d4
-		movea.l	a0,a2
-		moveq	#2,d1
+		movea.l	a0,a2			; a2 = current parent (starts as head)
+		moveq	#2,d1			; spawn 3 segments
 
 Cat_Loop:
 		jsr	(FindNextFreeObj).l
 		bne.w	Cat_ChkGone
-		_move.b	#id_Caterkiller,obID(a1) ; load body segment object
-		move.b	d6,obRoutine(a1) ; goto Cat_BodySeg1 or Cat_BodySeg2 next
-		addq.b	#2,d6		; alternate between the two
+		_move.b	#id_Caterkiller,obID(a1)
+		move.b	d6,obRoutine(a1)	; goto Cat_BodySeg1 or Cat_BodySeg2
+		addq.b	#2,d6			; alternate between the two
 		move.l	obMap(a0),obMap(a1)
 		move.w	obGfx(a0),obGfx(a1)
 		move.b	#5,obPriority(a1)
@@ -82,12 +87,28 @@ Cat_Loop:
 		move.b	#8,obFrame(a1)
 		move.l	a2,cat_parent(a1)
 		move.b	d4,cat_segment_pos(a1)
+		; load values for the segments
+		lea	cat_floormap(a1),a3
+		moveq	#3,d0			; 4 groups of 3 bytes = 16 entries
+.childfill:
+		move.b	#$20,(a3)+
+		move.b	#$82,(a3)+
+		move.b	#$08,(a3)+
+		dbf	d0,.childfill
 		addq.b	#4,d4
 		movea.l	a1,a2
-		dbf	d1,Cat_Loop	; repeat sequence 2 more times
+		dbf	d1,Cat_Loop
 
 		move.b	#7,cat_wait_time(a0)
 		clr.b	cat_segment_pos(a0)
+		; and now for the head
+		lea	cat_floormap(a0),a3
+		moveq	#3,d0			; 4 groups of 3 bytes = 16 entries
+.headfill:
+		move.b	#$20,(a3)+
+		move.b	#$82,(a3)+
+		move.b	#$08,(a3)+
+		dbf	d0,.headfill
 
 Cat_Head:	; Routine 2
 		tst.b	obStatus(a0)
@@ -98,7 +119,7 @@ Cat_Head:	; Routine 2
 		jsr	Cat_Index2(pc,d1.w)
 		move.b	cat_mode(a0),d1
 		bpl.s	.display
-		lea	(Ani_Cat).l,a1
+		lea	Ani_Cat(pc),a1
 		move.b	obAngle(a0),d0
 		andi.w	#$7F,d0
 		addq.b	#4,obAngle(a0)
@@ -157,10 +178,6 @@ loc_16AFC:
 loc_16B02:
 		subq.b	#1,cat_wait_time(a0)
 		bmi.s	.loc_16B5E
-	;	tst.w	obVelX(a0)
-	;	beq.s	.notmoving
-	;	move.l	obX(a0),d2
-	;	move.l	d2,d3
 		move.w	obVelX(a0),d0
 		beq.s	.notmoving
 		move.l	obX(a0),d2
@@ -183,14 +200,12 @@ loc_16B02:
 		cmpi.w	#$C,d1
 		bge.s	.turn
 		add.w	d1,obY(a0)
+		addi.w	#cat_floor_bias,d1
 		moveq	#0,d0
 		move.b	cat_segment_pos(a0),d0
-		move.b	d1,cat_floormap(a0,d0.w)
-	;	addq.b	#1,cat_segment_pos(a0)
-	;	andi.b	#$F,cat_segment_pos(a0)
+		bsr.w	Cat_WriteFloor
 		addq.w	#1,d0
 		andi.w	#$F,d0
-	;	move.b	d1,cat_floormap(a0,d0.w)
 		move.b	d0,cat_segment_pos(a0)
 
 .notmoving:
@@ -208,23 +223,20 @@ loc_16B02:
 .turn:
 		moveq	#0,d0
 		move.b	cat_segment_pos(a0),d0
-		move.b	#$80,cat_floormap(a0,d0.w)
+		move.w	#cat_floor_turn,d1
+		bsr.w	Cat_WriteFloor
 		neg.w	obX+2(a0)
 		beq.s	.flip
 		btst	#0,obStatus(a0)
 		beq.s	.flip
 		subq.w	#1,obX(a0)
-	;	addq.b	#1,cat_segment_pos(a0)
 		addq.w	#1,d0
 		andi.w	#$F,d0
-	;	moveq	#0,d0
-	;	move.b	cat_segment_pos(a0),d0
-		clr.b	cat_floormap(a0,d0.w)
+		move.w	#cat_floor_flat,d1
+		bsr.w	Cat_WriteFloor
 .flip:
 		bchg	#0,obStatus(a0)
 		move.b	obStatus(a0),obRender(a0)
-	;	addq.b	#1,cat_segment_pos(a0)
-	;	andi.b	#$F,cat_segment_pos(a0)
 		addq.w	#1,d0
 		andi.w	#$F,d0
 		move.b	d0,cat_segment_pos(a0)
@@ -235,7 +247,7 @@ Cat_BodySeg2:	; Routine 6
 		movea.l	cat_parent(a0),a1
 		move.b	cat_mode(a1),cat_mode(a0)
 		bpl.s	Cat_BodySeg1
-		lea	(Ani_Cat).l,a1
+		lea	Ani_Cat(pc),a1
 		move.b	obAngle(a0),d0
 		andi.w	#$7F,d0
 		addq.b	#4,obAngle(a0)
@@ -255,16 +267,13 @@ Cat_BodySeg1:	; Routine 4, 8
 		move.b	cat_mode(a1),cat_mode(a0)
 		move.b	ob2ndRout(a1),ob2ndRout(a0)
 		beq.w	loc_16C64
-	;	move.w	obInertia(a1),obInertia(a0)
 		move.w	obInertia(a1),d1
 		move.w	d1,obInertia(a0)
 		move.w	obVelX(a1),d0
-	;	add.w	obInertia(a0),d0
 		add.w	d1,d0
 		move.w	d0,obVelX(a0)
 		move.l	obX(a0),d2
 		move.l	d2,d3
-	;	move.w	obVelX(a0),d0
 		btst	#0,obStatus(a0)
 		beq.s	.noflip
 		neg.w	d0
@@ -279,12 +288,11 @@ Cat_BodySeg1:	; Routine 4, 8
 		beq.s	loc_16C64
 		moveq	#0,d0
 		move.b	cat_segment_pos(a0),d0
-		move.b	cat_floormap(a1,d0.w),d1
-		move.b	d1,cat_floormap(a0,d0.w)
-		cmpi.b	#$80,d1
-	;	bne.s	loc_16C50
+		bsr.w	Cat_ReadFloor
+		bsr.w	Cat_WriteFloor
+		cmpi.w	#cat_floor_turn,d1
 		beq.s	.turn
-		ext.w	d1
+		subi.w	#cat_floor_bias,d1
 		add.w	d1,obY(a0)
 		addq.w	#1,d0
 		andi.w	#$F,d0
@@ -292,7 +300,6 @@ Cat_BodySeg1:	; Routine 4, 8
 		bra.s	loc_16C64
 
 .turn:
-	;	move.b	d1,cat_floormap(a0,d0.w)
 		neg.w	obX+2(a0)
 		beq.s	.flip
 		btst	#0,obStatus(a0)
@@ -300,17 +307,13 @@ Cat_BodySeg1:	; Routine 4, 8
 		cmpi.w	#-$C0,obVelX(a0)
 		bne.s	.flip
 		subq.w	#1,obX(a0)
-	;	addq.b	#1,cat_segment_pos(a0)
-	;	moveq	#0,d0
-	;	move.b	cat_segment_pos(a0),d0
 		addq.w	#1,d0
 		andi.w	#$F,d0
-		clr.b	cat_floormap(a0,d0.w)
+		move.w	#cat_floor_flat,d1
+		bsr.w	Cat_WriteFloor
 .flip:
 		bchg	#0,obStatus(a0)
 		move.b	obStatus(a0),obRender(a0)
-;		addq.b	#1,cat_segment_pos(a0)
-;		andi.b	#$F,cat_segment_pos(a0)
 		addq.w	#1,d0
 		andi.w	#$F,d0
 		move.b	d0,cat_segment_pos(a0)
@@ -334,7 +337,7 @@ loc_16C64:
 		cmpi.b	#$A,obRoutine(a1)
 		bne.s	.display
 		; Delete the parent.
-		jsr	(DeleteChild).l ; Don't mind this misnomer.
+		jsr	(DeleteChild).l	; Don't mind this misnomer.
 
 .delete:	; Mark self for deletion.
 		clr.b	obColType(a1)	; immediately remove all touch response values when destroying the head to avoid taking damage
@@ -384,3 +387,174 @@ loc_16CE0:
 		tst.b	obRender(a0)
 		bpl.w	Cat_ChkGone
 		jmp	(DisplaySprite).l
+; ---------------------------------------------------------------------------
+; Animation script - Caterkiller enemy (uses non-standard format)
+; ---------------------------------------------------------------------------
+Ani_Cat:	dc.b 0,	0, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 1
+		dc.b 1,	1, 1, 1, 1, 1, 2, 2, 2,	2, 2, 3, 3, 3, 3, 3
+		dc.b 4,	4, 4, 4, 4, 4, 5, 5, 5,	5, 5, 6, 6, 6, 6, 6
+		dc.b 6,	6, 7, 7, 7, 7, 7, 7, 7,	7, 7, 7, $FF, 7, 7, $FF
+		dc.b 7,	7, 7, 7, 7, 7, 7, 7, 7,	7, 7, 7, 7, 7, 7, 6
+		dc.b 6,	6, 6, 6, 6, 6, 5, 5, 5,	5, 5, 4, 4, 4, 4, 4
+		dc.b 4,	3, 3, 3, 3, 3, 2, 2, 2,	2, 2, 1, 1, 1, 1, 1
+		dc.b 1,	1, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0, $FF, 0, 0, $FF
+		even
+; ===========================================================================
+; Read packed 6-bit floormap entry from parent object.
+; in:  a1 = object base, d0.w = entry index (0..15)
+; out: d1.w = encoded entry
+; preserves: d0,a0,a1
+; clobbers: d2-d3/a2-a3
+Cat_ReadFloor:
+		lea	cat_floormap(a1),a2
+		lea	Cat_FloorMeta(pc),a3
+		moveq	#0,d3
+		move.w	d0,d3
+		add.w	d3,d3
+		move.w	(a3,d3.w),d2	; high byte = case, low byte = offset
+		moveq	#0,d3
+		move.b	d2,d3		; low byte = offset
+		adda.w	d3,a2
+		lsr.w	#8,d2		; high byte = case
+		add.w	d2,d2
+		move.w	.read_index(pc,d2.w),d2
+		jmp	.read_index(pc,d2.w)
+; ===========================================================================
+.read_index:
+		dc.w	.read0-.read_index
+		dc.w	.read1-.read_index
+		dc.w	.read2-.read_index
+		dc.w	.read3-.read_index
+; ===========================================================================
+; case 0: a2 -> byte 0 of group
+.read0:
+		moveq	#0,d1
+		move.b	(a2),d1
+		lsr.b	#2,d1
+		rts
+; ===========================================================================
+; case 1: a2 -> byte 0 of group
+.read1:
+		moveq	#0,d1
+		move.b	(a2),d1
+		andi.w	#3,d1
+		lsl.w	#4,d1
+		moveq	#0,d3
+		move.b	1(a2),d3
+		lsr.b	#4,d3
+		or.w	d3,d1
+		rts
+; ===========================================================================
+; case 2: a2 -> byte 1 of group
+.read2:
+		moveq	#0,d1
+		move.b	(a2),d1
+		andi.w	#$F,d1
+		lsl.w	#2,d1
+		moveq	#0,d3
+		move.b	1(a2),d3
+		lsr.b	#6,d3
+		or.w	d3,d1
+		rts
+
+; ===========================================================================
+; case 3: a2 -> byte 2 of group
+.read3:
+		moveq	#0,d1
+		move.b	(a2),d1
+		andi.w	#$3F,d1
+		rts
+; ===========================================================================
+; low byte = byte offset, high byte = case
+Cat_FloorMeta:
+		dc.w $0000,$0100,$0201,$0302
+		dc.w $0003,$0103,$0204,$0305
+		dc.w $0006,$0106,$0207,$0308
+		dc.w $0009,$0109,$020A,$030B
+	;	even
+; ===========================================================================
+; Write packed 6-bit floormap entry to current object.
+; in:  a0 = object base, d0.w = entry index (0..15), d1.w = encoded entry
+; out: none
+; preserves: d0,d1,a1
+; clobbers: d2-d4/a2-a3
+Cat_WriteFloor:
+		move.w	d1,d4
+		andi.w	#$3F,d4
+		lea	cat_floormap(a0),a2
+		lea	Cat_FloorMeta(pc),a3
+		moveq	#0,d3
+		move.w	d0,d3
+		add.w	d3,d3
+		move.w	(a3,d3.w),d2	; high byte = case, low byte = offset
+		moveq	#0,d3
+		move.b	d2,d3		; low byte = offset
+		adda.w	d3,a2
+		lsr.w	#8,d2		; high byte = case
+		add.w	d2,d2
+		move.w	.write_index(pc,d2.w),d2
+		jmp	.write_index(pc,d2.w)
+; ===========================================================================
+.write_index:
+		dc.w	.write0-.write_index
+		dc.w	.write1-.write_index
+		dc.w	.write2-.write_index
+		dc.w	.write3-.write_index
+; ===========================================================================
+; case 0: a2 -> byte 0 of group
+.write0:
+		moveq	#0,d3
+		move.b	(a2),d3
+		andi.w	#3,d3
+		lsl.w	#2,d4
+		or.w	d4,d3
+		move.b	d3,(a2)
+		rts
+; ===========================================================================
+; case 1: a2 -> byte 0 of group
+.write1:
+		moveq	#0,d3
+		move.b	(a2),d3
+		andi.w	#$FC,d3
+		move.w	d4,d2
+		lsr.w	#4,d2
+		or.w	d2,d3
+		move.b	d3,(a2)
+		moveq	#0,d3
+		move.b	1(a2),d3
+		andi.w	#$0F,d3
+		move.w	d4,d2
+		lsl.w	#4,d2
+		andi.w	#$F0,d2
+		or.w	d2,d3
+		move.b	d3,1(a2)
+		rts
+; ===========================================================================
+; case 2: a2 -> byte 1 of group
+.write2:
+		moveq	#0,d3
+		move.b	(a2),d3
+		andi.w	#$F0,d3
+		move.w	d4,d2
+		lsr.w	#2,d2
+		andi.w	#$0F,d2
+		or.w	d2,d3
+		move.b	d3,(a2)
+		moveq	#0,d3
+		move.b	1(a2),d3
+		andi.w	#$3F,d3
+		move.w	d4,d2
+		lsl.w	#6,d2
+		andi.w	#$C0,d2
+		or.w	d2,d3
+		move.b	d3,1(a2)
+		rts
+; ===========================================================================
+; case 3: a2 -> byte 2 of group
+.write3:
+		moveq	#0,d3
+		move.b	(a2),d3
+		andi.w	#$C0,d3
+		or.w	d4,d3
+		move.b	d3,(a2)
+		rts
