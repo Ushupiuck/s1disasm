@@ -59,13 +59,13 @@ Yad_Main:	; Routine 0
 		bsr.w	ObjectFall
 		bsr.w	ObjFloorDist
 		tst.w	d1
-		bpl.s	locret_F89E
+		bpl.s	.return
 		add.w	d1,obY(a0)	; match object's position with the floor
-		move.w	#0,obVelY(a0)
+		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 		bchg	#0,obStatus(a0)
 
-locret_F89E:
+.return:
 		rts
 ; ===========================================================================
 
@@ -84,15 +84,15 @@ Yad_Index2:	dc.w Yad_Move-Yad_Index2
 
 Yad_Move:
 		subq.w	#1,yad_timedelay(a0) ; subtract 1 from pause time
-		bpl.s	locret_F8E2	; if time remains, branch
+		bpl.s	.return		; if time remains, branch
 		addq.b	#2,ob2ndRout(a0)
 		move.w	#-$100,obVelX(a0) ; move object
 		move.b	#1,obAnim(a0)
 		bchg	#0,obStatus(a0)
-		bne.s	locret_F8E2
+		bne.s	.return
 		neg.w	obVelX(a0)	; change direction
 
-locret_F8E2:
+.return:
 		rts
 ; ===========================================================================
 
@@ -106,12 +106,13 @@ Yad_FixToFloor:
 		add.w	d1,obY(a0)	; match object's position to the floor
 		bsr.w	Yad_ChkWall
 		bne.s	Yad_Pause
+.return:
 		rts
 ; ===========================================================================
 
 Yad_Pause:
 		subq.b	#2,ob2ndRout(a0)
 		move.w	#59,yad_timedelay(a0) ; set pause time to 1 second
-		move.w	#0,obVelX(a0)
-		move.b	#0,obAnim(a0)
+		clr.w	obVelX(a0)
+		clr.b	obAnim(a0)
 		rts
