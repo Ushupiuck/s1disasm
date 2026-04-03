@@ -35,12 +35,6 @@ locret_16950:
 Cat_Main:	; Routine 0
 		move.b	#7,obHeight(a0)
 		move.b	#8,obWidth(a0)
-		jsr	(ObjectFall).l
-		jsr	(ObjFloorDist).l
-		tst.w	d1
-		bpl.s	locret_16950
-		add.w	d1,obY(a0)
-		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Cat,obMap(a0)
 		move.w	#make_art_tile(ArtTile_SBZ_Caterkiller,1,0),obGfx(a0)
@@ -55,6 +49,13 @@ Cat_Main:	; Routine 0
 		move.b	#4,obPriority(a0)
 		move.b	#8,obActWid(a0)
 		move.b	#$B,obColType(a0)
+
+		; airborne / dormant start
+		clr.b	cat_mode(a0)
+		clr.w	obVelX(a0)
+		clr.w	obVelY(a0)
+		clr.w	obInertia(a0)
+
 		move.w	obX(a0),d2
 		moveq	#$C,d5
 		btst	#0,obStatus(a0)
@@ -79,6 +80,11 @@ Cat_Loop:
 		move.b	#5,obPriority(a1)
 		move.b	#8,obActWid(a1)
 		move.b	#$CB,obColType(a1)
+
+		clr.w	obVelX(a1)
+		clr.w	obVelY(a1)
+		clr.w	obInertia(a1)
+
 		add.w	d5,d2
 		move.w	d2,obX(a1)
 		move.w	obY(a0),obY(a1)
@@ -95,6 +101,7 @@ Cat_Loop:
 		move.b	#$82,(a3)+
 		move.b	#$08,(a3)+
 		dbf	d0,.childfill
+
 		addq.b	#4,d4
 		movea.l	a1,a2
 		dbf	d1,Cat_Loop
@@ -109,6 +116,9 @@ Cat_Loop:
 		move.b	#$82,(a3)+
 		move.b	#$08,(a3)+
 		dbf	d0,.headfill
+
+		; start Cat_Head in airborne state
+		clr.b	ob2ndRout(a0)
 
 Cat_Head:	; Routine 2
 		tst.b	obStatus(a0)
@@ -152,10 +162,28 @@ Cat_ChkGone:
 Cat_Delete:	; Routine $A
 		jmp	(DeleteObject).l
 ; ===========================================================================
-Cat_Index2:	dc.w .wait-Cat_Index2
+Cat_Index2:
+		dc.w .airborne-Cat_Index2
+		dc.w .wait-Cat_Index2
 		dc.w loc_16B02-Cat_Index2
 ; ===========================================================================
-
+.airborne:
+		cmpi.w	#$800,obVelY(a0)	; cap at 8px/frame — safely within ObjFloorDist's $10 range
+	;	blt.s	.chkfloor
+		bls.s	.chkfloor
+		move.w	#$800,obVelY(a0)
+.chkfloor:
+		jsr	(ObjectFall).l
+		jsr	(ObjFloorDist).l
+		tst.w	d1
+		bpl.s	.stillair
+		add.w	d1,obY(a0)
+		clr.w	obVelY(a0)
+		move.b	#2,ob2ndRout(a0)
+		move.b	#7,cat_wait_time(a0)
+.stillair:
+		rts
+; ===========================================================================
 .wait:
 		subq.b	#1,cat_wait_time(a0)
 		bmi.s	.move
@@ -264,9 +292,29 @@ Cat_BodySeg1:	; Routine 4, 8
 		movea.l	cat_parent(a0),a1
 		tst.b	obStatus(a0)
 		bmi.w	loc_16C90
+		moveq	#0,d6
+		move.b	ob2ndRout(a0),d6	; save previous child state
+
 		move.b	cat_mode(a1),cat_mode(a0)
 		move.b	ob2ndRout(a1),ob2ndRout(a0)
-		beq.w	loc_16C64
+		beq.w	Cat_BodyAirborne	; parent still airborne
+
+		cmpi.b	#2,ob2ndRout(a1)
+		bne.s	.notwait
+
+		; parent is waiting after landing
+		; only snap once if this child was airborne last frame
+		tst.b	d6
+		bne.w	loc_16C64
+
+		move.l	obY(a1),obY(a0)
+		clr.w	obVelX(a0)
+		clr.w	obVelY(a0)
+		clr.w	obInertia(a0)
+		move.b	#8,obFrame(a0)
+		bra.w	loc_16C64
+
+.notwait:
 		move.w	obInertia(a1),d1
 		move.w	d1,obInertia(a0)
 		move.w	obVelX(a1),d0
@@ -285,18 +333,26 @@ Cat_BodySeg1:	; Routine 4, 8
 		move.l	d2,obX(a0)
 		swap	d3
 		cmp.w	obX(a0),d3
-		beq.s	loc_16C64
+		beq.w	loc_16C64
 		moveq	#0,d0
 		move.b	cat_segment_pos(a0),d0
 		bsr.w	Cat_ReadFloor
 		bsr.w	Cat_WriteFloor
 		cmpi.w	#cat_floor_turn,d1
-		beq.s	.turn
+		beq.s	Cat_BodyAirborne.turn
 		subi.w	#cat_floor_bias,d1
 		add.w	d1,obY(a0)
 		addq.w	#1,d0
 		andi.w	#$F,d0
 		move.b	d0,cat_segment_pos(a0)
+		bra.s	loc_16C64
+
+Cat_BodyAirborne:
+		move.l	obY(a1),obY(a0)
+		clr.w	obVelX(a0)
+		clr.w	obVelY(a0)
+		clr.w	obInertia(a0)
+		move.b	#8,obFrame(a0)
 		bra.s	loc_16C64
 
 .turn:
