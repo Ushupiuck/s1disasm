@@ -140,11 +140,7 @@ loc_FB0E:
 		tst.b	(f_playerctrl).w ; are object interactions disabled?
 		bmi.w	Solid_Ignore	; if yes, branch
 		cmpi.b	#6,(v_player+obRoutine).w ; is Sonic dying?
-	if Revision=0
-		bcc.w	Solid_Ignore	; if yes, branch
-	else
-		bcc.w	Solid_Debug
-	endif
+		bcc.w	Solid_Debug	; if yes, branch
 		tst.w	(v_debuguse).w	; is debug mode being used?
 		bne.w	Solid_Debug	; if yes, branch
 		move.w	d0,d5
@@ -205,7 +201,6 @@ Solid_SideAir:
 Solid_Ignore:
 		btst	#5,obStatus(a0)	; is Sonic pushing?
 		beq.s	Solid_Debug	; if not, branch
-	if FixBugs
 		; Fix the Walk-Jump bug
 		; https://info.sonicretro.org/SCHG_How-to:Fix_the_Walk-Jump_Bug_in_Sonic_1
 		move.b	obAnim(a1),d4		; get Sonic's current animation
@@ -215,7 +210,6 @@ Solid_Ignore:
 		beq.s	Solid_NotPushing	; if so, branch
 		cmpi.b	#id_Hurt,d4		; is Sonic in his hurt animation?
 		beq.s	Solid_NotPushing	; if so, branch
-	endif
 		move.w	#id_Run,obAnim(a1) ; use running animation
 
 Solid_NotPushing:

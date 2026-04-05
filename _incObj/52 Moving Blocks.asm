@@ -66,20 +66,12 @@ MBlock_StandOn:	; Routine 4
 		moveq	#0,d1
 		move.b	obActWid(a0),d1
 		jsr	(ExitPlatform).l
-	if FixBugs
 		; MBlock_Move manipulates the stack pointer, potentially
 		; resulting in a crash. To avoid this, don't store data on
 		; the stack. We can use object scratch RAM instead.
 		move.w	obX(a0),objoff_38(a0)
-	else
-		move.w	obX(a0),-(sp)
-	endif
 		bsr.w	MBlock_Move
-	if FixBugs
 		move.w	objoff_38(a0),d2
-	else
-		move.w	(sp)+,d2
-	endif
 		jsr	(MvSonicOnPtfm2).l
 
 MBlock_ChkDel:
@@ -95,7 +87,8 @@ MBlock_Move:
 		move.w	MBlock_TypeIndex(pc,d0.w),d1
 		jmp	MBlock_TypeIndex(pc,d1.w)
 ; ===========================================================================
-MBlock_TypeIndex:dc.w MBlock_Type00-MBlock_TypeIndex, MBlock_Type01-MBlock_TypeIndex
+MBlock_TypeIndex:
+		dc.w MBlock_Type00-MBlock_TypeIndex, MBlock_Type01-MBlock_TypeIndex
 		dc.w MBlock_Type02-MBlock_TypeIndex, MBlock_Type03-MBlock_TypeIndex
 		dc.w MBlock_Type02-MBlock_TypeIndex, MBlock_Type05-MBlock_TypeIndex
 		dc.w MBlock_Type06-MBlock_TypeIndex, MBlock_Type07-MBlock_TypeIndex

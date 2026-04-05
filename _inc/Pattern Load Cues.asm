@@ -251,9 +251,9 @@ PLC_SBZ:	plcheader
 PLC_SBZ_end:
 
 PLC_SBZ2:	plcheader
+		plcm	Nem_Bomb,	ArtTile_SBZ_Bomb		; bomb enemy
 		plcm	Nem_Cater,	ArtTile_SBZ_Caterkiller		; caterkiller enemy
-		plcm	Nem_Bomb,	ArtTile_Bomb			; bomb enemy
-		plcm	Nem_Orbinaut,	ArtTile_SBZ_Orbinaut		; orbinaut enemy
+		plcm	Nem_Yadrin,	ArtTile_SBZ_Yadrin		; caterkiller enemy
 		plcm	Nem_SlideFloor,	ArtTile_SBZ_Moving_Block_Long	; floor that slides away
 		plcm	Nem_SbzDoor2,	ArtTile_SBZ_Horizontal_Door	; horizontal door
 		plcm	Nem_Electric,	ArtTile_SBZ_Electric_Orb	; electric orb

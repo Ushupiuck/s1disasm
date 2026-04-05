@@ -36,12 +36,6 @@ Scen_ChkDel:	; Routine 2
 Scen_Values:	dc.l Map_Scen                                     ; mappings address
 		dc.w make_art_tile(ArtTile_SLZ_Fireball_Launcher,2,0) ; VRAM setting
 		dc.b 0,	8, 2, 0                                   ; frame, width, priority, collision response
-		dc.l Map_Scen
-		dc.w make_art_tile(ArtTile_SLZ_Fireball_Launcher,2,0)
-		dc.b 0,	8, 2, 0
-		dc.l Map_Scen
-		dc.w make_art_tile(ArtTile_SLZ_Fireball_Launcher,2,0)
-		dc.b 0,	8, 2, 0
 		dc.l Map_Bri
 		dc.w make_art_tile(ArtTile_GHZ_Bridge,2,0)
 		dc.b 1,	$10, 1,	0

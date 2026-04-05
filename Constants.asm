@@ -407,17 +407,18 @@ ArtTile_SLZ_Collapsing_Floor:	equ $4E0
 ArtTile_SLZ_Spikeball:		equ $4F0
 
 ; Scrap Brain Zone
-ArtTile_SBZ_Caterkiller:	equ $2B0
-ArtTile_SBZ_Moving_Block_Short:	equ $2C0
-ArtTile_SBZ_Door:		equ $2E8
-ArtTile_SBZ_Girder:		equ $2F0
-ArtTile_SBZ_Disc:		equ $344
-ArtTile_SBZ_Junction:		equ $348
-ArtTile_SBZ_Swing:		equ $391
-ArtTile_SBZ_Saw:		equ $3B5
-ArtTile_SBZ_Flamethrower:	equ $3D9
-ArtTile_SBZ_Collapsing_Floor:	equ $3F5
-ArtTile_SBZ_Orbinaut:		equ $429
+ArtTile_SBZ_Caterkiller:	equ $28B
+ArtTile_SBZ_Moving_Block_Short:	equ $29B
+ArtTile_SBZ_Door:		equ $2C3
+ArtTile_SBZ_Girder:		equ $2CB
+ArtTile_SBZ_Disc:		equ $30C
+ArtTile_SBZ_Junction:		equ $310
+ArtTile_SBZ_Swing:		equ $359
+ArtTile_SBZ_Saw:		equ $37D
+ArtTile_SBZ_Flamethrower:	equ $3A1
+ArtTile_SBZ_Collapsing_Floor:	equ $3BD
+ArtTile_SBZ_Bomb:		equ $3C5
+ArtTile_SBZ_Yadrin:		equ $3EE
 ArtTile_SBZ_Smoke_Puff_1:	equ ArtTile_Level+$448
 ArtTile_SBZ_Smoke_Puff_2:	equ ArtTile_Level+$454
 ArtTile_SBZ_Moving_Block_Long:	equ $460
@@ -434,7 +435,7 @@ ArtTile_FZ_Eggman_No_Vehicle:	equ $470
 
 ; General Level Art
 ArtTile_Level:			equ $000
-ArtTile_Ball_Hog:		equ $302
+ArtTile_Ball_Hog:		equ $2DD
 ArtTile_Bomb:			equ $400
 ArtTile_Crabmeat:		equ $400
 ArtTile_Missile_Disolve:	equ $41C ; Unused
