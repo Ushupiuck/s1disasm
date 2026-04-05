@@ -22,16 +22,21 @@ Bom_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bomb,obMap(a0)
 		move.w	#make_art_tile(ArtTile_Bomb,0,0),obGfx(a0)
+		cmpi.b	#id_SBZ,(v_zone).w ; check if level is SBZ
+		bne.s	.notscrap
+		move.w	#make_art_tile(ArtTile_SBZ_Bomb,0,0),obGfx(a0)	; SBZ specific code
+
+.notscrap:
 		ori.b	#4,obRender(a0)
 		move.b	#3,obPriority(a0)
 		move.b	#$C,obActWid(a0)
 		move.b	obSubtype(a0),d0
-		beq.s	loc_11A3C
+		beq.s	+
 		move.b	d0,obRoutine(a0)
 		rts
 ; ===========================================================================
 
-loc_11A3C:
++
 		move.b	#$9A,obColType(a0)
 		bchg	#0,obStatus(a0)
 
@@ -60,17 +65,14 @@ Bom_Action:	; Routine 2
 		bchg	#0,obStatus(a0)
 		beq.s	.noflip
 		neg.w	obVelX(a0)	; change direction
-
-.noflip:
-		rts
+.noflip:	rts
 ; ===========================================================================
 
 .wait:
 		bsr.w	.chksonic
 		subq.w	#1,bom_time(a0)	; subtract 1 from time delay
 		bmi.s	.stopwalking	; if time expires, branch
-		bsr.w	SpeedToPos
-		rts
+		bra.w	SpeedToPos
 ; ===========================================================================
 
 .stopwalking:
@@ -86,9 +88,7 @@ Bom_Action:	; Routine 2
 		bpl.s	.noexplode	; if time remains, branch
 		_move.b	#id_ExplosionBomb,obID(a0) ; change bomb into an explosion
 		move.b	#0,obRoutine(a0)
-
-.noexplode:
-		rts
+.noexplode:	rts
 ; ===========================================================================
 
 .chksonic:
@@ -132,31 +132,22 @@ Bom_Action:	; Routine 2
 .normal:
 		move.w	#143,bom_time(a1) ; set fuse time
 		move.l	a0,bom_parent(a1)
-
-.outofrange:
-		rts
+.outofrange:	rts
 ; ===========================================================================
 
 Bom_Display:	; Routine 4
-		bsr.s	loc_11B70
+		subq.w	#1,bom_time(a0)
+		bmi.s	+
+		bsr.w	SpeedToPos
 		lea	(Ani_Bomb).l,a1
 		bsr.w	AnimateSprite
 		bra.w	RememberState
 ; ===========================================================================
 
-loc_11B70:
-		subq.w	#1,bom_time(a0)
-		bmi.s	loc_11B7C
-		bsr.w	SpeedToPos
-		rts
-; ===========================================================================
-
-loc_11B7C:
-	if FixBugs
++
 		; Avoid returning to Bom_Display to prevent display-and-delete
 		; and double-delete bugs.
 		addq.l	#4,sp
-	endif
 		clr.w	bom_time(a0)
 		clr.b	obRoutine(a0)
 		move.w	bom_origY(a0),obY(a0)

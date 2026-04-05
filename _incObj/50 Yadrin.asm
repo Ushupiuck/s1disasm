@@ -1,34 +1,33 @@
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Yad_ChkWall:
-		move.w	(v_framecount).w,d0
-		add.w	d7,d0
-		andi.w	#3,d0
-		bne.s	loc_F836
+Obj_ChkWall:
+		move.w	(v_framecount).w,d0	; get frame counter
+		add.w	d7,d0			; add object object enumerator from RAM
+		andi.w	#3,d0			; and by 3 (effectively makes it so it's only checked every 4 frames, presumably for performance reasons)
+		bne.s	.nowallhit		; if outside a 4th frame, branch
 		moveq	#0,d3
-		move.b	obActWid(a0),d3
-		tst.w	obVelX(a0)
-		bmi.s	loc_F82C
-		bsr.w	ObjHitWallRight
-		tst.w	d1
-		bpl.s	loc_F836
-
-loc_F828:
-		moveq	#1,d0
+		move.b	obActWid(a0),d3		; load object width to d3 (input param for wall col detection subroutines)
+		tst.w	obVelX(a0)		; is object moving to the left?
+		bmi.s	.checkleftwall		; if so, branch
+		bsr.w	ObjHitWallRight		; get distance to nearest right wall
+		tst.w	d1			; did object hit wall?
+		smi	d0			; d0=$FF if hit, 0 if not
+		neg.b	d0			; we want -1, not $FF, tho
 		rts
 ; ===========================================================================
-
-loc_F82C:
-		not.w	d3
-		bsr.w	ObjHitWallLeft
-		tst.w	d1
-		bmi.s	loc_F828
-
-loc_F836:
-		moveq	#0,d0
+.checkleftwall:
+		not.w	d3			; invert object width to make it work for left wall col
+		bsr.w	ObjHitWallLeft		; get distance to nearest left wall
+		tst.w	d1			; did object hit wall?
+		smi	d0			; d0=$FF if hit, 0 if not
+		neg.b	d0			; we want -1, not $FF, tho
 		rts
-; End of function Yad_ChkWall
+
+.nowallhit:
+		moveq	#0,d0			; clear Z-flag (wall not touched)
+		rts
+; End of function Obj_ChkWall
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -50,6 +49,11 @@ yad_timedelay = objoff_30
 Yad_Main:	; Routine 0
 		move.l	#Map_Yad,obMap(a0)
 		move.w	#make_art_tile(ArtTile_Yadrin,1,0),obGfx(a0)
+		cmpi.b	#id_SBZ,(v_zone).w ; check if level is SBZ
+		bne.s	.notscrap
+		move.w	#make_art_tile(ArtTile_SBZ_Yadrin,1,0),obGfx(a0)	; SBZ specific code
+
+.notscrap:
 		move.b	#4,obRender(a0)
 		move.b	#4,obPriority(a0)
 		move.b	#$14,obActWid(a0)
@@ -64,9 +68,7 @@ Yad_Main:	; Routine 0
 		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 		bchg	#0,obStatus(a0)
-
-.return:
-		rts
+.return:	rts
 ; ===========================================================================
 
 Yad_Action:	; Routine 2
@@ -91,9 +93,7 @@ Yad_Move:
 		bchg	#0,obStatus(a0)
 		bne.s	.return
 		neg.w	obVelX(a0)	; change direction
-
-.return:
-		rts
+.return:	rts
 ; ===========================================================================
 
 Yad_FixToFloor:
@@ -104,15 +104,10 @@ Yad_FixToFloor:
 		cmpi.w	#$C,d1
 		bge.s	Yad_Pause
 		add.w	d1,obY(a0)	; match object's position to the floor
-		bsr.w	Yad_ChkWall
-		bne.s	Yad_Pause
-.return:
-		rts
-; ===========================================================================
-
-Yad_Pause:
-		subq.b	#2,ob2ndRout(a0)
-		move.w	#59,yad_timedelay(a0) ; set pause time to 1 second
+		bsr.w	Obj_ChkWall
+		beq.s	Yad_Pause.return
+Yad_Pause:	subq.b	#2,ob2ndRout(a0)
+		move.w	#60-1,yad_timedelay(a0) ; set pause time to 1 second
 		clr.w	obVelX(a0)
 		clr.b	obAnim(a0)
-		rts
+.return:	rts
