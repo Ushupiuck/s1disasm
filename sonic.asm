@@ -30,7 +30,7 @@ PaddingOptimization = 0|AllOptimizations
 
 EnableSRAM = 0
 ;	| If 1, enable SRAM support
-BackupSRAM	  = 1
+BackupSRAM = 1
 ;	| 0 = no saving (read-only SRAM); 1 = allow saving
 AddressSRAM = 3
 ;	| 0 = odd+even; 2 = even only; 3 = odd only
@@ -5582,7 +5582,7 @@ BuildSpr_Draw:
 
 BuildSpr_Normal:
 		cmpi.b	#$50,d5		; check sprite limit
-		beq.s	.return
+		bhs.s	.return
 		move.b	(a1)+,d0	; get y-offset
 		ext.w	d0
 		add.w	d2,d0		; add y-position
@@ -5618,7 +5618,7 @@ BuildSpr_FlipX:
 
 	.loop:
 		cmpi.b	#$50,d5		; check sprite limit
-		beq.s	.return
+		bhs.s	.return
 		move.b	(a1)+,d0	; y position
 		ext.w	d0
 		add.w	d2,d0
@@ -5654,6 +5654,7 @@ CellOffsets_XFlip:
 		dc.b $10,$10,$10,$10	; 8
 		dc.b $18,$18,$18,$18	; 12
 		dc.b $20,$20,$20,$20	; 16
+		even
 ; ===========================================================================
 ; offsets for vertically mirrored sprite pieces
 CellOffsets_YFlip:
@@ -5661,11 +5662,12 @@ CellOffsets_YFlip:
 		dc.b   8,$10,$18,$20	; 8
 		dc.b   8,$10,$18,$20	; 12
 		dc.b   8,$10,$18,$20	; 16
+		even
 ; ===========================================================================
 
 BuildSpr_FlipY:
 		cmpi.b	#$50,d5		; check sprite limit
-		beq.s	.return
+		bhs.s	.return
 		move.b	(a1)+,d0	; get y-offset
 		move.b	(a1),d4		; get size
 		ext.w	d0
@@ -5703,6 +5705,7 @@ CellOffsets_XFlip2:
 		dc.b $10,$10,$10,$10	; 8
 		dc.b $18,$18,$18,$18	; 12
 		dc.b $20,$20,$20,$20	; 16
+		even
 ; ===========================================================================
 ; offsets for vertically mirrored sprite pieces
 CellOffsets_YFlip2:
@@ -5710,11 +5713,12 @@ CellOffsets_YFlip2:
 		dc.b   8,$10,$18,$20	; 8
 		dc.b   8,$10,$18,$20	; 12
 		dc.b   8,$10,$18,$20	; 16
+		even
 ; ===========================================================================
 
 BuildSpr_FlipXY:
 		cmpi.b	#$50,d5		; check sprite limit
-		beq.s	.return
+		bhs.s	.return
 		move.b	(a1)+,d0	; calculated flipped y
 		move.b	(a1),d4
 		ext.w	d0
