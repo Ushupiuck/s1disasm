@@ -30,7 +30,6 @@ Swing_Main:	; Routine 0
 		move.w	obX(a0),swing_origX(a0)
 		cmpi.b	#id_SLZ,(v_zone).w ; check if level is SLZ
 		bne.s	.notSLZ
-
 		move.l	#Map_Swing_SLZ,obMap(a0) ; SLZ specific code
 		move.w	#make_art_tile(ArtTile_SLZ_Swing,2,0),obGfx(a0)
 		move.b	#$20,obActWid(a0)
@@ -40,7 +39,6 @@ Swing_Main:	; Routine 0
 .notSLZ:
 		cmpi.b	#id_SBZ,(v_zone).w ; check if level is SBZ
 		bne.s	.length
-
 		move.l	#Map_BBall,obMap(a0) ; SBZ specific code
 		move.w	#make_art_tile(ArtTile_SBZ_Swing,0,0),obGfx(a0)
 		move.b	#$18,obActWid(a0)
@@ -66,8 +64,7 @@ Swing_Main:	; Routine 0
 		addq.b	#8,d3
 		subq.w	#1,d1
 
-.makechain:
-		bsr.w	FindFreeObj
+.makechain:	bsr.w	FindFreeObj
 		bne.s	.fail
 		addq.b	#1,obSubtype(a0)
 		move.w	a1,d5
@@ -90,9 +87,7 @@ Swing_Main:	; Routine 0
 		move.b	#2,obFrame(a1)
 		move.b	#3,obPriority(a1)
 		bset	#6,obGfx(a1)
-
-.notanchor:
-		dbf	d1,.makechain ; repeat d1 times (chain length)
+.notanchor:	dbf	d1,.makechain ; repeat d1 times (chain length)
 
 .fail:
 		move.w	a0,d5
@@ -143,3 +138,110 @@ Swing_Action2:	; Routine 4
 		bra.w	Swing_ChkDel
 
 		rts
+; End of function MvSonicOnPtfm
+
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Object 15 (part 2)
+; ---------------------------------------------------------------------------
+
+Swing_Move:
+		move.b	(v_oscillate+$1A).w,d0
+		move.w	#$80,d1
+		btst	#0,obStatus(a0)
+		beq.s	loc_7B78
+		neg.w	d0
+		add.w	d1,d0
+
+loc_7B78:
+		bra.s	Swing_Move2
+; End of function Swing_Move
+; ===========================================================================
+
+Obj48_Move:
+		tst.b	objoff_3D(a0)
+		bne.s	loc_7B9C
+		move.w	objoff_3E(a0),d0
+		addq.w	#8,d0
+		move.w	d0,objoff_3E(a0)
+		add.w	d0,obAngle(a0)
+		cmpi.w	#$200,d0
+		bne.s	loc_7BB6
+		move.b	#1,objoff_3D(a0)
+		bra.s	loc_7BB6
+; ===========================================================================
+
+loc_7B9C:
+		move.w	objoff_3E(a0),d0
+		subq.w	#8,d0
+		move.w	d0,objoff_3E(a0)
+		add.w	d0,obAngle(a0)
+		cmpi.w	#-$200,d0
+		bne.s	loc_7BB6
+		move.b	#0,objoff_3D(a0)
+
+loc_7BB6:
+		move.b	obAngle(a0),d0
+; End of function Obj48_Move
+; ===========================================================================
+
+Swing_Move2:
+		bsr.w	CalcSine
+		move.w	objoff_38(a0),d2
+		move.w	objoff_3A(a0),d3
+		lea	obSubtype(a0),a2
+		moveq	#0,d6
+		move.b	(a2)+,d6
+
+loc_7BCE:
+		moveq	#0,d4
+		move.b	(a2)+,d4
+		lsl.w	#object_size_bits,d4
+		addi.l	#v_objspace&$FFFFFF,d4
+		movea.l	d4,a1
+		moveq	#0,d4
+		move.b	objoff_3C(a1),d4
+		move.l	d4,d5
+		muls.w	d0,d4
+		asr.l	#8,d4
+		muls.w	d1,d5
+		asr.l	#8,d5
+		add.w	d2,d4
+		add.w	d3,d5
+		move.w	d4,obY(a1)
+		move.w	d5,obX(a1)
+		dbf	d6,loc_7BCE
+		rts
+; End of function Swing_Move2
+
+; ===========================================================================
+
+Swing_ChkDel:
+		out_of_range.w	Swing_DelAll,objoff_3A(a0)
+		rts
+; ===========================================================================
+
+Swing_DelAll:
+		moveq	#0,d2
+		lea	obSubtype(a0),a2
+		move.b	(a2)+,d2
+
+Swing_DelLoop:
+		moveq	#0,d0
+		move.b	(a2)+,d0
+		lsl.w	#object_size_bits,d0
+		addi.l	#v_objspace&$FFFFFF,d0
+		movea.l	d0,a1
+		bsr.w	DeleteChild
+		dbf	d2,Swing_DelLoop ; repeat for length of chain
+		rts
+; ===========================================================================
+
+Swing_Delete:	; Routine 6, 8
+		bra.w	DeleteObject
+		rts
+; ===========================================================================
+
+Swing_Display:	; Routine $A
+		bra.w	DisplaySprite
