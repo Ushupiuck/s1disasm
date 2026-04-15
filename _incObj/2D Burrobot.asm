@@ -11,7 +11,8 @@ Burrobot:
 Burro_Index:	dc.w Burro_Main-Burro_Index
 		dc.w Burro_Action-Burro_Index
 
-burro_timedelay = objoff_30		; time between direction changes
+burrobot_turn_time	= objoff_30	; 2 bytes; time between direction changes
+burrobot_floor_flag	= objoff_32	; 1 byte ; flag set every other frame to detect edge of floor
 ; ===========================================================================
 
 Burro_Main:	; Routine 0
@@ -43,56 +44,52 @@ Burro_Action:	; Routine 2
 ; ===========================================================================
 
 .changedir:
-		subq.w	#1,burro_timedelay(a0)
+		subq.w	#1,burrobot_turn_time(a0)
 		bpl.s	.nochg
 		addq.b	#2,ob2ndRout(a0)
-		move.w	#255,burro_timedelay(a0)
+		move.w	#255,burrobot_turn_time(a0)
 		move.w	#$80,obVelX(a0)
 		move.b	#1,obAnim(a0)
 		bchg	#0,obStatus(a0)	; change direction the Burrobot is facing
 		beq.s	.nochg
 		neg.w	obVelX(a0)	; change direction the Burrobot is moving
-
-.nochg:
-		rts
+.nochg:		rts
 ; ===========================================================================
 
 Burro_Move:
-		subq.w	#1,burro_timedelay(a0)
-		bmi.s	loc_AD84
+		subq.w	#1,burrobot_turn_time(a0)	; decrement turning timer
+		bmi.s	Burro_Turn			; branch if it runs out
 		bsr.w	SpeedToPos
-		bchg	#0,objoff_32(a0)
-		bne.s	loc_AD78
+		bchg	#0,burrobot_floor_flag(a0)
+		bne.s	Burro_Turn.findfloor
 		move.w	obX(a0),d3
-		addi.w	#$C,d3
-		btst	#0,obStatus(a0)
-		bne.s	loc_AD6A
-		subi.w	#$18,d3
-
-loc_AD6A:
+		addi.w	#$C,d3				; find floor to the right
+		btst	#0,obStatus(a0)			; is burrobot flipped?
+		bne.s	+
+		subi.w	#$18,d3				; find floor to the left
++
 		jsr	(ObjFloorDist2).l
-		cmpi.w	#$C,d1
-		bge.s	loc_AD84
-		rts
+		cmpi.w	#$C,d1				; is floor 12 or more px away?
+		blt.s	Burro_Turn.return		; if so, return
+	;	bge.s	Burro_Turn			; if yes, branch
+Burro_Turn:
+	;	btst	#2,(v_vbla_byte+3).w		; becomes vbla_byte+3 in Sonic 2 onwards
+		btst	#2,(v_vbla_byte).w
+		beq.s	.jump
+		subq.b	#2,ob2ndRout(a0)
+		move.w	#59,burrobot_turn_time(a0)
+		clr.w	obVelX(a0)
+		clr.b	obAnim(a0)
+.return:	rts
 ; ===========================================================================
 
-loc_AD78:
+.findfloor:
 		jsr	(ObjFloorDist).l
 		add.w	d1,obY(a0)
 		rts
 ; ===========================================================================
 
-loc_AD84:
-		btst	#2,(v_vbla_byte).w
-		beq.s	loc_ADA4
-		subq.b	#2,ob2ndRout(a0)
-		move.w	#59,burro_timedelay(a0)
-		move.w	#0,obVelX(a0)
-		move.b	#0,obAnim(a0)
-		rts
-; ===========================================================================
-
-loc_ADA4:
+.jump:		; RNG decided we should jump, so prepare.
 		addq.b	#2,ob2ndRout(a0)
 		move.w	#-$400,obVelY(a0)
 		move.b	#2,obAnim(a0)
@@ -102,54 +99,48 @@ loc_ADA4:
 Burro_Jump:
 		bsr.w	SpeedToPos
 		addi.w	#$18,obVelY(a0)
-		bmi.s	locret_ADF0
+		bmi.s	Burro_ChkSonic.return
 		move.b	#3,obAnim(a0)
 		jsr	(ObjFloorDist).l
 		tst.w	d1
-		bpl.s	locret_ADF0
+		bpl.s	Burro_ChkSonic.return
 		add.w	d1,obY(a0)
-		move.w	#0,obVelY(a0)
+		clr.w	obVelY(a0)
 		move.b	#1,obAnim(a0)
-		move.w	#255,burro_timedelay(a0)
+		move.w	#255,burrobot_turn_time(a0)
 		subq.b	#2,ob2ndRout(a0)
-		bsr.w	Burro_ChkSonic2
-
-locret_ADF0:
-		rts
+		move.w	#$80,d1
+		bra.w	Burro_ChkSonic2
 ; ===========================================================================
 
 Burro_ChkSonic:
-		move.w	#$60,d2
+		moveq	#$60,d2
+		move.w	#$80,d1
 		bsr.w	Burro_ChkSonic2
-		bcc.s	locret_AE20
+		bcc.s	.return
 		move.w	(v_player+obY).w,d0
 		sub.w	obY(a0),d0
-		bcc.s	locret_AE20
+		bcc.s	.return
 		cmpi.w	#-$80,d0
-		blo.s	locret_AE20
+		blo.s	.return
 		tst.w	(v_debuguse).w
-		bne.s	locret_AE20
+		bne.s	.return
 		subq.b	#2,ob2ndRout(a0)
 		move.w	d1,obVelX(a0)
 		move.w	#-$400,obVelY(a0)
-
-locret_AE20:
-		rts
+.return:	rts
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
 Burro_ChkSonic2:
-		move.w	#$80,d1
 		bset	#0,obStatus(a0)
 		move.w	(v_player+obX).w,d0
 		sub.w	obX(a0),d0
-		bcc.s	loc_AE40
+		bcc.s	.right
 		neg.w	d0
 		neg.w	d1
 		bclr	#0,obStatus(a0)
-
-loc_AE40:
-		cmp.w	d2,d0
+.right:		cmp.w	d2,d0
 		rts
 ; End of function Burro_ChkSonic2

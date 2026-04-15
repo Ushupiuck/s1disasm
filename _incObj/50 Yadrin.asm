@@ -13,7 +13,6 @@ Obj_ChkWall:
 		bsr.w	ObjHitWallRight		; get distance to nearest right wall
 		tst.w	d1			; did object hit wall?
 		smi	d0			; d0=$FF if hit, 0 if not
-		neg.b	d0			; we want -1, not $FF, tho
 		rts
 ; ===========================================================================
 .checkleftwall:
@@ -21,7 +20,6 @@ Obj_ChkWall:
 		bsr.w	ObjHitWallLeft		; get distance to nearest left wall
 		tst.w	d1			; did object hit wall?
 		smi	d0			; d0=$FF if hit, 0 if not
-		neg.b	d0			; we want -1, not $FF, tho
 		rts
 
 .nowallhit:
@@ -105,7 +103,7 @@ Yad_FixToFloor:
 		bge.s	Yad_Pause
 		add.w	d1,obY(a0)	; match object's position to the floor
 		bsr.w	Obj_ChkWall
-		beq.s	Yad_Pause.return
+		bpl.s	Yad_Pause.return
 Yad_Pause:	subq.b	#2,ob2ndRout(a0)
 		move.w	#60-1,yad_timedelay(a0) ; set pause time to 1 second
 		clr.w	obVelX(a0)

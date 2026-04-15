@@ -31,13 +31,21 @@ Bump_Hit:	; Routine 2
 		sub.w	obX(a1),d1
 		sub.w	obY(a1),d2
 		jsr	(CalcAngle).l
+		moveq	#3,d1
+		and.b	(v_framecount).w,d1
+		add.w	d1,d0
 		jsr	(CalcSine).l
-		muls.w	#-$700,d1
-		asr.l	#8,d1
-		move.w	d1,obVelX(a1)	; bounce Sonic away
-		muls.w	#-$700,d0
-		asr.l	#8,d0
-		move.w	d0,obVelY(a1)	; bounce Sonic away
+		move.w	d1,d3
+		asl.w	#3,d1		; 8x
+		sub.w	d3,d1		; 7x
+		neg.w	d1
+		move.w	d1,obVelX(a1)
+
+		move.w	d0,d3
+		asl.w	#3,d0		; 8x
+		sub.w	d3,d0		; 7x
+		neg.w	d0
+		move.w	d0,obVelY(a1)
 		bset	#1,obStatus(a1)
 		bclr	#4,obStatus(a1)
 		bclr	#5,obStatus(a1)

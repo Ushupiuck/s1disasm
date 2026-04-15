@@ -18,8 +18,9 @@ Cat_Index:	dc.w Cat_Main-Cat_Index
 
 cat_wait_time	= obAniFrame		; 1 byte; delay between moves
 cat_mode	= obAnim		; 1 byte; bit 4 = segment up/down, bit 7 = animate
-cat_floormap	= objoff_2A		; $C bytes; 16 packed 6-bit floor entries
-cat_parent	= objoff_36		; 4 bytes; parent object (high byte = segment index)
+cat_inertia	= objoff_2A		; 2 bytes; Needed to avoid overwriting it's own obColType & obColProp
+cat_floormap	= objoff_2C		; $C bytes; 16 packed 6-bit floor entries
+cat_parent	= objoff_38		; 4 bytes; parent object (high byte = segment index)
 cat_segment_pos	= cat_parent		; high byte; current position in floor buffer
 
 cat_floor_bias	= 8			; -8..+11 -> 0..19
@@ -54,7 +55,7 @@ Cat_Main:	; Routine 0
 		clr.b	cat_mode(a0)
 		clr.w	obVelX(a0)
 		clr.w	obVelY(a0)
-		clr.w	obInertia(a0)
+		clr.w	cat_inertia(a0)
 
 		move.w	obX(a0),d2
 		moveq	#$C,d5
@@ -83,7 +84,7 @@ Cat_Loop:
 
 		clr.w	obVelX(a1)
 		clr.w	obVelY(a1)
-		clr.w	obInertia(a1)
+		clr.w	cat_inertia(a1)
 
 		add.w	d5,d2
 		move.w	d2,obX(a1)
@@ -194,11 +195,11 @@ Cat_Index2:
 		addq.b	#2,ob2ndRout(a0)
 		move.b	#$10,cat_wait_time(a0)
 		move.w	#-$C0,obVelX(a0)
-		move.w	#$40,obInertia(a0)
+		move.w	#$40,cat_inertia(a0)
 		bchg	#4,cat_mode(a0)
 		bne.s	loc_16AFC
 		clr.w	obVelX(a0)
-		neg.w	obInertia(a0)
+		neg.w	cat_inertia(a0)
 
 loc_16AFC:
 		bset	#7,cat_mode(a0)
@@ -244,7 +245,7 @@ loc_16B02:
 		subq.b	#2,ob2ndRout(a0)
 		move.b	#7,cat_wait_time(a0)
 		clr.w	obVelX(a0)
-		clr.w	obInertia(a0)
+		clr.w	cat_inertia(a0)
 		rts
 ; ===========================================================================
 
@@ -310,13 +311,13 @@ Cat_BodySeg1:	; Routine 4, 8
 		move.l	obY(a1),obY(a0)
 		clr.w	obVelX(a0)
 		clr.w	obVelY(a0)
-		clr.w	obInertia(a0)
+		clr.w	cat_inertia(a0)
 		move.b	#8,obFrame(a0)
 		bra.w	loc_16C64
 
 .notwait:
-		move.w	obInertia(a1),d1
-		move.w	d1,obInertia(a0)
+		move.w	cat_inertia(a1),d1
+		move.w	d1,cat_inertia(a0)
 		move.w	obVelX(a1),d0
 		add.w	d1,d0
 		move.w	d0,obVelX(a0)
@@ -351,7 +352,7 @@ Cat_BodyAirborne:
 		move.l	obY(a1),obY(a0)
 		clr.w	obVelX(a0)
 		clr.w	obVelY(a0)
-		clr.w	obInertia(a0)
+		clr.w	cat_inertia(a0)
 		move.b	#8,obFrame(a0)
 		bra.s	loc_16C64
 

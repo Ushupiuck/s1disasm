@@ -4624,53 +4624,7 @@ locret_75F2:
 		include	"_incObj/11 Bridge (part 3).asm"
 Map_Bri:	include	"_maps/Bridge.asm"
 
-		include	"_incObj/15 Swinging Platforms (part 1).asm"
-
-; ---------------------------------------------------------------------------
-; Subroutine to change Sonic's position with a platform
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
-
-MvSonicOnPtfm:
-		lea	(v_player).w,a1
-		move.w	obY(a0),d0
-		sub.w	d3,d0
-		bra.s	MvSonic2
-; End of function MvSonicOnPtfm
-
-; ---------------------------------------------------------------------------
-; Subroutine to change Sonic's position with a platform
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
-
-MvSonicOnPtfm2:
-		lea	(v_player).w,a1
-		move.w	obY(a0),d0
-		subi.w	#9,d0
-
-MvSonic2:
-		tst.b	(f_playerctrl).w
-		bmi.s	locret_7B62
-		cmpi.b	#6,(v_player+obRoutine).w
-		bhs.s	locret_7B62
-		tst.w	(v_debuguse).w
-		bne.s	locret_7B62
-		moveq	#0,d1
-		move.b	obHeight(a1),d1
-		sub.w	d1,d0
-		move.w	d0,obY(a1)
-		sub.w	obX(a0),d2
-		sub.w	d2,obX(a1)
-
-locret_7B62:
-		rts
-; End of function MvSonicOnPtfm2
-
-		include	"_incObj/15 Swinging Platforms (part 2).asm"
+		include	"_incObj/15 Swinging Platforms.asm"
 Map_Swing_GHZ:	include	"_maps/Swinging Platforms (GHZ).asm"
 Map_Swing_SLZ:	include	"_maps/Swinging Platforms (SLZ).asm"
 		include	"_incObj/17 Spiked Pole Helix.asm"
@@ -5636,7 +5590,11 @@ BuildSpr_FlipX:
 		move.b	(a1)+,d0	; get x-offset
 		ext.w	d0
 		neg.w	d0			; negate it
-		move.b	CellOffsets_XFlip(pc,d4.w),d4
+	;	move.b	CellOffsets_XFlip(pc,d4.w),d4
+		add.b	d4,d4		; calculate flipped position by size
+		andi.w	#$18,d4
+		addq.w	#8,d4
+
 		sub.w	d4,d0
 		add.w	d3,d0
 		andi.w	#$1FF,d0	; keep within 512px
@@ -5672,7 +5630,11 @@ BuildSpr_FlipY:
 		move.b	(a1),d4		; get size
 		ext.w	d0
 		neg.w	d0		; negate y-offset
-		move.b	CellOffsets_YFlip(pc,d4.w),d4
+	;	move.b	CellOffsets_YFlip(pc,d4.w),d4
+		lsl.b	#3,d4	; calculate flip offset
+		andi.w	#$18,d4
+		addq.w	#8,d4
+
 		sub.w	d4,d0
 		add.w	d2,d0	; add y-position
 		move.w	d0,(a2)+	; write to buffer
@@ -5723,7 +5685,11 @@ BuildSpr_FlipXY:
 		move.b	(a1),d4
 		ext.w	d0
 		neg.w	d0
-		move.b	CellOffsets_YFlip2(pc,d4.w),d4
+	;	move.b	CellOffsets_YFlip2(pc,d4.w),d4
+		lsl.b	#3,d4
+		andi.w	#$18,d4
+		addq.w	#8,d4
+
 		sub.w	d4,d0
 		add.w	d2,d0
 		move.w	d0,(a2)+	; write to buffer
@@ -5740,7 +5706,11 @@ BuildSpr_FlipXY:
 		move.b	(a1)+,d0	; calculate flipped x
 		ext.w	d0
 		neg.w	d0
-		move.b	CellOffsets_XFlip2(pc,d4.w),d4
+	;	move.b	CellOffsets_XFlip2(pc,d4.w),d4
+		add.b	d4,d4
+		andi.w	#$18,d4
+		addq.w	#8,d4
+
 		sub.w	d4,d0
 		add.w	d3,d0
 		andi.w	#$1FF,d0

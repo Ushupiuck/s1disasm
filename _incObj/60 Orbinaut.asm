@@ -14,7 +14,10 @@ Orb_Index:	dc.w Orb_Main-Orb_Index
 		dc.w Orb_MoveOrb-Orb_Index
 		dc.w Orb_ChkDel2-Orb_Index
 
-orb_parent = objoff_3C		; address of parent object
+orb_direction	= objoff_36		; $36 ; direction orbs rotate: 1 = clockwise; -1 = anticlockwise
+orb_child_count = objoff_37		; $37 ; number of child objects
+orb_child_list	= objoff_38		; $38 ; OST indices of child objects (4 bytes - 1 byte per ball)
+orb_parent	= objoff_3C		; address of parent object
 ; ===========================================================================
 
 Orb_Main:	; Routine 0
@@ -30,7 +33,7 @@ Orb_Main:	; Routine 0
 		move.b	#$B,obColType(a0)
 		move.b	#$C,obActWid(a0)
 		moveq	#0,d2
-		lea	objoff_37(a0),a2
+		lea	orb_child_count(a0),a2
 		movea.l	a2,a3
 		addq.w	#1,a2
 		moveq	#3,d1
@@ -65,7 +68,7 @@ Orb_Main:	; Routine 0
 		neg.w	d0
 
 .noflip:
-		move.b	d0,objoff_36(a0)
+		move.b	d0,orb_direction(a0)
 		move.b	obSubtype(a0),obRoutine(a0) ; if type is 02, skip Orb_ChkSonic
 		addq.b	#2,obRoutine(a0)
 		move.w	#-$40,obVelX(a0) ; move orbinaut to the left
@@ -119,7 +122,7 @@ Orb_ChkDel:
 		bclr	#7,2(a2,d0.w)
 
 loc_11E34:
-		lea	objoff_37(a0),a2
+		lea	orb_child_count(a0),a2
 		moveq	#0,d2
 		move.b	(a2)+,d2
 		subq.w	#1,d2
@@ -147,7 +150,7 @@ Orb_MoveOrb:	; Routine 6
 		cmpi.b	#$40,obAngle(a0) ; is spikeorb directly under the orbinaut?
 		bne.s	.circle		; if not, branch
 		addq.b	#2,obRoutine(a0)
-		subq.b	#1,objoff_37(a1)
+		subq.b	#1,orb_child_count(a1)
 		bne.s	.fire
 		addq.b	#2,obRoutine(a1)
 
@@ -170,7 +173,7 @@ Orb_MoveOrb:	; Routine 6
 		asr.w	#4,d0
 		add.w	obY(a1),d0
 		move.w	d0,obY(a0)
-		move.b	objoff_36(a1),d0
+		move.b	orb_direction(a1),d0
 		add.b	d0,obAngle(a0)
 		bra.w	DisplaySprite
 ; ===========================================================================

@@ -9,9 +9,12 @@ SwingingPlatform:
 		move.w	Swing_Index(pc,d0.w),d1
 		jmp	Swing_Index(pc,d1.w)
 ; ===========================================================================
-Swing_Index:	dc.w Swing_Main-Swing_Index, Swing_SetSolid-Swing_Index
-		dc.w Swing_Action2-Swing_Index,	Swing_Delete-Swing_Index
-		dc.w Swing_Delete-Swing_Index, Swing_Display-Swing_Index
+Swing_Index:	dc.w Swing_Main-Swing_Index
+		dc.w Swing_SetSolid-Swing_Index
+		dc.w Swing_Action2-Swing_Index
+		dc.w Swing_Delete-Swing_Index
+		dc.w Swing_Delete-Swing_Index
+		dc.w Swing_Display-Swing_Index
 		dc.w Swing_Action-Swing_Index
 
 swing_origX = objoff_3A		; original x-axis position
@@ -137,6 +140,39 @@ Swing_Action2:	; Routine 4
 		bsr.w	DisplaySprite
 		bra.w	Swing_ChkDel
 
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to	update Sonic's position when standing on a platform
+; (shared by other platform objects)
+; ---------------------------------------------------------------------------
+
+MvSonicOnPtfm:	; platform height is taken from d3
+		lea	(v_player).w,a1
+		move.w	obY(a0),d0
+		sub.w	d3,d0
+		bra.s	MvSonic2
+; ===========================================================================
+
+MvSonicOnPtfm2:	; platform height is assumed to be 9
+		lea	(v_player).w,a1
+		move.w	obY(a0),d0
+		subi.w	#9,d0
+
+MvSonic2:
+		tst.b	(f_playerctrl).w
+		bmi.s	.return
+		cmpi.b	#6,(v_player+obRoutine).w
+		bhs.s	.return
+		tst.w	(v_debuguse).w
+		bne.s	.return
+		moveq	#0,d1
+		move.b	obHeight(a1),d1
+		sub.w	d1,d0
+		move.w	d0,obY(a1)
+		sub.w	obX(a0),d2
+		sub.w	d2,obX(a1)
+
+	.return:
 		rts
 ; End of function MvSonicOnPtfm
 
@@ -240,7 +276,6 @@ Swing_DelLoop:
 
 Swing_Delete:	; Routine 6, 8
 		bra.w	DeleteObject
-		rts
 ; ===========================================================================
 
 Swing_Display:	; Routine $A
