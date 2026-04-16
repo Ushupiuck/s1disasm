@@ -1,6 +1,9 @@
 ; ---------------------------------------------------------------------------
 ; Object 28 - animals
 ; ---------------------------------------------------------------------------
+animal_ground_routine_base	= objoff_30
+animal_ground_x_vel		= objoff_32
+animal_ground_y_vel		= objoff_34
 
 Animals:
 		moveq	#0,d0
@@ -51,17 +54,43 @@ Anml_EndMap:	dc.l Map_Animal2, Map_Animal2, Map_Animal2, Map_Animal1, Map_Animal
 		dc.l Map_Animal1, Map_Animal1, Map_Animal2, Map_Animal3, Map_Animal2
 		dc.l Map_Animal3
 
-Anml_EndVram:	dc.w make_art_tile(ArtTile_Ending_Flicky,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Flicky,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Flicky,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Rabbit,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Rabbit,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Penguin,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Penguin,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Seal,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Pig,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Chicken,0,0)
-		dc.w make_art_tile(ArtTile_Ending_Squirrel,0,0)
+Anml_EndVariables:
+		; Art, horizontal speed, vertical speed, mappings
+		dc.w make_art_tile(ArtTile_Ending_Flicky,0,0)	; $A
+		dc.w -$440, -$400		; $A
+		dc.l Map_Animal2		; $A
+		dc.w make_art_tile(ArtTile_Ending_Flicky,0,0)      ; $B - unused
+		dc.w -$440, -$400		; $B - unused
+		dc.l Map_Animal2		; $B - unused
+		dc.w make_art_tile(ArtTile_Ending_Flicky,0,0)      ; $C
+		dc.w -$440, -$400		; $C
+		dc.l Map_Animal2		; $C
+		dc.w make_art_tile(ArtTile_Ending_Rabbit,0,0)      ; $D
+		dc.w -$300, -$400		; $D
+		dc.l Map_Animal1		; $D
+		dc.w make_art_tile(ArtTile_Ending_Rabbit,0,0)      ; $E
+		dc.w -$300, -$400		; $E
+		dc.l Map_Animal1		; $E
+		dc.w make_art_tile(ArtTile_Ending_Penguin,0,0)     ; $F
+		dc.w -$180, -$300		; $F
+		dc.l Map_Animal1		; $F
+		dc.w make_art_tile(ArtTile_Ending_Penguin,0,0)     ; $10 - unused
+		dc.w -$180, -$300		; $10 - unused
+		dc.l Map_Animal1		; $10 - unused
+		dc.w make_art_tile(ArtTile_Ending_Seal,0,0)        ; $11 - unused
+		dc.w -$140, -$180		; $11 - unused
+		dc.l Map_Animal2		; $11 - unused
+		dc.w make_art_tile(ArtTile_Ending_Pig,0,0)         ; $12 - unused
+		dc.w -$1C0, -$300		; $12 - unused
+		dc.l Map_Animal3		; $12 - unused
+		dc.w make_art_tile(ArtTile_Ending_Chicken,0,0)     ; $13
+		dc.w -$200, -$300		; $13
+		dc.l Map_Animal2		; $13
+		dc.w make_art_tile(ArtTile_Ending_Squirrel,0,0)    ; $14
+		dc.w -$280, -$380		; $14
+		dc.l Map_Animal3		; $14
+
+Anml_EndVram:
 ; ===========================================================================
 
 Anml_Ending:	; Routine 0
@@ -71,15 +100,19 @@ Anml_Ending:	; Routine 0
 		move.b	obSubtype(a0),d0 ; move object type to d0
 		add.w	d0,d0		; multiply d0 by 2
 		move.b	d0,obRoutine(a0) ; move d0 to routine counter
-		subi.w	#$14,d0
-		move.w	Anml_EndVram(pc,d0.w),obGfx(a0)
+		subi.w	#$14,d0		; d0 = (subtype-$A)*2
+		move.w	d0,d1
 		add.w	d0,d0
-		move.l	Anml_EndMap(pc,d0.w),obMap(a0)
-		lea	Anml_EndSpeed(pc),a1
-		move.w	(a1,d0.w),objoff_32(a0) ; load horizontal speed
-		move.w	(a1,d0.w),obVelX(a0)
-		move.w	2(a1,d0.w),objoff_34(a0) ; load vertical speed
-		move.w	2(a1,d0.w),obVelY(a0)
+		add.w	d0,d0
+		add.w	d1,d0
+		lea	Anml_EndVariables(pc),a1
+		adda.w	d0,a1
+		move.w	(a1)+,obGfx(a0)
+		move.w	(a1)+,animal_ground_x_vel(a0)
+		move.w	animal_ground_x_vel(a0),obVelX(a0)
+		move.w	(a1)+,animal_ground_y_vel(a0)
+		move.w	animal_ground_y_vel(a0),obVelY(a0)
+		move.l	(a1)+,obMap(a0)
 		move.b	#$C,obHeight(a0)
 		move.b	#4,obRender(a0)
 		bset	#0,obRender(a0)
@@ -174,7 +207,7 @@ loc_9184:
 		move.b	#1,obFrame(a0)
 		tst.w	obVelY(a0)
 		bmi.s	loc_91AE
-		move.b	#0,obFrame(a0)
+		clr.b	obFrame(a0)
 		jsr	(ObjFloorDist).l
 		tst.w	d1
 		bpl.s	loc_91AE
@@ -292,7 +325,7 @@ loc_92D6:
 		move.b	#1,obFrame(a0)
 		tst.w	obVelY(a0)
 		bmi.s	loc_9310
-		move.b	#0,obFrame(a0)
+		clr.b	obFrame(a0)
 		jsr	(ObjFloorDist).l
 		tst.w	d1
 		bpl.s	loc_9310
@@ -329,7 +362,7 @@ loc_9332:
 		move.b	#1,obFrame(a0)
 		tst.w	obVelY(a0)
 		bmi.s	loc_936C
-		move.b	#0,obFrame(a0)
+		clr.b	obFrame(a0)
 		jsr	(ObjFloorDist).l
 		tst.w	d1
 		bpl.s	loc_936C
@@ -376,7 +409,7 @@ loc_93C4:
 		move.b	#1,obFrame(a0)
 		tst.w	obVelY(a0)
 		bmi.s	locret_93EA
-		move.b	#0,obFrame(a0)
+		clr.b	obFrame(a0)
 		jsr	(ObjFloorDist).l
 		tst.w	d1
 		bpl.s	locret_93EA
