@@ -18,7 +18,7 @@ SStom_Index:	dc.w SStom_Main-SStom_Index
 		;		 xpos
 SStom_Var:	dc.b	2,  	 4,	0	; main block
 		dc.b	4,	-$1C,	1	; spikes
-		dc.b	8,	 $34,	3	; pole
+		dc.b	8,	 $54,	3	; pole
 		dc.b	6,	 $28,	2	; wall bracket
 
 ;word_B9BE:	; Note that this indicates three subtypes
@@ -75,13 +75,13 @@ SStom_Main:	; Routine 0
 SStom_Solid:	; Routine 2
 		move.w	obX(a0),-(sp)
 		bsr.w	SStom_Move
-		move.w	#$17,d1
-		move.w	#$20,d2
-		move.w	#$20,d3
+		moveq	#$17,d1
+		moveq	#$20,d2
+		moveq	#$20,d3
 		move.w	(sp)+,d4
 		bsr.w	SolidObject
-		bsr.w	DisplaySprite
-		bra.w	SStom_ChkDel
+		out_of_range.w	DeleteObject,objoff_3A(a0)
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 SStom_Pole:	; Routine 8
@@ -99,33 +99,28 @@ loc_BA8E:	; Routine 4
 		neg.w	d0
 		add.w	objoff_30(a0),d0
 		move.w	d0,obX(a0)
-
-SStom_Display:	; Routine 6
-		bsr.w	DisplaySprite
-
-SStom_ChkDel:
 		out_of_range.w	DeleteObject,objoff_3A(a0)
-		rts
+SStom_Display:
+		bra.w	DisplaySprite	; Routine 6
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
-
 SStom_Move:
-		moveq	#0,d0
-		move.b	obSubtype(a0),d0
-		add.w	d0,d0
-		move.w	off_BAD6(pc,d0.w),d1
-		jmp	off_BAD6(pc,d1.w)
+	;	moveq	#0,d0
+	;	move.b	obSubtype(a0),d0
+	;	add.w	d0,d0
+	;	move.w	off_BAD6(pc,d0.w),d1
+	;	jmp	off_BAD6(pc,d1.w)
 ; End of function SStom_Move
 
 ; ===========================================================================
 		; This indicates only two subtypes... that do the same thing
 		; Compare to SStom_Len. This breaks subtype 02
-off_BAD6:	dc.w loc_BADA-off_BAD6
-		dc.w loc_BADA-off_BAD6
+off_BAD6:;	dc.w loc_BADA-off_BAD6
+	;	dc.w loc_BADA-off_BAD6
 ; ===========================================================================
 
-loc_BADA:
+; loc_BADA:
 		tst.w	objoff_36(a0)
 		beq.s	loc_BB08
 		tst.w	objoff_38(a0)
@@ -137,9 +132,10 @@ loc_BADA:
 loc_BAEC:
 		subi.w	#$80,objoff_32(a0)
 		bcc.s	loc_BB3C
-		move.w	#0,objoff_32(a0)
-		move.w	#0,obVelX(a0)
-		move.w	#0,objoff_36(a0)
+		moveq	#0,d0
+		move.w	d0,objoff_32(a0)
+		move.w	d0,obVelX(a0)
+		move.w	d0,objoff_36(a0)
 		bra.s	loc_BB3C
 ; ===========================================================================
 
@@ -153,7 +149,7 @@ loc_BB08:
 		cmp.w	objoff_32(a0),d1
 		bhi.s	loc_BB3C
 		move.w	d1,objoff_32(a0)
-		move.w	#0,obVelX(a0)
+		clr.w	obVelX(a0)
 		move.w	#1,objoff_36(a0)
 		move.w	#$3C,objoff_38(a0)
 

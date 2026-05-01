@@ -53,7 +53,6 @@ FBlock_Main:	; Routine 0
 		move.b	(a2),d0
 		add.w	d0,d0
 		move.w	d0,fb_height(a0)
-	if Revision<>0
 		cmpi.b	#$37,obSubtype(a0)
 		bne.s	.dontdelete
 		cmpi.w	#$1BB8,obX(a0)
@@ -67,7 +66,6 @@ FBlock_Main:	; Routine 0
 		bne.s	.dontdelete
 		jmp	(DeleteObject).l
 .dontdelete:
-	endif
 		moveq	#0,d0
 		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ
 		beq.s	.stillnotLZ
@@ -124,22 +122,15 @@ FBlock_Action:	; Routine 2
 		addq.w	#1,d3
 		bsr.w	SolidObject
 
-.chkdel:
-	if Revision=0
-		out_of_range.w	DeleteObject,fb_origX(a0)
-		bra.w	DisplaySprite
-	else
-		out_of_range.s	.chkdel2,fb_origX(a0)
-.display:
-		bra.w	DisplaySprite
+.chkdel:	out_of_range.s	.chkdel2,fb_origX(a0)
+.display:	bra.w	DisplaySprite
+
 .chkdel2:
 		cmpi.b	#$37,obSubtype(a0)
 		bne.s	.delete
 		tst.b	objoff_38(a0)
 		bne.s	.display
-.delete:
-		jmp	(DeleteObject).l
-	endif
+.delete:	jmp	(DeleteObject).l
 ; ===========================================================================
 .index:		dc.w .type00-.index, .type01-.index
 		dc.w .type02-.index, .type03-.index
@@ -160,7 +151,15 @@ FBlock_Action:	; Routine 2
 		move.w	#$40,d1		; set move distance
 		moveq	#0,d0
 		move.b	(v_oscillate+$A).w,d0
-		bra.s	.moveLR
+		btst	#0,obStatus(a0)	; is it flipped?
+		beq.s	+
+		neg.w	d0
+		add.w	d1,d0
++
+		move.w	fb_origX(a0),d1
+		sub.w	d0,d1
+		move.w	d1,obX(a0)	; move object horizontally
+		rts
 ; ===========================================================================
 
 .type02:
@@ -187,7 +186,15 @@ FBlock_Action:	; Routine 2
 		move.w	#$40,d1		; set move distance
 		moveq	#0,d0
 		move.b	(v_oscillate+$A).w,d0
-		bra.s	.moveUD
+		btst	#0,obStatus(a0)
+		beq.s	+
+		neg.w	d0
+		add.w	d1,d0
++
+		move.w	fb_origY(a0),d1
+		sub.w	d0,d1
+		move.w	d1,obY(a0)	; move object vertically
+		rts
 ; ===========================================================================
 
 .type04:
@@ -214,16 +221,15 @@ FBlock_Action:	; Routine 2
 		tst.b	objoff_38(a0)
 		bne.s	.loc_104A4
 		cmpi.w	#id_LZ_act1,(v_zone).w ; is level LZ1 ?
-		bne.s	.aaa		; if not, branch
+		bne.s	+		; if not, branch
 		cmpi.b	#3,fb_type(a0)
-		bne.s	.aaa
+		bne.s	+
 		clr.b	(f_wtunnelallow).w
 		move.w	(v_player+obX).w,d0
 		cmp.w	obX(a0),d0
-		bhs.s	.aaa
+		bhs.s	+
 		move.b	#1,(f_wtunnelallow).w
-
-.aaa:
++
 		lea	(f_switch).w,a2
 		moveq	#0,d0
 		move.b	fb_type(a0),d0
@@ -262,9 +268,17 @@ FBlock_Action:	; Routine 2
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
-		beq.s	.loc_104AE
+		beq.s	+
 		bset	#0,2(a2,d0.w)
-		bra.s	.loc_104AE
++		move.w	fb_height(a0),d0
+		btst	#0,obStatus(a0)
+		beq.s	+
+		neg.w	d0
++
+		move.w	fb_origY(a0),d1
+		add.w	d0,d1
+		move.w	d1,obY(a0)
+		rts
 ; ===========================================================================
 
 .type06:
@@ -304,73 +318,81 @@ FBlock_Action:	; Routine 2
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
-		beq.s	.loc_10512
+		beq.s	+
 		bclr	#0,2(a2,d0.w)
-		bra.s	.loc_10512
++		move.w	fb_height(a0),d0
+		btst	#0,obStatus(a0)
+		beq.s	+
+		neg.w	d0
++
+		move.w	fb_origY(a0),d1
+		add.w	d0,d1
+		move.w	d1,obY(a0)
+		rts
 ; ===========================================================================
 
 .type07:
 		tst.b	objoff_38(a0)
-		bne.s	.loc_1055E
+		bne.s	+
 		tst.b	(f_switch+$F).w	; has switch number $F been pressed?
-		beq.s	.locret_10578
+		beq.s	.return
 		move.b	#1,objoff_38(a0)
 		clr.w	fb_height(a0)
-
-.loc_1055E:
++
 		addq.w	#1,obX(a0)
 		move.w	obX(a0),fb_origX(a0)
 		addq.w	#1,fb_height(a0)
 		cmpi.w	#$380,fb_height(a0)
-		bne.s	.locret_10578
-	if Revision<>0
+		bne.s	.return
 		move.b	#1,(f_obj56).w
 		clr.b	objoff_38(a0)
-	endif
 		clr.b	obSubtype(a0)
-
-.locret_10578:
-		rts
+.return:	rts
 ; ===========================================================================
 
 .type0C:
 		tst.b	objoff_38(a0)
-		bne.s	.loc_10598
+		bne.s	+
 		lea	(f_switch).w,a2
 		moveq	#0,d0
 		move.b	fb_type(a0),d0
 		btst	#0,(a2,d0.w)
-		beq.s	.loc_105A2
+		beq.s	++
 		move.b	#1,objoff_38(a0)
-
-.loc_10598:
++
 		tst.w	fb_height(a0)
-		beq.s	.loc_105C0
+		beq.s	+++
 		subq.w	#2,fb_height(a0)
-
-.loc_105A2:
++
 		move.w	fb_height(a0),d0
 		btst	#0,obStatus(a0)
-		beq.s	.loc_105B4
+		beq.s	+
 		neg.w	d0
 		addi.w	#$80,d0
-
-.loc_105B4:
++
 		move.w	fb_origX(a0),d1
 		add.w	d0,d1
 		move.w	d1,obX(a0)
 		rts
 ; ===========================================================================
-
-.loc_105C0:
++
 		addq.b	#1,obSubtype(a0)
 		clr.b	objoff_38(a0)
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
-		beq.s	.loc_105A2
+		beq.s	+
 		bset	#0,2(a2,d0.w)
-		bra.s	.loc_105A2
++		move.w	fb_height(a0),d0
+		btst	#0,obStatus(a0)
+		beq.s	+
+		neg.w	d0
+		addi.w	#$80,d0
++
+		move.w	fb_origX(a0),d1
+		add.w	d0,d1
+		move.w	d1,obX(a0)
+		rts
 ; ===========================================================================
 
 .type0D:
@@ -409,13 +431,22 @@ FBlock_Action:	; Routine 2
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
-		beq.s	.wtf
+		beq.s	+
 		bclr	#0,2(a2,d0.w)
-		bra.s	.wtf
++		move.w	fb_height(a0),d0
+		btst	#0,obStatus(a0)
+		beq.s	+
+		neg.w	d0
+		addi.w	#$80,d0
++
+		move.w	fb_origX(a0),d1
+		add.w	d0,d1
+		move.w	d1,obX(a0)
+		rts
 ; ===========================================================================
 
 .type08:
-		move.w	#$10,d1
+		moveq	#$10,d1
 		moveq	#0,d0
 		move.b	(v_oscillate+$2A).w,d0
 		lsr.w	#1,d0
@@ -424,7 +455,7 @@ FBlock_Action:	; Routine 2
 ; ===========================================================================
 
 .type09:
-		move.w	#$30,d1
+		moveq	#$30,d1
 		moveq	#0,d0
 		move.b	(v_oscillate+$2E).w,d0
 		move.w	(v_oscillate+$30).w,d3
@@ -432,7 +463,7 @@ FBlock_Action:	; Routine 2
 ; ===========================================================================
 
 .type0A:
-		move.w	#$50,d1
+		moveq	#$50,d1
 		moveq	#0,d0
 		move.b	(v_oscillate+$32).w,d0
 		move.w	(v_oscillate+$34).w,d3
@@ -440,7 +471,7 @@ FBlock_Action:	; Routine 2
 ; ===========================================================================
 
 .type0B:
-		move.w	#$70,d1
+		moveq	#$70,d1
 		moveq	#0,d0
 		move.b	(v_oscillate+$36).w,d0
 		move.w	(v_oscillate+$38).w,d3

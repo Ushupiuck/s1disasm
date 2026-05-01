@@ -97,27 +97,24 @@ loc_12460:
 		andi.w	#$7F,d0
 		lea	(v_obj63).w,a2
 		bset	#0,(a2,d0.w)
-	if FixBugs
 		bne.s	.delete
-	else
-		bne.w	DeleteObject
-	endif
 		add.w	d0,d0
-		andi.w	#$1E,d0
-		addi.w	#ObjPosLZPlatform_Index-ObjPos_Index,d0
-		lea	(ObjPos_Index).l,a2
+	;	andi.w	#$1E,d0
+	;	addi.w	#ObjPosLZPlatform_Index-ObjPos_Index,d0
+	;	lea	(ObjPos_Index).l,a2
+		lea	(ObjPosLZPlatform_Index).l,a2
 		adda.w	(a2,d0.w),a2
 		move.w	(a2)+,d1
 		movea.l	a0,a1
+	;	move.w	obX(a0),d2	; S2 Obj6C
+	;	move.w	obY(a0),d3	; S2 Obj6C
 		bra.s	LCon_MakePtfms
 
-	if FixBugs
 		; Avoid returning to LabyrinthConvey to prevent a
 		; display-and-delete bug.
 .delete:
 		addq.l	#4,sp
 		bra.w	DeleteObject
-	endif
 ; ===========================================================================
 
 LCon_Loop:
@@ -215,8 +212,7 @@ loc_12552:
 		bsr.w	LCon_ChangeDir
 
 loc_1256A:
-		bsr.w	SpeedToPos
-		rts
+		bra.w	SpeedToPos
 ; End of function sub_12502
 
 
@@ -295,7 +291,7 @@ LCon_Data:	dc.w .group0-LCon_Data
 		dc.w .group4-LCon_Data
 		dc.w .group5-LCon_Data
 
-.group0:	
+.group0:
 		.baseX_0: = $1070
 		.baseY_0: = $2F0
 		dc.w 6*4
@@ -358,5 +354,23 @@ LCon_Data:	dc.w .group0-LCon_Data
 		dc.w .baseX_5+$DE, .baseY_5-$5A
 		dc.w .baseX_5+$DE, .baseY_5+$5A
 		dc.w .baseX_5-$AE, .baseY_5+$5A
-
+		even
+; ===========================================================================
+ObjPosLZPlatform_Index:
+		dc.w ObjPos_LZ1pf1-ObjPosLZPlatform_Index, ObjPos_LZ1pf2-ObjPosLZPlatform_Index
+		dc.w ObjPos_LZ2pf1-ObjPosLZPlatform_Index, ObjPos_LZ2pf2-ObjPosLZPlatform_Index
+		dc.w ObjPos_LZ3pf1-ObjPosLZPlatform_Index, ObjPos_LZ3pf2-ObjPosLZPlatform_Index
+		dc.w ObjPos_LZ1pf1-ObjPosLZPlatform_Index, ObjPos_LZ1pf2-ObjPosLZPlatform_Index
+		dc.b $FF, $FF, 0, 0, 0,	0
+ObjPos_LZ1pf1:	binclude	"objpos/lz1pf1.bin"
+		even
+ObjPos_LZ1pf2:	binclude	"objpos/lz1pf2.bin"
+		even
+ObjPos_LZ2pf1:	binclude	"objpos/lz2pf1.bin"
+		even
+ObjPos_LZ2pf2:	binclude	"objpos/lz2pf2.bin"
+		even
+ObjPos_LZ3pf1:	binclude	"objpos/lz3pf1.bin"
+		even
+ObjPos_LZ3pf2:	binclude	"objpos/lz3pf2.bin"
 		even

@@ -1,10 +1,8 @@
 ; ---------------------------------------------------------------------------
 ; Object 5B - blocks that form a staircase (SLZ)
 ; ---------------------------------------------------------------------------
-
 stair_origX = objoff_30		; original x-axis position
 stair_origY = objoff_32		; original y-axis position
-
 stair_parent = objoff_3C	; address of parent object (4 bytes)
 
 Staircase:
@@ -18,7 +16,6 @@ Staircase:
 Stair_Index:	dc.w Stair_Main-Stair_Index
 		dc.w Stair_Move-Stair_Index
 		dc.w Stair_Solid-Stair_Index
-
 ; ===========================================================================
 
 Stair_Main:	; Routine 0
@@ -80,8 +77,8 @@ Stair_Solid:	; Routine 4
 		moveq	#0,d1
 		move.b	obActWid(a0),d1
 		addi.w	#$B,d1
-		move.w	#$10,d2
-		move.w	#$11,d3
+		moveq	#$10,d2
+		moveq	#$11,d3
 		move.w	obX(a0),d4
 		bsr.w	SolidObject
 		tst.b	d4
@@ -104,41 +101,34 @@ Stair_TypeIndex:dc.w Stair_Type00-Stair_TypeIndex
 
 Stair_Type00:
 		tst.w	objoff_34(a0)
-		bne.s	loc_10FC0
+		bne.s	+
 		cmpi.b	#1,objoff_36(a0)
-		bne.s	locret_10FBE
+		bne.s	.return
 		move.w	#$1E,objoff_34(a0)
-
-locret_10FBE:
 		rts
 ; ===========================================================================
-
-loc_10FC0:
++
 		subq.w	#1,objoff_34(a0)
-		bne.s	locret_10FBE
+		bne.s	.return
 		addq.b	#1,obSubtype(a0) ; add 1 to type
-		rts
+.return:	rts
 ; ===========================================================================
 
 Stair_Type02:
 		tst.w	objoff_34(a0)
-		bne.s	loc_10FE0
+		bne.s	+
 		tst.b	objoff_36(a0)
-		bpl.s	locret_10FDE
-		move.w	#$3C,objoff_34(a0)
-
-locret_10FDE:
+		bpl.s	.return
+		move.w	#60,objoff_34(a0)
 		rts
 ; ===========================================================================
-
-loc_10FE0:
++
 		subq.w	#1,objoff_34(a0)
-		bne.s	loc_10FEC
+		bne.s	+
 		addq.b	#1,obSubtype(a0) ; add 1 to type
-		rts
+.return:	rts
 ; ===========================================================================
-
-loc_10FEC:
++
 		lea	objoff_38(a0),a1
 		move.w	objoff_34(a0),d0
 		lsr.b	#2,d0
@@ -146,7 +136,6 @@ loc_10FEC:
 		move.b	d0,(a1)+
 		eori.b	#1,d0
 		move.b	d0,(a1)+
-		eori.b	#1,d0
 		move.b	d0,(a1)+
 		eori.b	#1,d0
 		move.b	d0,(a1)+
@@ -156,7 +145,7 @@ loc_10FEC:
 Stair_Type01:
 		lea	objoff_38(a0),a1
 		cmpi.b	#$80,(a1)
-		beq.s	locret_11038
+		beq.s	.return
 		addq.b	#1,(a1)
 		moveq	#0,d1
 		move.b	(a1)+,d1
@@ -172,7 +161,4 @@ Stair_Type01:
 		move.b	d3,(a1)+
 		move.b	d2,(a1)+
 		move.b	d1,(a1)+
-
-locret_11038:
-		rts
-		rts
+.return:	rts

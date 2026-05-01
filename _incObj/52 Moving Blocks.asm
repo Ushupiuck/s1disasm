@@ -66,9 +66,6 @@ MBlock_StandOn:	; Routine 4
 		moveq	#0,d1
 		move.b	obActWid(a0),d1
 		jsr	(ExitPlatform).l
-		; MBlock_Move manipulates the stack pointer, potentially
-		; resulting in a crash. To avoid this, don't store data on
-		; the stack. We can use object scratch RAM instead.
 		move.w	obX(a0),objoff_38(a0)
 		bsr.w	MBlock_Move
 		move.w	objoff_38(a0),d2
@@ -161,13 +158,11 @@ MBlock_Type06:
 		addi.w	#$18,obVelY(a0)	; make the platform fall
 		bsr.w	ObjFloorDist
 		tst.w	d1		; has platform hit the floor?
-		bpl.w	locret_FFA0	; if not, branch
+		bpl.s	.return		; if not, branch
 		add.w	d1,obY(a0)
 		clr.w	obVelY(a0)	; stop platform falling
 		clr.b	obSubtype(a0)	; change to type 00 (non-moving)
-
-locret_FFA0:
-		rts
+.return:	rts
 ; ===========================================================================
 
 MBlock_Type07:
@@ -176,10 +171,7 @@ MBlock_Type07:
 		subq.b	#3,obSubtype(a0) ; if yes, change object type to 04
 
 MBlock_07_ChkDel:
-		; This line, combined with the coordinate being pushed to
-		; the stack in MBlock_StandOn, can be disasterous.
 		addq.l	#4,sp
-
 		out_of_range.w	DeleteObject,mblock_origX(a0)
 		rts
 ; ===========================================================================
@@ -223,11 +215,9 @@ loc_10004:
 
 MBlock_0A_Wait:
 		subq.w	#1,objoff_34(a0)	; subtract 1 from time delay
-		bne.s	locret_1002E	; if time remains, branch
+		bne.s	.return		; if time remains, branch
 		move.w	#1,objoff_36(a0)	; set platform to move back to its original position
-
-locret_1002E:
-		rts
+.return:	rts
 ; ===========================================================================
 
 MBlock_0A_Back:

@@ -19,8 +19,7 @@ SmashObject:
 		bra.s	.loadfrag
 ; ===========================================================================
 
-.loop:
-		bsr.w	FindFreeObj
+.loop:		bsr.w	FindFreeObj
 		bne.s	.playsnd
 		addq.w	#5,a3
 

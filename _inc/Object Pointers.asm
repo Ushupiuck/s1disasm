@@ -89,7 +89,7 @@ id_WaterSound:		objptr	WaterSound		; 49
 id_VanishSonic:		objptr	VanishSonic		; 4A
 id_GiantRing:		objptr	GiantRing		; 4B
 id_GeyserMaker:		objptr	GeyserMaker		; 4C
-id_LavaGeyser:		objptr	LavaGeyser		; 4D
+id_LavaGeyser:		objptr	NullObject		; 4D
 id_LavaWall:		objptr	LavaWall		; 4E
 id_Obj4F:		objptr	Obj4F			; 4F
 id_Yadrin:		objptr	Yadrin			; 50
@@ -157,7 +157,4 @@ id_TryChaos:		objptr	TryChaos		; 8C
 ; ---------------------------------------------------------------------------
 
 NullObject:
-	if FixBugs
-		; It would be safer to have this instruction here, otherwise it would just fall through to ObjectFall
 		jmp	(DeleteObject).l
-	endif

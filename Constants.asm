@@ -444,8 +444,9 @@ ArtTile_Chopper:		equ $47B
 ArtTile_Yadrin:			equ $47B
 ArtTile_Jaws:			equ $486
 ArtTile_Newtron:		equ $49B
+ArtTile_MZ_Newtron:		equ $47B
 ArtTile_Burrobot:		equ $4A6
-ArtTile_Basaran:		equ $4B8
+ArtTile_Basaran:		equ $4D0
 ArtTile_Roller:			equ $4B8
 ArtTile_Moto_Bug:		equ $4F0
 ArtTile_Button:			equ $50F

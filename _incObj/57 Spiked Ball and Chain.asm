@@ -14,8 +14,8 @@ SBall_Index:	dc.w SBall_Main-SBall_Index
 
 sball_childs = objoff_29	; number of child objects (1 byte)
 		; $30-$37	; object RAM numbers of childs (1 byte each)
-sball_origX = objoff_3A		; centre x-axis position (2 bytes)
-sball_origY = objoff_38		; centre y-axis position (2 bytes)
+sball_origX = objoff_38		; centre x-axis position (2 bytes)
+sball_origY = objoff_3A		; centre y-axis position (2 bytes)
 sball_radius = objoff_3C	; radius (1 byte)
 sball_speed = objoff_3E		; rate of spin (2 bytes)
 ; ===========================================================================
@@ -33,7 +33,7 @@ SBall_Main:	; Routine 0
 		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ
 		bne.s	.notlz
 
-		move.b	#0,obColType(a0) ; LZ specific code (chain doesn't hurt)
+		clr.b	obColType(a0) ; LZ specific code (chain doesn't hurt)
 		move.w	#make_art_tile(ArtTile_LZ_Spikeball_Chain,0,0),obGfx(a0)
 		move.l	#Map_SBall2,obMap(a0)
 
@@ -50,7 +50,7 @@ SBall_Main:	; Routine 0
 		lea	sball_childs(a0),a2
 		move.b	obSubtype(a0),d1 ; get object type
 		andi.w	#7,d1		; read only the 2nd digit
-		move.b	#0,(a2)+
+		clr.b	(a2)+
 		move.w	d1,d3
 		lsl.w	#4,d3
 		move.b	d3,sball_radius(a0)
@@ -62,14 +62,10 @@ SBall_Main:	; Routine 0
 		bcs.s	.fail
 
 .makechain:
-	if FixBugs
 		; If an object is allocated before the parent object, then
 		; when the child is deleted, it will have already been queued
 		; for display, which is a display-and-delete bug.
 		bsr.w	FindNextFreeObj
-	else
-		bsr.w	FindFreeObj
-	endif
 		bne.s	.fail
 		addq.b	#1,sball_childs(a0) ; increment child object counter
 		move.w	a1,d5		; get child object RAM address

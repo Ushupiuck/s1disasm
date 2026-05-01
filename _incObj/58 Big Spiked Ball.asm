@@ -11,10 +11,11 @@ BigSpikeBall:
 BBall_Index:	dc.w BBall_Main-BBall_Index
 		dc.w BBall_Move-BBall_Index
 
-bball_origX = objoff_3A		; original x-axis position
-bball_origY = objoff_38		; original y-axis position
-bball_radius = objoff_3C	; radius of circle
-bball_speed = objoff_3E		; speed
+bball_origX	= objoff_30		; original x-axis position
+bball_origY	= objoff_32		; original y-axis position
+bball_speed	= objoff_34		; more precisely, angular speed
+bball_radius	= objoff_36		; radius of circle
+bball_child	= objoff_3C		; multi_sprite chain object
 ; ===========================================================================
 
 BBall_Main:	; Routine 0
@@ -27,11 +28,13 @@ BBall_Main:	; Routine 0
 		move.w	obX(a0),bball_origX(a0)
 		move.w	obY(a0),bball_origY(a0)
 		move.b	#$86,obColType(a0)
-		move.b	obSubtype(a0),d1 ; get object type
-		andi.b	#$F0,d1		; read only the 1st digit
-		ext.w	d1
-		asl.w	#3,d1		; multiply by 8
-		move.w	d1,bball_speed(a0) ; set object speed
+		move.b	obSubtype(a0),d4	; Get object type
+		move.b	d4,d0			; Backup to d0 for further processing
+		andi.w	#$F,d4			; read the low nibble (this will become relevant later)
+		andi.b	#$F0,d0			; and now the high nibble
+		ext.w	d0
+		asl.w	#3,d0			; multiply by 8
+		move.w	d0,bball_speed(a0)	; store speed
 		move.b	obStatus(a0),d0
 		ror.b	#2,d0
 		andi.b	#$C0,d0
@@ -52,6 +55,7 @@ BBall_Move:	; Routine 2
 		dc.w .type01-.index
 		dc.w .type02-.index
 		dc.w .type03-.index
+		dc.w .type04-.index
 ; ===========================================================================
 
 .type00:
@@ -59,7 +63,7 @@ BBall_Move:	; Routine 2
 ; ===========================================================================
 
 .type01:
-		move.w	#$60,d1
+		moveq	#$60,d1
 		moveq	#0,d0
 		move.b	(v_oscillate+$E).w,d0
 		btst	#0,obStatus(a0)
@@ -109,3 +113,6 @@ BBall_Move:	; Routine 2
 		move.w	d4,obY(a0)	; move object circularly
 		move.w	d5,obX(a0)
 		rts
+; ===========================================================================
+
+.type04:

@@ -1,165 +1,197 @@
 ; ---------------------------------------------------------------------------
-; Object 42 - Newtron enemy (GHZ)
+; Object 42 - GHZ Newtron badnik
 ; ---------------------------------------------------------------------------
-
+newtron_shoot	= objoff_2C	; flag set after shooting, so we don't shoot indefinitely
 Newtron:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
-		move.w	Newt_Index(pc,d0.w),d1
-		jmp	Newt_Index(pc,d1.w)
+		move.w	Newtron_Index(pc,d0.w),d1
+		jmp	Newtron_Index(pc,d1.w)
 ; ===========================================================================
-Newt_Index:	dc.w Newt_Main-Newt_Index
-		dc.w Newt_Action-Newt_Index
-		dc.w Newt_Delete-Newt_Index
+Newtron_Index:
+		dc.w Newtron_Init-Newtron_Index		; 0
+		dc.w Newtron_Main-Newtron_Index		; 2
+		dc.w Newtron_Vanish-Newtron_Index	; 4
 ; ===========================================================================
 
-Newt_Main:	; Routine 0
+Newtron_Init:
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Newt,obMap(a0)
 		move.w	#make_art_tile(ArtTile_Newtron,0,0),obGfx(a0)
+		cmpi.b	#id_MZ,(v_zone).w
+		bne.s	.skip
+		move.w	#make_art_tile(ArtTile_MZ_Newtron,0,0),obGfx(a0)
+
+.skip
 		move.b	#4,obRender(a0)
 		move.b	#4,obPriority(a0)
 		move.b	#$14,obActWid(a0)
 		move.b	#$10,obHeight(a0)
 		move.b	#8,obWidth(a0)
 
-Newt_Action:	; Routine 2
+Newtron_Main:
 		moveq	#0,d0
 		move.b	ob2ndRout(a0),d0
-		move.w	.index(pc,d0.w),d1
-		jsr	.index(pc,d1.w)
-		lea	(Ani_Newt).l,a1
-		bsr.w	AnimateSprite
+		move.w	.secondary_index(pc,d0.w),d1
+		jsr	.secondary_index(pc,d1.w)
+		lea	Ani_Newtron(pc),a1
+		bsr.w	AnimateSprite	; If green, go to Vanish next time (animation flag afRoutine ensures this)
 		bra.w	RememberState
 ; ===========================================================================
-.index:		dc.w .chkdistance-.index
-		dc.w .type00-.index
-		dc.w .matchfloor-.index
-		dc.w .speed-.index
-		dc.w .type01-.index
+.secondary_index:
+		dc.w Newtron_ChkDistance-.secondary_index	; 0
+		dc.w Newtron_Type00-.secondary_index		; 2
+		dc.w Newtron_ChkFloor-.secondary_index		; 4
+		dc.w Newtron_Type02-.secondary_index		; 6
+		dc.w Newtron_Type03-.secondary_index		; 8
 ; ===========================================================================
 
-.chkdistance:
+Newtron_ChkDistance:
 		bset	#0,obStatus(a0)
 		move.w	(v_player+obX).w,d0
 		sub.w	obX(a0),d0
-		bcc.s	.sonicisright
+		bhs.s	+
 		neg.w	d0
 		bclr	#0,obStatus(a0)
-
-.sonicisright:
-		cmpi.w	#$80,d0		; is Sonic within $80 pixels of the newtron?
-		bhs.s	.outofrange	; if not, branch
-		addq.b	#2,ob2ndRout(a0) ; goto .type00 next
++
+		cmpi.w	#$80,d0
+		bhs.s	.return
+		addq.b	#2,ob2ndRout(a0)
 		move.b	#1,obAnim(a0)
-		tst.b	obSubtype(a0)	; check object type
-		beq.s	.istype00	; if type is 00, branch
-
+		tst.b	obSubtype(a0)
+		beq.s	Newtron_Type00
 		move.w	#make_art_tile(ArtTile_Newtron,1,0),obGfx(a0)
-		move.b	#8,ob2ndRout(a0) ; goto .type01 next
-		move.b	#4,obAnim(a0)	; use different animation
-
-.outofrange:
-.istype00:
+		cmpi.b	#id_MZ,(v_zone).w
+		bne.s	.skip
+		move.w	#make_art_tile(ArtTile_MZ_Newtron,1,0),obGfx(a0)
+.skip:		cmpi.b	#2,obSubtype(a0)
+		beq.s	.hybrid
+		move.b	#6,ob2ndRout(a0)
+		move.b	#3,obAnim(a0)
 		rts
-; ===========================================================================
 
-.type00:
-		cmpi.b	#4,obFrame(a0)	; has "appearing" animation finished?
-		bhs.s	.fall		; is yes, branch
+.hybrid:
+		move.b	#8,ob2ndRout(a0)
+		move.b	#4,obAnim(a0)
+.return:	rts
+; ===========================================================================
+; Blue Newtron that appears before chasing Sonic/Tails
+Newtron_Type00:
+		cmpi.b	#4,obFrame(a0)
+		bhs.s	Newtron_Fall
 		bset	#0,obStatus(a0)
 		move.w	(v_player+obX).w,d0
 		sub.w	obX(a0),d0
-		bcc.s	.sonicisright2
+		bhs.s	.return
 		bclr	#0,obStatus(a0)
+.return:	rts
+; ---------------------------------------------------------------------------
 
-.sonicisright2:
-		rts
-; ===========================================================================
-
-.fall:
+Newtron_Fall:
 		cmpi.b	#1,obFrame(a0)
-		bne.s	.loc_DE42
+		bne.s	+
 		move.b	#$C,obColType(a0)
-
-.loc_DE42:
-		bsr.w	ObjectFall
++
+		bsr.w	ObjectMoveAndFall
 		bsr.w	ObjFloorDist
-		tst.w	d1		; has newtron hit the floor?
-		bpl.s	.keepfalling	; if not, branch
-
+		tst.w	d1
+		bpl.s	.return
 		add.w	d1,obY(a0)
-		move.w	#0,obVelY(a0)	; stop newtron falling
+		clr.w	obVelY(a0)
 		addq.b	#2,ob2ndRout(a0)
 		move.b	#2,obAnim(a0)
-		btst	#5,obGfx(a0)
-		beq.s	.notgreen
-		addq.b	#1,obAnim(a0)
-
-.notgreen:
 		move.b	#$D,obColType(a0)
-		move.w	#$200,obVelX(a0) ; move newtron horizontally
+		move.w	#$200,obVelX(a0)
 		btst	#0,obStatus(a0)
-		bne.s	.keepfalling
+		bne.s	.return
 		neg.w	obVelX(a0)
-
-.keepfalling:
-		rts
+.return:	rts
 ; ===========================================================================
 
-.matchfloor:
-		bsr.w	SpeedToPos
+Newtron_ChkFloor:
+		bsr.w	ObjectMove
 		bsr.w	ObjFloorDist
 		cmpi.w	#-8,d1
-		blt.s	.nextroutine
+		blt.s	.return	; Change to ObjectMove and it'll speed up
 		cmpi.w	#$C,d1
-		bge.s	.nextroutine
-		add.w	d1,obY(a0)	; match newtron's position with floor
-		rts
+		bge.s	.return	; Change to ObjectMove and it'll speed up
+		add.w	d1,obY(a0)
+.return:	rts
 ; ===========================================================================
-
-.nextroutine:
-		addq.b	#2,ob2ndRout(a0) ; goto .speed next
-		rts
-; ===========================================================================
-
-.speed:
-		bsr.w	SpeedToPos
-		rts
-; ===========================================================================
-
-.type01:
+; Green Newtron that fires a missile
+Newtron_Type02:
 		cmpi.b	#1,obFrame(a0)
-		bne.s	.firemissile
+		bne.s	Newtron_FireMissile
 		move.b	#$C,obColType(a0)
-
-.firemissile:
-		cmpi.b	#2,obFrame(a0)
-		bne.s	.fail
-		tst.b	objoff_32(a0)
-		bne.s	.fail
-		move.b	#1,objoff_32(a0)
+; loc_ED14:
+Newtron_FireMissile:
+		cmpi.b	#2,obFrame(a0)		; is animation on firing frame?
+		bne.s	.return			; if so, quit
+		tst.b	newtron_shoot(a0)	; has newtron already fired?
+		bne.s	.return			; if so, quit
+		move.b	#1,newtron_shoot(a0)	; set fired flag
 		bsr.w	FindFreeObj
-		bne.s	.fail
-		_move.b	#id_Missile,obID(a1) ; load missile object
+		bne.s	.return
+		_move.b	#id_Missile,obID(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		subq.w	#8,obY(a1)
-		move.w	#$200,obVelX(a1)
-		move.w	#$14,d0
-		btst	#0,obStatus(a0)
-		bne.s	.noflip
-		neg.w	d0
+		move.w	#$200,obVelX(a1)	; by default, missile goes right
+		move.w	#20,d0
+		btst	#0,obStatus(a0)		; are we facing right?
+		bne.s	+			; carry on, then
+		neg.w	d0			; otherwise negate
 		neg.w	obVelX(a1)
-
-.noflip:
++
 		add.w	d0,obX(a1)
 		move.b	obStatus(a0),obStatus(a1)
 		move.b	#1,obSubtype(a1)
-
-.fail:
-		rts
+.return:	rts
 ; ===========================================================================
-
-Newt_Delete:	; Routine 4
-		bra.w	DeleteObject
+; loc_ED6E:
+Newtron_Vanish:
+		clr.b	obColType(a0)	; Set as intangible
+		bra.w	RememberState
+; ===========================================================================
+; Green Newtron that fires a missile, then gives chase
+Newtron_Type03:
+		cmpi.b	#1,obFrame(a0)
+		bne.s	Newtron_FireMissile2
+		move.b	#$C,obColType(a0)
+; loc_ED14:
+Newtron_FireMissile2:
+		cmpi.b	#2,obFrame(a0)		; is animation on firing frame?
+		bne.s	.return			; if so, quit
+		tst.b	newtron_shoot(a0)	; has newtron already fired?
+		bne.s	.return			; if so, quit
+		move.b	#1,newtron_shoot(a0)	; set fired flag
+		bsr.w	FindFreeObj
+		bne.s	.return
+		move.b	#2,ob2ndRout(a0)
+		_move.b	#id_Missile,obID(a1)
+		move.w	obX(a0),obX(a1)
+		move.w	obY(a0),obY(a1)
+		subq.w	#8,obY(a1)
+		move.w	#$200,obVelX(a1)	; by default, missile goes right
+		move.w	#20,d0
+		btst	#0,obStatus(a0)		; are we facing right?
+		bne.s	+			; carry on, then
+		neg.w	d0			; otherwise negate
+		neg.w	obVelX(a1)
++
+		add.w	d0,obX(a1)
+		move.b	obStatus(a0),obStatus(a1)
+		move.b	#1,obSubtype(a1)
+.return:	rts
+; ===========================================================================
+Ani_Newtron:	dc.w ani_newt_blank-Ani_Newtron
+		dc.w ani_newt_drop-Ani_Newtron
+		dc.w ani_newt_fly-Ani_Newtron
+		dc.w ani_newt_fire-Ani_Newtron
+		dc.w ani_newt_fire2-Ani_Newtron
+ani_newt_blank:	dc.b  $F,  8,afEnd
+ani_newt_drop:	dc.b $13,  0,  1,  3,  4,  5,afBack,  1
+ani_newt_fly:	dc.b   2,  6,  7,afEnd
+ani_newt_fire:	dc.b $13,  0,  1,  1,  2,  1,  1,  0,  8,afRoutine
+ani_newt_fire2:	dc.b $13,  0,  1,  1,  2,  1,  1,  4,  5,afBack,  1
+		even

@@ -5985,7 +5985,6 @@ locret_DA8A:
 Map_Spring:	include	"_maps/Springs.asm"
 
 		include	"_incObj/42 Newtron.asm"
-		include	"_anim/Newtron.asm"
 Map_Newt:	include	"_maps/Newtron.asm"
 		include	"_incObj/43 Roller.asm"
 		include	"_anim/Roller.asm"
@@ -8030,18 +8029,12 @@ ObjPos_Index:
 		dc.w ObjPos_SBZ2-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_FZ-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_SBZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		zonewarning ObjPos_Index,$10
 		; Ending
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		; --- Put extra object data here. ---
-ObjPosLZPlatform_Index:
-		dc.w ObjPos_LZ1pf1-ObjPos_Index, ObjPos_LZ1pf2-ObjPos_Index
-		dc.w ObjPos_LZ2pf1-ObjPos_Index, ObjPos_LZ2pf2-ObjPos_Index
-		dc.w ObjPos_LZ3pf1-ObjPos_Index, ObjPos_LZ3pf2-ObjPos_Index
-		dc.w ObjPos_LZ1pf1-ObjPos_Index, ObjPos_LZ1pf2-ObjPos_Index
 ObjPosSBZPlatform_Index:
 		dc.w ObjPos_SBZ1pf1-ObjPos_Index, ObjPos_SBZ1pf2-ObjPos_Index
 		dc.w ObjPos_SBZ1pf3-ObjPos_Index, ObjPos_SBZ1pf4-ObjPos_Index
@@ -8081,18 +8074,6 @@ ObjPos_LZ3:
 		even
 	endif
 ObjPos_SBZ3:	binclude	"objpos/sbz3.bin"
-		even
-ObjPos_LZ1pf1:	binclude	"objpos/lz1pf1.bin"
-		even
-ObjPos_LZ1pf2:	binclude	"objpos/lz1pf2.bin"
-		even
-ObjPos_LZ2pf1:	binclude	"objpos/lz2pf1.bin"
-		even
-ObjPos_LZ2pf2:	binclude	"objpos/lz2pf2.bin"
-		even
-ObjPos_LZ3pf1:	binclude	"objpos/lz3pf1.bin"
-		even
-ObjPos_LZ3pf2:	binclude	"objpos/lz3pf2.bin"
 		even
 
 ObjPos_MZ1:

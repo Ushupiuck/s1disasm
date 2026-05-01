@@ -173,7 +173,8 @@ PLC_MZ:		plcheader
 		plcm	Nem_MzGlass,	ArtTile_MZ_Glass_Pillar		; green glassy block
 		plcm	Nem_Lava,	ArtTile_MZ_Lava			; lava
 		plcm	Nem_Buzz,	ArtTile_Buzz_Bomber		; buzz bomber enemy
-		plcm	Nem_Yadrin,	ArtTile_Yadrin			; yadrin enemy
+	;	plcm	Nem_Yadrin,	ArtTile_Yadrin			; yadrin enemy
+		plcm	Nem_Newtron,	ArtTile_MZ_Newtron		; newtron enemy
 		plcm	Nem_Basaran,	ArtTile_Basaran			; basaran enemy
 		plcm	Nem_Cater,	ArtTile_MZ_SYZ_Caterkiller	; caterkiller enemy
 PLC_MZ_end:

@@ -1,80 +1,44 @@
-; ---------------------------------------------------------------------------
-; Sprite mappings - Newtron enemy (GHZ)
-; ---------------------------------------------------------------------------
-Map_Newt_internal:	mappingsTable
-	mappingsTableEntry.w	M_Newt_Trans
-	mappingsTableEntry.w	M_Newt_Norm
-	mappingsTableEntry.w	M_Newt_Fires
-	mappingsTableEntry.w	M_Newt_Drop1
-	mappingsTableEntry.w	M_Newt_Drop2
-	mappingsTableEntry.w	M_Newt_Drop3
-	mappingsTableEntry.w	M_Newt_Fly1a
-	mappingsTableEntry.w	M_Newt_Fly1b
-	mappingsTableEntry.w	M_Newt_Fly2a
-	mappingsTableEntry.w	M_Newt_Fly2b
-	mappingsTableEntry.w	M_Newt_Blank
+; --------------------------------------------------------------------------------
+; Sprite mappings - output from SonMapEd - Sonic 1 format
+; --------------------------------------------------------------------------------
 
-M_Newt_Trans:	spriteHeader
-	spritePiece	-$14, -$14, 4, 2, 0, 0, 0, 0, 0	; partially visible
-	spritePiece	$C, -$C, 1, 1, 8, 0, 0, 0, 0
-	spritePiece	-$C, -4, 4, 3, 9, 0, 0, 0, 0
-M_Newt_Trans_End
-
-M_Newt_Norm:	spriteHeader
-	spritePiece	-$14, -$14, 2, 3, $15, 0, 0, 0, 0 ; visible
-	spritePiece	-4, -$14, 3, 2, $1B, 0, 0, 0, 0
-	spritePiece	-4, -4, 3, 3, $21, 0, 0, 0, 0
-M_Newt_Norm_End
-
-M_Newt_Fires:	spriteHeader
-	spritePiece	-$14, -$14, 2, 3, $2A, 0, 0, 0, 0 ; open mouth, firing
-	spritePiece	-4, -$14, 3, 2, $1B, 0, 0, 0, 0
-	spritePiece	-4, -4, 3, 3, $21, 0, 0, 0, 0
-M_Newt_Fires_End
-
-M_Newt_Drop1:	spriteHeader
-	spritePiece	-$14, -$14, 2, 3, $30, 0, 0, 0, 0 ; dropping
-	spritePiece	-4, -$14, 3, 2, $1B, 0, 0, 0, 0
-	spritePiece	-4, -4, 3, 2, $36, 0, 0, 0, 0
-	spritePiece	$C, $C, 1, 1, $3C, 0, 0, 0, 0
-M_Newt_Drop1_End
-
-M_Newt_Drop2:	spriteHeader
-	spritePiece	-$14, -$C, 4, 2, $3D, 0, 0, 0, 0
-	spritePiece	$C, -4, 1, 1, $20, 0, 0, 0, 0
-	spritePiece	-4, 4, 3, 1, $45, 0, 0, 0, 0
-M_Newt_Drop2_End
-
-M_Newt_Drop3:	spriteHeader
-	spritePiece	-$14, -8, 4, 2, $48, 0, 0, 0, 0
-	spritePiece	$C, -8, 1, 2, $50, 0, 0, 0, 0
-M_Newt_Drop3_End
-
-M_Newt_Fly1a:	spriteHeader
-	spritePiece	-$14, -8, 4, 2, $48, 0, 0, 0, 0 ; flying
-	spritePiece	$C, -8, 1, 2, $50, 0, 0, 0, 0
-	spritePiece	$14, -2, 1, 1, $52, 0, 0, 0, 0
-M_Newt_Fly1a_End
-
-M_Newt_Fly1b:	spriteHeader
-	spritePiece	-$14, -8, 4, 2, $48, 0, 0, 0, 0
-	spritePiece	$C, -8, 1, 2, $50, 0, 0, 0, 0
-	spritePiece	$14, -2, 2, 1, $53, 0, 0, 0, 0
-M_Newt_Fly1b_End
-
-M_Newt_Fly2a:	spriteHeader
-	spritePiece	-$14, -8, 4, 2, $48, 0, 0, 0, 0
-	spritePiece	$C, -8, 1, 2, $50, 0, 0, 0, 0
-	spritePiece	$14, -2, 1, 1, $52, 0, 0, 3, 1
-M_Newt_Fly2a_End
-
-M_Newt_Fly2b:	spriteHeader
-	spritePiece	-$14, -8, 4, 2, $48, 0, 0, 0, 0
-	spritePiece	$C, -8, 1, 2, $50, 0, 0, 0, 0
-	spritePiece	$14, -2, 2, 1, $53, 0, 0, 3, 1
-M_Newt_Fly2b_End
-
-M_Newt_Blank:	spriteHeader
-M_Newt_Blank_End
-
-	even
+SME_YFeSu:	
+		dc.w SME_YFeSu_12-SME_YFeSu, SME_YFeSu_22-SME_YFeSu	
+		dc.w SME_YFeSu_32-SME_YFeSu, SME_YFeSu_42-SME_YFeSu	
+		dc.w SME_YFeSu_57-SME_YFeSu, SME_YFeSu_67-SME_YFeSu	
+		dc.w SME_YFeSu_72-SME_YFeSu, SME_YFeSu_82-SME_YFeSu	
+		dc.w SME_YFeSu_92-SME_YFeSu	
+SME_YFeSu_12:	dc.b 3	
+		dc.b $EC, $D, 0, 0, $EC	
+		dc.b $F4, 0, 0, 8, $C	
+		dc.b $FC, $E, 0, 9, $F4	
+SME_YFeSu_22:	dc.b 3	
+		dc.b $EC, 6, 0, $15, $EC	
+		dc.b $EC, 9, 0, $1B, $FC	
+		dc.b $FC, $A, 0, $21, $FC	
+SME_YFeSu_32:	dc.b 3	
+		dc.b $EC, 6, 0, $2A, $EC	
+		dc.b $EC, 9, 0, $1B, $FC	
+		dc.b $FC, $A, 0, $21, $FC	
+SME_YFeSu_42:	dc.b 4	
+		dc.b $EC, 6, 0, $30, $EC	
+		dc.b $EC, 9, 0, $1B, $FC	
+		dc.b $FC, 9, 0, $36, $FC	
+		dc.b $C, 0, 0, $3C, $C	
+SME_YFeSu_57:	dc.b 3	
+		dc.b $F4, $D, 0, $3D, $EC	
+		dc.b $FC, 0, 0, $20, $C	
+		dc.b 4, 8, 0, $45, $FC	
+SME_YFeSu_67:	dc.b 2	
+		dc.b $F8, $D, 0, $48, $EC	
+		dc.b $F8, 1, 0, $50, $C	
+SME_YFeSu_72:	dc.b 3	
+		dc.b $F8, $D, 0, $48, $EC	
+		dc.b $F8, 1, 0, $50, $C	
+		dc.b $FE, 0, 0, $52, $14	
+SME_YFeSu_82:	dc.b 3	
+		dc.b $F8, $D, 0, $48, $EC	
+		dc.b $F8, 1, 0, $50, $C	
+		dc.b $FE, 4, 0, $53, $14	
+SME_YFeSu_92:	dc.b 0	
+		even

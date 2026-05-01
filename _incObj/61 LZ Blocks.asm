@@ -73,9 +73,9 @@ LBlk_Action:	; Routine 2
 		bra.w	DisplaySprite
 ; ===========================================================================
 .index:		dc.w .type00-.index, .type01-.index
-		dc.w .type02-.index, .type03-.index
+		dc.w .type02-.index, .type01-.index
 		dc.w .type04-.index, .type05-.index
-		dc.w .type06-.index, .type07-.index
+		dc.w .type02-.index, .type07-.index
 ; ===========================================================================
 
 .type00:
@@ -83,15 +83,13 @@ LBlk_Action:	; Routine 2
 ; ===========================================================================
 
 .type01:
-.type03:
+;.type03:
 		tst.w	lblk_time(a0)	; does time remain?
 		bne.s	.wait01		; if yes, branch
 		btst	#3,obStatus(a0)	; is Sonic standing on the object?
 		beq.s	.donothing01	; if not, branch
 		move.w	#30,lblk_time(a0) ; wait for half second
-
-.donothing01:
-		rts
+.donothing01:	rts
 ; ===========================================================================
 
 .wait01:
@@ -103,19 +101,17 @@ LBlk_Action:	; Routine 2
 ; ===========================================================================
 
 .type02:
-.type06:
+;.type06:
 		bsr.w	SpeedToPos
 		addq.w	#8,obVelY(a0)	; make block fall
 		bsr.w	ObjFloorDist
 		tst.w	d1		; has block hit the floor?
-		bpl.w	.nofloor02	; if not, branch
+		bpl.s	.nofloor02	; if not, branch
 		addq.w	#1,d1
 		add.w	d1,obY(a0)
 		clr.w	obVelY(a0)	; stop when it touches the floor
 		clr.b	obSubtype(a0)	; set type to 00 (non-moving type)
-
-.nofloor02:
-		rts
+.nofloor02:	rts
 ; ===========================================================================
 
 .type04:
@@ -123,13 +119,11 @@ LBlk_Action:	; Routine 2
 		subq.w	#8,obVelY(a0)	; make block rise
 		bsr.w	ObjHitCeiling
 		tst.w	d1		; has block hit the ceiling?
-		bpl.w	.noceiling04	; if not, branch
+		bpl.s	.noceiling04	; if not, branch
 		sub.w	d1,obY(a0)
 		clr.w	obVelY(a0)	; stop when it touches the ceiling
 		clr.b	obSubtype(a0)	; set type to 00 (non-moving type)
-
-.noceiling04:
-		rts
+.noceiling04:	rts
 ; ===========================================================================
 
 .type05:
@@ -137,9 +131,7 @@ LBlk_Action:	; Routine 2
 		bne.s	.notouch05	; if not, branch
 		addq.b	#1,obSubtype(a0) ; goto .type06
 		clr.b	lblk_untouched(a0)
-
-.notouch05:
-		rts
+.notouch05:	rts
 ; ===========================================================================
 
 .type07:
@@ -148,54 +140,39 @@ LBlk_Action:	; Routine 2
 		beq.s	.stop07		; if yes, branch
 		bcc.s	.fall07		; branch if block is above water
 		cmpi.w	#-2,d0
-		bge.s	.loc_1214E
+		bge.s	+
 		moveq	#-2,d0
-
-.loc_1214E:
++
 		add.w	d0,obY(a0)	; make the block rise with water level
 		bsr.w	ObjHitCeiling
 		tst.w	d1		; has block hit the ceiling?
-		bpl.w	.noceiling07	; if not, branch
+		bpl.s	.noceiling07	; if not, branch
 		sub.w	d1,obY(a0)	; stop block
-
-.noceiling07:
-		rts
+.noceiling07:	rts
 ; ===========================================================================
 
 .fall07:
 		cmpi.w	#2,d0
-		ble.s	.loc_1216A
+		ble.s	+
 		moveq	#2,d0
-
-.loc_1216A:
++
 		add.w	d0,obY(a0)	; make the block sink with water level
 		bsr.w	ObjFloorDist
 		tst.w	d1
-		bpl.w	.stop07
+		bpl.s	.stop07
 		addq.w	#1,d1
 		add.w	d1,obY(a0)
-
-.stop07:
-		rts
+.stop07:	rts
 ; ===========================================================================
 
 loc_12180:
 		tst.b	lblk_untouched(a0) ; has block been stood on or touched?
-		beq.s	locret_121C0	; if yes, branch
+		beq.s	.return		; if yes, branch
 		btst	#3,obStatus(a0)	; is Sonic standing on it now?
-		bne.s	loc_1219A	; if yes, branch
+		bne.s	+		; if yes, branch
 		tst.b	objoff_3E(a0)
-		beq.s	locret_121C0
+		beq.s	.return
 		subq.b	#4,objoff_3E(a0)
-		bra.s	loc_121A6
-; ===========================================================================
-
-loc_1219A:
-		cmpi.b	#$40,objoff_3E(a0)
-		beq.s	locret_121C0
-		addq.b	#4,objoff_3E(a0)
-
-loc_121A6:
 		move.b	objoff_3E(a0),d0
 		jsr	(CalcSine).l
 		move.w	#$400,d1
@@ -203,6 +180,18 @@ loc_121A6:
 		swap	d0
 		add.w	lblk_origY(a0),d0
 		move.w	d0,obY(a0)
-
-locret_121C0:
+.return:	rts
+; ===========================================================================
++
+		cmpi.b	#$40,objoff_3E(a0)
+		beq.s	.return
+		addq.b	#4,objoff_3E(a0)
++
+		move.b	objoff_3E(a0),d0
+		jsr	(CalcSine).l
+		move.w	#$400,d1
+		muls.w	d1,d0
+		swap	d0
+		add.w	lblk_origY(a0),d0
+		move.w	d0,obY(a0)
 		rts
